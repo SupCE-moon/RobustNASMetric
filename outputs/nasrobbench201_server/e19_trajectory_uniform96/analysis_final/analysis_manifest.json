@@ -1,0 +1,9 @@
+{
+  "inputs": {
+    "zero_cost": "outputs\\nasrobbench201_server\\e19_zero_cost\\metrics_uniform512_fgsm_n64_seed0.csv",
+    "early_fidelity": "outputs\\nasrobbench201_server\\e19_trajectory_uniform96\\metrics_uniform96_e0e5e10.csv",
+    "mature_fidelity": "outputs\\nasrobbench201_server\\e17_full50_seed0\\analysis_final_stopped\\complete_metrics.csv"
+  },
+  "bootstrap_repeats": 2000,
+  "seed": 20260718
+}

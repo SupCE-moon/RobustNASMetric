@@ -1,0 +1,16 @@
+input,weight_step_size,metric,n,finite_n,spearman
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step0.csv,0.0,trnas_activation_psi,512,512,0.56706732666684
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step0.csv,0.0,trnas_consistency_phi,512,512,0.7766279663709441
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step0.csv,0.0,trnas_r_score,512,512,0.8042310262551317
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e6.csv,1e-06,trnas_activation_psi,512,512,0.56706732666684
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e6.csv,1e-06,trnas_consistency_phi,512,512,0.7888503780655344
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e6.csv,1e-06,trnas_r_score,512,512,0.8066951526708159
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e4.csv,0.0001,trnas_activation_psi,512,512,0.56706732666684
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e4.csv,0.0001,trnas_consistency_phi,512,498,0.8152324062687344
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e4.csv,0.0001,trnas_r_score,512,498,0.8300125914697696
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_fgsm_n64_seed0.csv,0.001,trnas_activation_psi,512,512,0.56706732666684
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_fgsm_n64_seed0.csv,0.001,trnas_consistency_phi,512,494,0.8235920891718879
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_fgsm_n64_seed0.csv,0.001,trnas_r_score,512,494,0.8397044875339119
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e2.csv,0.01,trnas_activation_psi,512,512,0.56706732666684
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e2.csv,0.01,trnas_consistency_phi,512,442,0.7561204036221182
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e2.csv,0.01,trnas_r_score,512,442,0.7852101327383955

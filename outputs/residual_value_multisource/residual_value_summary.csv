@@ -1,0 +1,15 @@
+baseline,candidate,baseline_r2,combined_r2,delta_r2,baseline_adj_r2,combined_adj_r2,delta_adj_r2,baseline_loocv_r2,combined_loocv_r2,delta_loocv_r2,target_residual_vs_candidate_pearson,partial_pearson,partial_spearman
+local_logit_lipschitz,feature_measure_spatial_gram_delta,0.867,0.871,0.00427,0.859,0.856,-0.0035,0.708,0.439,-0.269,-0.124,-0.179,-0.371
+local_logit_lipschitz,feature_measure_spatial_gram_rel_delta,0.867,0.867,0.000486,0.859,0.852,-0.00773,0.708,0.535,-0.173,-0.0367,-0.0604,-0.271
+local_logit_lipschitz,feature_measure_weighted_delta,0.867,0.872,0.00538,0.859,0.857,-0.00227,0.708,0.801,0.0933,0.0402,0.201,0.0577
+local_logit_lipschitz,feature_measure_robust_spatial_delta,0.867,0.867,0.000318,0.859,0.851,-0.00792,0.708,0.697,-0.0111,0.0129,0.0488,-0.0749
+local_logit_lipschitz,feature_measure_robust_spatial_rel_delta,0.867,0.867,0.000295,0.859,0.851,-0.00795,0.708,0.701,-0.00647,0.0155,0.047,-0.0581
+local_logit_lipschitz,feature_measure_robust_hybrid_delta,0.867,0.873,0.00605,0.859,0.858,-0.00152,0.708,0.811,0.103,0.0559,0.213,0.0204
+local_logit_lipschitz,feature_measure_robust_hybrid_rel_delta,0.867,0.868,0.00113,0.859,0.852,-0.00702,0.708,0.779,0.0708,0.0254,0.0919,-0.0889
+input_grad_l2,feature_measure_spatial_gram_delta,0.862,0.867,0.00498,0.854,0.851,-0.003,-0.0998,-3.44,-3.34,-0.132,-0.19,-0.42
+input_grad_l2,feature_measure_spatial_gram_rel_delta,0.862,0.863,0.0005,0.854,0.846,-0.00801,-0.0998,-1.65,-1.55,-0.0364,-0.0602,-0.332
+input_grad_l2,feature_measure_weighted_delta,0.862,0.867,0.00516,0.854,0.852,-0.0028,-0.0998,0.801,0.9,0.0371,0.193,0.00693
+input_grad_l2,feature_measure_robust_spatial_delta,0.862,0.862,0.000159,0.854,0.846,-0.00839,-0.0998,-0.771,-0.671,0.00883,0.0339,-0.184
+input_grad_l2,feature_measure_robust_spatial_rel_delta,0.862,0.862,0.000237,0.854,0.846,-0.0083,-0.0998,-0.496,-0.396,0.0135,0.0414,-0.123
+input_grad_l2,feature_measure_robust_hybrid_delta,0.862,0.868,0.006,0.854,0.853,-0.00186,-0.0998,0.816,0.916,0.0533,0.209,-0.0511
+input_grad_l2,feature_measure_robust_hybrid_rel_delta,0.862,0.863,0.00104,0.854,0.847,-0.0074,-0.0998,0.00403,0.104,0.0234,0.0868,-0.202

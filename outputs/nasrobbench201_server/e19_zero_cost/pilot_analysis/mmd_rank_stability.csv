@@ -1,0 +1,5 @@
+experiment,epoch_left,epoch_right,n,mmd_rank_stability
+E16-early-fidelity,5,10,512,0.8181795098476786
+E17-mature-fidelity,10,25,91,0.5197642936773372
+E17-mature-fidelity,10,50,91,0.46896002548176463
+E17-mature-fidelity,25,50,91,0.5254021340977862

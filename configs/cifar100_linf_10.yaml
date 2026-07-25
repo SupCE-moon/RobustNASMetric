@@ -1,0 +1,19 @@
+dataset: cifar100
+threat_model: Linf
+num_classes: 100
+epsilon: 0.03137254901960784  # 8 / 255
+data_root: null
+model_dir: models
+batch_size: 32
+num_workers: 2
+models:
+  - Gowal2020Uncovering
+  - Gowal2020Uncovering_extra
+  - Chen2020Efficient
+  - Wu2020Adversarial
+  - Sehwag2021Proxy
+  - Sitawarin2020Improving
+  - Hendrycks2019Using
+  - Rice2020Overfitting
+  - Rebuffi2021Fixing_R18_ddpm
+  - Rade2021Helper_R18_ddpm

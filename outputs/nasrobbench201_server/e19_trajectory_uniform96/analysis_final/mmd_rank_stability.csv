@@ -1,0 +1,7 @@
+experiment,epoch_left,epoch_right,n,mmd_rank_stability
+E19-matched-trajectory,0,5,96,0.2327183939229517
+E19-matched-trajectory,0,10,96,0.27407759088442757
+E19-matched-trajectory,5,10,96,0.6540694519804666
+E17-mature-fidelity,10,25,91,0.5197642936773372
+E17-mature-fidelity,10,50,91,0.46896002548176463
+E17-mature-fidelity,25,50,91,0.5254021340977862

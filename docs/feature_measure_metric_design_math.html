@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feature Measure ROBUST Metric Design</title>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["\\(", "\\)"]],
+        displayMath: [["\\[", "\\]"]]
+      },
+      svg: { fontCache: "global" }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    body {
+      max-width: 1040px;
+      margin: 32px auto;
+      padding: 0 24px 56px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      color: #202124;
+      line-height: 1.68;
+      background: #fbfbfb;
+    }
+    h1 { font-size: 30px; margin-bottom: 4px; }
+    h2 {
+      font-size: 21px;
+      margin-top: 34px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #dadce0;
+    }
+    h3 { font-size: 17px; margin-top: 24px; }
+    .meta { color: #5f6368; margin-bottom: 26px; }
+    .math-block {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      overflow-x: auto;
+    }
+    .note {
+      background: #fff8e1;
+      border: 1px solid #f2d36b;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin: 18px 0;
+    }
+    code {
+      background: #f1f3f4;
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      margin: 14px 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #f1f3f4; }
+  </style>
+</head>
+<body>
+  <h1>Feature Measure ROBUST Metric Design</h1>
+  <p class="meta">Date: 2026-07-04 | MathJax rendered formula version</p>
+
+  <div class="note">
+    这一版只讨论两个对象：RobNets 论文中的严格 FSP，以及我们的 measure-based ROBUST metric。旧字段 <code>fsp_delta</code> 是 normalized same-layer Gram 变体，不再当作原始 FSP。
+  </div>
+
+  <h2>1. Strict FSP From RobNets</h2>
+  <p><em>When NAS Meets Robustness</em> 对第 \(l\) 个 cell 的 FSP 矩阵定义为 cell 输入特征和输出特征的跨层 Gramian：</p>
+  <div class="math-block">
+    \[
+    G_l(x;\theta)=
+    \frac{1}{h w}
+    \sum_{s=1}^{h}\sum_{t=1}^{w}
+    F^{\mathrm{in}}_{l,s,t}(x;\theta)
+    \left(F^{\mathrm{out}}_{l,s,t}(x;\theta)\right)^{\top}.
+    \]
+  </div>
+
+  <p>若把同一空间位置的输入/输出特征看成成对原子：</p>
+  <div class="math-block">
+    \[
+    \left(a^{\mathrm{in}}_{l,s}(x),a^{\mathrm{out}}_{l,s}(x)\right)
+    \in \mathbb{R}^{C_{\mathrm{in}}}\times\mathbb{R}^{C_{\mathrm{out}}},
+    \]
+  </div>
+  <p>则 FSP 是这个 joint empirical measure 的二阶交叉矩：</p>
+  <div class="math-block">
+    \[
+    G_l(x;\theta)=
+    \int a^{\mathrm{in}}\left(a^{\mathrm{out}}\right)^{\top}
+    \,d\rho_l^x(a^{\mathrm{in}},a^{\mathrm{out}})
+    =
+    \frac{1}{S_l}
+    \sum_{s=1}^{S_l}
+    a^{\mathrm{in}}_{l,s}(x)
+    \left(a^{\mathrm{out}}_{l,s}(x)\right)^{\top}.
+    \]
+  </div>
+
+  <p>论文中的 FSP loss 是：</p>
+  <div class="math-block">
+    \[
+    L^{\mathrm{FSP}}_l
+    =
+    \frac{1}{N}
+    \sum_x
+    \left\|G_l(x;\theta)-G_l(x';\theta)\right\|_F^2.
+    \]
+  </div>
+
+  <div class="note">
+    关键修正：原始 FSP loss 没有 \(\|G_l(x;\theta)\|_F+\varepsilon\) 这样的分母。FSP 矩阵内部只有空间平均 \(1/(hw)\)，loss 外部只有样本平均。
+  </div>
+
+  <p>RobustBench 模型没有统一的 cell input/output API，因此当前实验用相邻选中 4D activation 近似 cell 输入/输出流：</p>
+  <div class="math-block">
+    \[
+    \widehat{G}_{i,j}(x)
+    =
+    \frac{1}{S}
+    \sum_{s=1}^{S}
+    a_{i,s}(x)a_{j,s}(x)^{\top},
+    \quad i<j.
+    \]
+  </div>
+  <div class="math-block">
+    \[
+    \mathrm{fsp\_strict\_delta}
+    =
+    \frac{1}{|\mathcal{P}|}
+    \sum_{(i,j)\in\mathcal{P}}
+    \frac{1}{N}\sum_x
+    \left\|
+    \widehat{G}_{i,j}(x_{\mathrm{adv}})
+    -
+    \widehat{G}_{i,j}(x)
+    \right\|_F^2.
+    \]
+  </div>
+
+  <h2>2. First-Order vs Second-Order</h2>
+  <p>第 \(l\) 层 feature map 为：</p>
+  <div class="math-block">
+    \[
+    F_l(x)\in\mathbb{R}^{C_l\times H_l\times W_l}.
+    \]
+  </div>
+  <p>每个空间位置给出一个局部特征原子：</p>
+  <div class="math-block">
+    \[
+    a_{l,s}(x)=F_l(x)[:,h,w]\in\mathbb{R}^{C_l}.
+    \]
+  </div>
+
+  <p>整层 feature map 可以看成 feature space 上的经验测度：</p>
+  <div class="math-block">
+    \[
+    \mu_l^x
+    =
+    \frac{1}{S_l}
+    \sum_{s=1}^{S_l}
+    \delta_{a_{l,s}(x)}.
+    \]
+  </div>
+  <p>\(\delta_a\) 是位于 \(a\) 点的 Dirac measure，即全部概率质量集中在一个特征向量上。因此 \(\mu_l^x\) 就是这一层所有空间特征向量形成的经验分布。</p>
+
+  <h3>First-Order</h3>
+  <p>测度的一阶矩是均值：</p>
+  <div class="math-block">
+    \[
+    m_l(x)=
+    \int a\,d\mu_l^x(a)
+    =
+    \frac{1}{S_l}\sum_{s=1}^{S_l}a_{l,s}(x).
+    \]
+  </div>
+  <p>但只用 \(m_l(x)\) 就退化成 GAP。我们的 first-order 项不用 GAP，而是直接测量局部特征原子的位移：</p>
+  <div class="math-block">
+    \[
+    u_{l,s}(x)=
+    \frac{a_{l,s}(x)}{\|a_{l,s}(x)\|_2+\varepsilon},
+    \quad
+    w_{l,s}(x)=
+    \frac{\|a_{l,s}(x)\|_2}
+    {\sum_t\|a_{l,t}(x)\|_2+\varepsilon}.
+    \]
+  </div>
+  <div class="math-block">
+    \[
+    D^{(1)}_l(x,x_{\mathrm{adv}})
+    =
+    \sum_{s=1}^{S_l}
+    w_{l,s}(x)
+    \left\|
+    u_{l,s}(x_{\mathrm{adv}})-u_{l,s}(x)
+    \right\|_2.
+    \]
+  </div>
+  <p>这里的一阶不是“泰勒一阶”，而是“测度矩的一阶”：它关心单个 feature atom 的直接移动。</p>
+
+  <h3>Second-Order</h3>
+  <p>二阶矩描述 feature 之间的相互作用。单层形式是：</p>
+  <div class="math-block">
+    \[
+    M_l(x)=
+    \int aa^\top\,d\mu_l^x(a)
+    =
+    \frac{1}{S_l}\sum_s a_{l,s}(x)a_{l,s}(x)^\top.
+    \]
+  </div>
+  <p>FSP 是跨层二阶矩，它衡量同一空间位置上输入侧特征与输出侧特征如何共同激活：</p>
+  <div class="math-block">
+    \[
+    G_l(x)=
+    \int a^{\mathrm{in}}
+    \left(a^{\mathrm{out}}\right)^\top
+    d\rho_l^x.
+    \]
+  </div>
+
+  <h2>3. Our ROBUST Metric</h2>
+  <p>我们的 ROBUST metric 保留 FSP 的 feature-flow 二阶结构，同时加入直接的 feature-measure 位移。为了让组合项不被通道数尺度压住，严格 FSP baseline 仍保留论文式平方 Frobenius；但 ROBUST 的二阶项使用每个 FSP 矩阵元素的 RMS 变化：</p>
+  <div class="math-block">
+    \[
+    \widetilde{D}^{(2)}_{i,j}(x,x_{\mathrm{adv}})
+    =
+    \frac{1}{\sqrt{C_iC_j}}
+    \left\|
+    \widehat{G}_{i,j}(x_{\mathrm{adv}})
+    -
+    \widehat{G}_{i,j}(x)
+    \right\|_F.
+    \]
+  </div>
+  <div class="math-block">
+    \[
+    D^{(1)}_{i,j}
+    =
+    \frac{1}{2}\left(D^{(1)}_i+D^{(1)}_j\right).
+    \]
+  </div>
+  <div class="math-block">
+    \[
+    D^{\mathrm{ROBUST}}_{i,j}
+    =
+    \widetilde{D}^{(2)}_{i,j}
+    +
+    \lambda D^{(1)}_{i,j},
+    \quad \lambda=1.
+    \]
+  </div>
+  <div class="math-block">
+    \[
+    \mathrm{feature\_measure\_robust\_delta}
+    =
+    \frac{1}{|\mathcal{P}|}
+    \sum_{(i,j)\in\mathcal{P}}
+    D^{\mathrm{ROBUST}}_{i,j}.
+    \]
+  </div>
+
+  <h2>4. Strict FSP vs ROBUST</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Strict FSP</th>
+        <th>Our ROBUST metric</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Main object</td>
+        <td>Cross-layer FSP matrix</td>
+        <td>Feature measure plus cross-layer FSP matrix</td>
+      </tr>
+      <tr>
+        <td>Mathematical order</td>
+        <td>Second-order only</td>
+        <td>First-order local displacement plus second-order feature flow</td>
+      </tr>
+      <tr>
+        <td>Formula core</td>
+        <td>\(\|G(x_{\mathrm{adv}})-G(x)\|_F^2\)</td>
+        <td>\(\widetilde{D}^{(2)}+\lambda D^{(1)}\)</td>
+      </tr>
+      <tr>
+        <td>GAP usage</td>
+        <td>No</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>Denominator by \(\|G(x)\|\)</td>
+        <td>No</td>
+        <td>No; only dimension RMS scaling by \(\sqrt{C_iC_j}\)</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

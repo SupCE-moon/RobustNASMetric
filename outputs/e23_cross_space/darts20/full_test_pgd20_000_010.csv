@@ -1,0 +1,11 @@
+arch_id,checkpoint_epoch,checkpoint_path,evaluation_samples,pgd_steps,epsilon,full_clean_accuracy,full_pgd20_accuracy
+0,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_0_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.7623,0.4786
+1,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_1_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.7629,0.4709
+2,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_2_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.7657,0.4772
+3,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_3_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.7668,0.4706
+4,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_4_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.7555,0.471
+5,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_5_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.7639,0.4759
+6,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_6_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.761,0.4765
+7,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_7_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.773,0.4849
+8,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_8_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.7598,0.47
+9,100,outputs/e23_cross_space/darts20/shard_000_010/checkpoints/arch_9_epoch_100_seed_0.pt,10000,20,0.03137254901960784,0.7603,0.4714

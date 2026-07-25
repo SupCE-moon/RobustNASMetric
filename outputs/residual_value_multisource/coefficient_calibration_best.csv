@@ -1,0 +1,9 @@
+combo,baseline,lambda,pearson,spearman,direction
+hybrid_plus_lambda_weighted,,-3.0,0.934,0.275,higher_is_better
+hybrid_rel_plus_lambda_weighted,,-0.3,-0.779,-0.194,lower_is_better
+input_grad_l2_plus_gamma_feature_measure_spatial_gram_delta,input_grad_l2,0.0,-0.928,-0.538,lower_is_better
+input_grad_l2_plus_gamma_feature_measure_spatial_gram_rel_delta,input_grad_l2,0.0,-0.928,-0.538,lower_is_better
+local_logit_lipschitz_plus_gamma_feature_measure_spatial_gram_delta,local_logit_lipschitz,0.1,-0.933,-0.394,lower_is_better
+local_logit_lipschitz_plus_gamma_feature_measure_spatial_gram_rel_delta,local_logit_lipschitz,0.0,-0.931,-0.29,lower_is_better
+spatial_plus_lambda_weighted,,-3.0,0.863,-0.427,higher_is_better
+spatial_rel_plus_lambda_weighted,,-3.0,0.894,-0.331,higher_is_better

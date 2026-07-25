@@ -1,0 +1,29 @@
+dataset: cifar10
+threat_model: Linf
+num_classes: 10
+epsilon: 0.03137254901960784  # 8 / 255
+data_root: null
+model_dir: models
+batch_size: 128
+num_workers: 2
+models:
+  - Standard
+  - Engstrom2019Robustness
+  - Rice2020Overfitting
+  - Wong2020Fast
+  - Carmon2019Unlabeled
+  - Hendrycks2019Using
+  - Zhang2019Theoretically
+  - Chen2020Adversarial
+  - Huang2020Self
+  - Pang2020Boosting
+  - Sehwag2020Hydra
+  - Gowal2020Uncovering_28_10_extra
+  - Gowal2020Uncovering_34_20
+  - Sehwag2021Proxy_R18
+  - Sehwag2021Proxy
+  - Chen2020Efficient
+  - Rebuffi2021Fixing_R18_ddpm
+  - Rade2021Helper_R18_ddpm
+  - Addepalli2022Efficient_RN18
+  - Wang2023Better_WRN-28-10

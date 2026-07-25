@@ -1,0 +1,19 @@
+﻿input: outputs\cross_dataset\metrics_mnist_legacy_fgsm_n128_seed20260704.csv
+models: 6
+target: adv_acc
+
+metric,pearson,spearman,kendall_tau_a,empirical_direction
+logit_kl,-0.941,-0.841,-0.714,lower_is_better
+input_grad_l2,-0.398,-0.493,-0.429,lower_is_better
+local_logit_lipschitz,-0.924,-0.841,-0.714,lower_is_better
+margin_input_grad_ratio,0.0871,0.058,0,higher_is_better
+feature_measure_flow_rel_delta,-0.924,-0.754,-0.571,lower_is_better
+feature_measure_spatial_gram_delta,0.933,0.841,0.714,higher_is_better
+feature_measure_spatial_gram_rel_delta,-0.833,-0.812,-0.714,lower_is_better
+feature_measure_robust_spatial_delta,-0.91,-0.754,-0.571,lower_is_better
+feature_measure_robust_spatial_rel_delta,-0.897,-0.754,-0.571,lower_is_better
+feature_measure_robust_hybrid_delta,-0.914,-0.841,-0.714,lower_is_better
+feature_measure_robust_hybrid_rel_delta,-0.912,-0.928,-0.857,lower_is_better
+fsp_delta,-0.913,-0.754,-0.571,lower_is_better
+
+# skipped_missing_metrics=feature_delta,feature_measure_swd,feature_measure_mmd,feature_measure_cov_delta,feature_measure_moment_delta,feature_measure_local_delta,feature_measure_weighted_delta,feature_measure_struct_delta,feature_measure_struct01_delta,perturbation_capacity_delta,natural_loss,adversarial_loss,input_loss_delta,feature_measure_flow_delta,feature_measure_relu_active_delta,feature_measure_relu_active_spatial_delta,feature_measure_relu_active_spatial_rel_delta,feature_measure_relu_active_hybrid_delta,feature_measure_relu_active_hybrid_rel_delta,feature_measure_robust_delta,feature_measure_robust_rel_delta,fsp_strict_delta

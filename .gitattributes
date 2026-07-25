@@ -1,0 +1,20 @@
+# Normalize text files across Windows and Linux research environments.
+* text=auto eol=lf
+
+# Keep generated binary assets byte-for-byte.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pt binary
+*.pth binary
+*.ckpt binary
+*.safetensors binary
+*.npy binary
+*.npz binary
+*.mat binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.pdf binary

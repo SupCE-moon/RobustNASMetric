@@ -1,0 +1,277 @@
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\title{Feature-Measure Robustness: A Representation-Level Proxy for Robust Neural Architecture Search}
+
+\author{
+  Anonymous Authors\\
+  Anonymous Institution\\
+  \texttt{anonymous@example.com}
+}
+
+\date{}
+
+\newcommand{\xadv}{x_{\mathrm{adv}}}
+\newcommand{\xadvA}{x_{\mathrm{adv}}(\mathcal{A})}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\W}{\mathcal{W}}
+\newcommand{\muX}{\mu_l^x}
+\newcommand{\muA}{\mu_l^{\xadv}}
+\newcommand{\FM}{D_{\mathrm{FM}}}
+\newcommand{\Ours}{\textsc{FeatureMeasure}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Robust neural architecture search aims to identify architectures that preserve predictive reliability under adversarial perturbations, but evaluating robustness during search is expensive because adversarial training and strong attacks must be repeatedly applied to many candidate architectures.
+This paper studies a representation-level robustness proxy for robust NAS.
+Instead of measuring robustness only at the input gradient or output logit level, we model intermediate feature maps as empirical measures and quantify how adversarial perturbations displace feature distributions and their spatial co-activation structure.
+The proposed metric is designed to serve as a low-cost ranking signal for architecture robustness before or during search.
+We evaluate the metric on RobustBench model pools and legacy MNIST/SVHN checkpoints, comparing it against FSP-based perturbation measures, input-gradient metrics, and local logit Lipschitz proxies.
+Preliminary validation on CIFAR10, CIFAR100, ImageNet, MNIST, and SVHN suggests that feature-measure displacement captures complementary robustness information, especially when spatial Gram structure is included.
+\end{abstract}
+
+\section{Introduction}
+
+Adversarial robustness has become a central requirement for deployable neural networks.
+However, robust models are not determined only by training algorithms; architecture choices also shape the stability of intermediate representations.
+Robust NAS therefore seeks architectures that are naturally more stable under adversarial perturbations.
+
+The main difficulty is evaluation cost.
+During NAS, thousands of candidate architectures may need to be ranked.
+Directly adversarially training and attacking every candidate is computationally prohibitive.
+Existing proxies such as input-gradient norm, output-margin sensitivity, local logit Lipschitz estimates, and FSP feature perturbation provide cheaper signals, but they either focus on the input-output map or use limited representation statistics.
+
+This work asks the following question:
+\begin{quote}
+Can adversarial robustness be predicted from the displacement of feature-space empirical measures and their spatial co-activation structure?
+\end{quote}
+
+Our hypothesis is that adversarial vulnerability appears first as unstable propagation of feature measures.
+If a small input perturbation induces a large displacement in intermediate feature distributions or spatial co-activation patterns, the architecture is more likely to produce unstable final logits.
+
+\paragraph{Contributions.}
+This paper will develop and validate the following contributions:
+\begin{itemize}
+  \item A measure-theoretic formulation of feature-space robustness based on empirical feature measures induced by clean and adversarial samples.
+  \item A second-order spatial Gram displacement metric that captures perturbation-induced changes in local feature co-activation.
+  \item A cross-dataset validation protocol on CIFAR10, CIFAR100, ImageNet, MNIST, and SVHN.
+  \item A robust NAS experimental framework that uses the proposed metric as a ranking proxy or auxiliary objective.
+\end{itemize}
+
+\section{Related Work}
+
+\paragraph{Adversarial robustness benchmarks.}
+RobustBench and AutoAttack provide standardized evaluation protocols for adversarial robustness.
+They make it possible to compare models using official robust accuracy under fixed threat models.
+In this paper, RobustBench model pools are used as external validation targets for CIFAR10, CIFAR100, and ImageNet.
+
+\paragraph{Robust neural architecture search.}
+Prior work has shown that architectures differ substantially in adversarial robustness even under similar training settings.
+Two particularly relevant lines are robust architecture discovery and accuracy-robustness trade-off aware NAS.
+This paper positions the proposed metric as a cheaper representation-level proxy that can be plugged into these robust NAS pipelines.
+
+\paragraph{Representation-level robustness metrics.}
+Feature scattering, FSP matrices, Jacobian-based measures, and logit Lipschitz proxies have been used to estimate robustness.
+FSP-based metrics compare layer-pair feature flow statistics, while gradient and logit metrics focus on local sensitivity.
+Our metric differs by treating feature maps as empirical measures and by explicitly measuring spatial Gram displacement.
+
+\section{Method}
+
+\subsection{Feature Maps as Empirical Measures}
+
+Let $f_{\theta}: \mathcal{X} \to \R^K$ be a neural network and let
+$F_l(x) \in \R^{C_l \times H_l \times W_l}$ denote the feature map at layer $l$.
+Let $S_l = H_l W_l$ be the number of spatial locations.
+For each spatial location $s$, define the local feature atom
+\begin{equation}
+  a_{l,s}(x) \in \R^{C_l}.
+\end{equation}
+
+The clean feature map induces an empirical measure
+\begin{equation}
+  \mu_l^x = \frac{1}{S_l}\sum_{s=1}^{S_l} \delta_{a_{l,s}(x)},
+\end{equation}
+where $\delta_a$ is the Dirac measure at feature vector $a$.
+Similarly, an adversarial example $\xadv$ induces
+\begin{equation}
+  \mu_l^{\xadv} = \frac{1}{S_l}\sum_{s=1}^{S_l} \delta_{a_{l,s}(\xadv)}.
+\end{equation}
+
+This formulation makes robustness a question about how much the clean feature measure moves under adversarial perturbation.
+
+\subsection{First-Order Feature Displacement}
+
+A first-order displacement compares the locations of feature atoms:
+\begin{equation}
+  D_l^{(1)}(x,\xadv)
+  =
+  \frac{1}{S_l}
+  \sum_{s=1}^{S_l}
+  \left\|
+  \hat{a}_{l,s}(x) - \hat{a}_{l,s}(\xadv)
+  \right\|_2,
+\end{equation}
+where $\hat{a}$ denotes channel-normalized features.
+This term captures direct movement of local feature vectors.
+
+\subsection{Second-Order Spatial Gram Displacement}
+
+Robustness is not only about whether individual feature atoms move, but also whether spatial co-activation structure remains stable.
+For each layer, flatten $F_l(x)$ into $A_l(x) \in \R^{C_l \times S_l}$ and define the spatial Gram matrix
+\begin{equation}
+  G_l^{\mathrm{sp}}(x)
+  =
+  \frac{1}{C_l}
+  \hat{A}_l(x)^\top \hat{A}_l(x)
+  \in \R^{S_l \times S_l}.
+\end{equation}
+
+The spatial Gram displacement is
+\begin{equation}
+  D_l^{(2)}(x,\xadv)
+  =
+  \frac{
+  \left\|
+  G_l^{\mathrm{sp}}(x) - G_l^{\mathrm{sp}}(\xadv)
+  \right\|_F
+  }{
+  S_l
+  }.
+\end{equation}
+
+The final feature-measure robustness score aggregates layers:
+\begin{equation}
+  \FM(x,\xadv)
+  =
+  \sum_{l \in \mathcal{L}}
+  \alpha_l
+  D_l^{(2)}(x,\xadv)
+  +
+  \lambda
+  \sum_{l \in \mathcal{L}}
+  \beta_l
+  D_l^{(1)}(x,\xadv).
+\end{equation}
+
+In the current paper direction, the second-order term is the primary object of study, while the first-order term is used for ablation.
+
+\subsection{Use in Robust NAS}
+
+For a candidate architecture $\mathcal{A}$, define its proxy robustness score as
+\begin{equation}
+  \mathcal{R}_{\mathrm{proxy}}(\mathcal{A})
+  =
+  - \E_{(x,y)\sim \mathcal{D}}
+  \left[
+  \FM(x, \xadvA)
+  \right].
+\end{equation}
+Lower feature-measure displacement implies higher proxy robustness.
+This score can be used for:
+\begin{itemize}
+  \item pre-search filtering of candidate architectures;
+  \item search-time auxiliary scoring;
+  \item post-search re-ranking before full adversarial training.
+\end{itemize}
+
+\section{Experimental Framework}
+
+\subsection{Validation Before Search}
+
+Before integrating the metric into NAS, we validate whether it ranks known models consistently with robust accuracy.
+This stage is essential because a weak robustness proxy would only inject noise into the search process.
+
+\paragraph{Datasets.}
+The validation suite includes CIFAR10, CIFAR100, ImageNet, MNIST, and SVHN.
+
+\paragraph{Model pools.}
+CIFAR10, CIFAR100, and ImageNet use RobustBench models where available.
+MNIST and SVHN use legacy checkpoints as an internal validation set because they are not covered by the current RobustBench model zoo used in this project.
+
+\paragraph{Targets.}
+For RobustBench datasets, the target is official robust accuracy.
+For MNIST and SVHN legacy models, the target is same-run white-box adversarial accuracy.
+
+\subsection{Baselines}
+
+We compare against:
+\begin{itemize}
+  \item FSP perturbation metrics;
+  \item input gradient norm;
+  \item local logit Lipschitz estimates;
+  \item margin-input-gradient ratio;
+  \item logit KL divergence between clean and adversarial predictions.
+\end{itemize}
+
+\subsection{Metrics}
+
+The primary statistic is Spearman rank correlation with robust accuracy.
+Pearson correlation and Kendall rank correlation are reported as secondary statistics.
+Residual-value experiments test whether the proposed metric explains robustness differences not already captured by gradient or logit baselines.
+
+\subsection{Search Experiments}
+
+The later NAS section should include:
+\begin{itemize}
+  \item search space: NAS-Bench-201 or a DARTS-style cell space;
+  \item proxy stage: rank candidate architectures using \Ours{};
+  \item retraining stage: adversarially train selected architectures;
+  \item final evaluation: AutoAttack or RobustBench-compatible attacks;
+  \item efficiency analysis: GPU hours saved relative to full adversarial evaluation.
+\end{itemize}
+
+\section{Preliminary Results}
+
+\begin{table}[t]
+  \centering
+  \caption{Preliminary cross-dataset validation. Values are absolute Spearman correlations.}
+  \label{tab:prelim}
+  \begin{tabular}{lcccc}
+    \toprule
+    Dataset & Models & Target & Best Ours & FSP \\
+    \midrule
+    CIFAR100 & 10 & RB Acc. & 0.3697 & 0.0667 \\
+    ImageNet & 5 & RB Acc. & 0.8000 & 0.7000 \\
+    MNIST & 6 & FGSM Acc. & 0.9276 & 0.7537 \\
+    SVHN & 8 & FGSM Acc. & 0.5988 & 0.2635 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The preliminary results suggest that spatial feature-measure displacement is promising but not yet uniformly dominant.
+On CIFAR100, local logit Lipschitz remains stronger, indicating that normalization and shared-adversarial evaluation need further refinement.
+On ImageNet, MNIST, and SVHN, the proposed metric shows competitive or stronger rank correlation than FSP.
+
+\section{Discussion}
+
+The central research value of this direction is not merely to beat every existing metric on every benchmark.
+Rather, the proposed metric provides an architecture-interpretable representation-level view of robustness.
+For robust NAS, this matters because architecture search requires signals that can explain why one architecture is more stable than another, not only signals that score one fixed trained model.
+
+\section{Limitations}
+
+Current limitations include small ImageNet model count, legacy MNIST/SVHN validation targets, and dataset-dependent metric direction.
+The next experimental stage should expand model pools, introduce shared adversarial caches from multiple source models, and run residual-value analysis against strong gradient/logit baselines.
+
+\section{Conclusion}
+
+This paper proposes feature-measure robustness as a representation-level proxy for robust NAS.
+By comparing clean and adversarial feature measures, especially their spatial Gram structure, the metric aims to provide a cheaper and more architecture-aware ranking signal.
+Preliminary cross-dataset results support further development toward a full robust NAS pipeline.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,17 @@
+﻿input: outputs\metrics_baseline_smoke10_pgd3_n512_v2.csv
+models: 10
+target: adv_acc
+
+metric,pearson,spearman,kendall_tau_a,empirical_direction
+feature_delta,-0.995,-0.697,-0.511,lower_is_better
+perturbation_capacity_delta,-0.974,-0.394,-0.378,lower_is_better
+logit_kl,-0.989,-0.745,-0.6,lower_is_better
+natural_loss,0.658,0.394,0.244,higher_is_better
+adversarial_loss,-0.989,-0.527,-0.422,lower_is_better
+input_loss_delta,-0.989,-0.818,-0.689,lower_is_better
+input_grad_l2,-0.99,-0.782,-0.6,lower_is_better
+local_logit_lipschitz,-0.991,-0.673,-0.511,lower_is_better
+margin_input_grad_ratio,-0.988,-0.782,-0.556,lower_is_better
+fsp_delta,-0.971,-0.891,-0.778,lower_is_better
+
+# skipped_missing_metrics=feature_measure_swd,feature_measure_mmd,feature_measure_cov_delta,feature_measure_moment_delta,feature_measure_local_delta,feature_measure_weighted_delta,feature_measure_struct_delta,feature_measure_struct01_delta,feature_measure_flow_delta,feature_measure_flow_rel_delta,feature_measure_spatial_gram_delta,feature_measure_spatial_gram_rel_delta,feature_measure_relu_active_delta,feature_measure_relu_active_spatial_delta,feature_measure_relu_active_spatial_rel_delta,feature_measure_relu_active_hybrid_delta,feature_measure_relu_active_hybrid_rel_delta,feature_measure_robust_delta,feature_measure_robust_rel_delta,feature_measure_robust_spatial_delta,feature_measure_robust_spatial_rel_delta,feature_measure_robust_hybrid_delta,feature_measure_robust_hybrid_rel_delta,fsp_strict_delta

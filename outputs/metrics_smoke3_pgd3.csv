@@ -1,0 +1,4 @@
+model_name,dataset,threat_model,attack,batch_size,feature_delta,perturbation_capacity_delta,logit_kl,clean_acc,adv_acc,num_layers
+Standard,cifar10,Linf,pgd-lite,64,0.40269631147384644,0.0835379809141159,18.437028884887695,0.921875,0.046875,4
+Rice2020Overfitting,cifar10,Linf,pgd-lite,64,0.06363504379987717,0.03472975268959999,0.08631102740764618,0.84375,0.703125,4
+Wong2020Fast,cifar10,Linf,pgd-lite,64,0.08046683669090271,0.03350783511996269,0.09721118211746216,0.84375,0.625,4

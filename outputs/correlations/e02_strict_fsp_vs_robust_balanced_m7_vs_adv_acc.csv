@@ -1,0 +1,8 @@
+﻿input: outputs\metrics_strict_fsp_vs_robust_balanced_seed20260704_m7.csv
+models: 7
+target: adv_acc
+
+metric,pearson,spearman,kendall_tau_a,empirical_direction
+fsp_strict_delta,-0.984,-0.464,-0.429,lower_is_better
+feature_measure_robust_delta,-0.992,-0.857,-0.714,lower_is_better
+feature_measure_weighted_delta,-0.993,-0.786,-0.714,lower_is_better

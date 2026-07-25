@@ -1,0 +1,41 @@
+﻿input: outputs\metrics_20_whitebox_pgd10_n64_attack_ablation_with_rb_scores.csv
+models: 20
+target: rb_robust_acc
+
+metric,pearson,spearman,kendall_tau_b,expected_direction,observed_correlation_sign,direction_agreement
+feature_delta,-0.868,-0.182,-0.116,lower_is_better,negative,yes
+feature_measure_swd,-0.929,-0.481,-0.337,lower_is_better,negative,yes
+feature_measure_mmd,0.0173,-0.217,-0.147,lower_is_better,positive,no
+feature_measure_cov_delta,-0.943,-0.499,-0.347,lower_is_better,negative,yes
+feature_measure_moment_delta,-0.884,-0.377,-0.274,lower_is_better,negative,yes
+feature_measure_local_delta,-0.93,-0.311,-0.221,lower_is_better,negative,yes
+feature_measure_weighted_delta,-0.927,-0.274,-0.2,lower_is_better,negative,yes
+feature_measure_struct_delta,-0.926,-0.439,-0.316,lower_is_better,negative,yes
+feature_measure_struct01_delta,-0.876,-0.469,-0.347,lower_is_better,negative,yes
+perturbation_capacity_delta,-0.929,-0.573,-0.432,lower_is_better,negative,yes
+perturbation_capacity_relu_active_delta,-0.94,-0.602,-0.484,lower_is_better,negative,yes
+perturbation_capacity_above_mean_delta,-0.949,-0.541,-0.421,lower_is_better,negative,yes
+logit_kl,-0.928,-0.346,-0.232,lower_is_better,negative,yes
+natural_loss,0.151,0.0226,0,lower_is_better,positive,no
+adversarial_loss,-0.932,-0.862,-0.695,lower_is_better,negative,yes
+input_loss_delta,-0.929,-0.475,-0.337,lower_is_better,negative,yes
+input_grad_l2,-0.927,-0.429,-0.274,lower_is_better,negative,yes
+local_logit_lipschitz,-0.933,-0.317,-0.2,lower_is_better,negative,yes
+margin_input_grad_ratio,-0.925,-0.235,-0.126,higher_is_better,negative,no
+feature_measure_flow_delta,0.212,0.164,0.116,lower_is_better,positive,no
+feature_measure_flow_rel_delta,-0.907,-0.183,-0.0947,lower_is_better,negative,yes
+feature_measure_spatial_gram_delta,-0.708,-0.43,-0.295,lower_is_better,negative,yes
+feature_measure_spatial_gram_rel_delta,-0.74,-0.208,-0.158,lower_is_better,negative,yes
+feature_measure_relu_active_delta,-0.932,-0.319,-0.211,lower_is_better,negative,yes
+feature_measure_relu_active_spatial_delta,-0.696,-0.436,-0.305,lower_is_better,negative,yes
+feature_measure_relu_active_spatial_rel_delta,-0.721,-0.192,-0.158,lower_is_better,negative,yes
+feature_measure_relu_active_hybrid_delta,-0.913,-0.284,-0.2,lower_is_better,negative,yes
+feature_measure_relu_active_hybrid_rel_delta,-0.913,-0.305,-0.211,lower_is_better,negative,yes
+feature_measure_robust_delta,-0.89,0.0271,0.0421,lower_is_better,negative,yes
+feature_measure_robust_rel_delta,-0.915,-0.227,-0.158,lower_is_better,negative,yes
+feature_measure_robust_spatial_delta,-0.921,-0.328,-0.232,lower_is_better,negative,yes
+feature_measure_robust_spatial_rel_delta,-0.899,-0.304,-0.211,lower_is_better,negative,yes
+feature_measure_robust_hybrid_delta,-0.911,-0.229,-0.168,lower_is_better,negative,yes
+feature_measure_robust_hybrid_rel_delta,-0.912,-0.287,-0.2,lower_is_better,negative,yes
+fsp_strict_delta,0.27,0.167,0.105,lower_is_better,positive,no
+fsp_delta,-0.85,-0.477,-0.358,lower_is_better,negative,yes

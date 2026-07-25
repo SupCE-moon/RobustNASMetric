@@ -1,0 +1,14 @@
+dataset: imagenet
+threat_model: Linf
+num_classes: 1000
+epsilon: 0.01568627450980392  # 4 / 255, RobustBench ImageNet Linf default
+data_root: null
+model_dir: models
+batch_size: 4
+num_workers: 2
+models:
+  - Standard_R50
+  - Engstrom2019Robustness
+  - Wong2020Fast
+  - Salman2020Do_R18
+  - Salman2020Do_R50

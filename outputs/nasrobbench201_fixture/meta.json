@@ -1,0 +1,324 @@
+{
+  "ids": {
+    "0": {
+      "isomorph": "0",
+      "nb201-string": "|nor_conv_1x1~0|+|skip_connect~0|nor_conv_3x3~1|+|none~0|none~1|avg_pool_3x3~2|"
+    },
+    "1": {
+      "isomorph": "1",
+      "nb201-string": "|skip_connect~0|+|none~0|none~1|+|nor_conv_3x3~0|nor_conv_3x3~1|none~2|"
+    },
+    "2": {
+      "isomorph": "2",
+      "nb201-string": "|avg_pool_3x3~0|+|none~0|skip_connect~1|+|avg_pool_3x3~0|none~1|avg_pool_3x3~2|"
+    },
+    "3": {
+      "isomorph": "3",
+      "nb201-string": "|avg_pool_3x3~0|+|skip_connect~0|nor_conv_1x1~1|+|nor_conv_3x3~0|skip_connect~1|avg_pool_3x3~2|"
+    },
+    "4": {
+      "isomorph": "4",
+      "nb201-string": "|skip_connect~0|+|none~0|avg_pool_3x3~1|+|avg_pool_3x3~0|skip_connect~1|nor_conv_1x1~2|"
+    },
+    "5": {
+      "isomorph": "5",
+      "nb201-string": "|avg_pool_3x3~0|+|skip_connect~0|nor_conv_3x3~1|+|avg_pool_3x3~0|nor_conv_3x3~1|nor_conv_1x1~2|"
+    },
+    "6": {
+      "isomorph": "6",
+      "nb201-string": "|skip_connect~0|+|skip_connect~0|skip_connect~1|+|none~0|avg_pool_3x3~1|nor_conv_1x1~2|"
+    },
+    "7": {
+      "isomorph": "7",
+      "nb201-string": "|nor_conv_1x1~0|+|avg_pool_3x3~0|none~1|+|none~0|avg_pool_3x3~1|nor_conv_3x3~2|"
+    },
+    "8": {
+      "isomorph": "8",
+      "nb201-string": "|nor_conv_3x3~0|+|none~0|none~1|+|avg_pool_3x3~0|avg_pool_3x3~1|nor_conv_1x1~2|"
+    },
+    "9": {
+      "isomorph": "9",
+      "nb201-string": "|nor_conv_3x3~0|+|none~0|none~1|+|nor_conv_1x1~0|nor_conv_3x3~1|none~2|"
+    },
+    "10": {
+      "isomorph": "10",
+      "nb201-string": "|nor_conv_3x3~0|+|nor_conv_1x1~0|nor_conv_3x3~1|+|nor_conv_1x1~0|none~1|nor_conv_3x3~2|"
+    },
+    "11": {
+      "isomorph": "11",
+      "nb201-string": "|skip_connect~0|+|nor_conv_1x1~0|skip_connect~1|+|skip_connect~0|nor_conv_3x3~1|nor_conv_3x3~2|"
+    },
+    "12": {
+      "isomorph": "12",
+      "nb201-string": "|nor_conv_3x3~0|+|avg_pool_3x3~0|nor_conv_1x1~1|+|skip_connect~0|nor_conv_3x3~1|avg_pool_3x3~2|"
+    },
+    "13": {
+      "isomorph": "13",
+      "nb201-string": "|nor_conv_3x3~0|+|skip_connect~0|skip_connect~1|+|none~0|skip_connect~1|skip_connect~2|"
+    },
+    "14": {
+      "isomorph": "14",
+      "nb201-string": "|avg_pool_3x3~0|+|skip_connect~0|nor_conv_1x1~1|+|nor_conv_1x1~0|none~1|skip_connect~2|"
+    },
+    "15": {
+      "isomorph": "15",
+      "nb201-string": "|skip_connect~0|+|avg_pool_3x3~0|avg_pool_3x3~1|+|none~0|nor_conv_3x3~1|avg_pool_3x3~2|"
+    },
+    "16": {
+      "isomorph": "16",
+      "nb201-string": "|nor_conv_3x3~0|+|none~0|skip_connect~1|+|none~0|skip_connect~1|nor_conv_3x3~2|"
+    },
+    "17": {
+      "isomorph": "17",
+      "nb201-string": "|none~0|+|avg_pool_3x3~0|skip_connect~1|+|avg_pool_3x3~0|none~1|nor_conv_1x1~2|"
+    },
+    "18": {
+      "isomorph": "18",
+      "nb201-string": "|nor_conv_3x3~0|+|skip_connect~0|nor_conv_1x1~1|+|nor_conv_1x1~0|avg_pool_3x3~1|nor_conv_1x1~2|"
+    },
+    "19": {
+      "isomorph": "19",
+      "nb201-string": "|nor_conv_3x3~0|+|nor_conv_3x3~0|nor_conv_3x3~1|+|nor_conv_1x1~0|none~1|skip_connect~2|"
+    },
+    "20": {
+      "isomorph": "20",
+      "nb201-string": "|skip_connect~0|+|avg_pool_3x3~0|none~1|+|skip_connect~0|avg_pool_3x3~1|nor_conv_1x1~2|"
+    },
+    "21": {
+      "isomorph": "21",
+      "nb201-string": "|avg_pool_3x3~0|+|nor_conv_1x1~0|none~1|+|nor_conv_1x1~0|avg_pool_3x3~1|nor_conv_1x1~2|"
+    },
+    "22": {
+      "isomorph": "22",
+      "nb201-string": "|avg_pool_3x3~0|+|avg_pool_3x3~0|nor_conv_1x1~1|+|skip_connect~0|avg_pool_3x3~1|skip_connect~2|"
+    },
+    "23": {
+      "isomorph": "23",
+      "nb201-string": "|skip_connect~0|+|skip_connect~0|avg_pool_3x3~1|+|nor_conv_3x3~0|nor_conv_1x1~1|none~2|"
+    },
+    "24": {
+      "isomorph": "24",
+      "nb201-string": "|skip_connect~0|+|avg_pool_3x3~0|nor_conv_1x1~1|+|nor_conv_3x3~0|nor_conv_1x1~1|nor_conv_1x1~2|"
+    },
+    "25": {
+      "isomorph": "25",
+      "nb201-string": "|nor_conv_1x1~0|+|skip_connect~0|nor_conv_3x3~1|+|avg_pool_3x3~0|avg_pool_3x3~1|none~2|"
+    },
+    "26": {
+      "isomorph": "26",
+      "nb201-string": "|none~0|+|none~0|nor_conv_3x3~1|+|skip_connect~0|nor_conv_3x3~1|skip_connect~2|"
+    },
+    "27": {
+      "isomorph": "27",
+      "nb201-string": "|nor_conv_3x3~0|+|nor_conv_3x3~0|nor_conv_3x3~1|+|none~0|skip_connect~1|skip_connect~2|"
+    },
+    "28": {
+      "isomorph": "28",
+      "nb201-string": "|nor_conv_3x3~0|+|skip_connect~0|avg_pool_3x3~1|+|avg_pool_3x3~0|nor_conv_3x3~1|nor_conv_1x1~2|"
+    },
+    "29": {
+      "isomorph": "29",
+      "nb201-string": "|none~0|+|avg_pool_3x3~0|skip_connect~1|+|nor_conv_3x3~0|skip_connect~1|skip_connect~2|"
+    },
+    "30": {
+      "isomorph": "30",
+      "nb201-string": "|avg_pool_3x3~0|+|nor_conv_1x1~0|nor_conv_1x1~1|+|avg_pool_3x3~0|nor_conv_3x3~1|skip_connect~2|"
+    },
+    "31": {
+      "isomorph": "31",
+      "nb201-string": "|avg_pool_3x3~0|+|avg_pool_3x3~0|nor_conv_3x3~1|+|avg_pool_3x3~0|skip_connect~1|avg_pool_3x3~2|"
+    },
+    "32": {
+      "isomorph": "32",
+      "nb201-string": "|skip_connect~0|+|avg_pool_3x3~0|none~1|+|skip_connect~0|skip_connect~1|skip_connect~2|"
+    },
+    "33": {
+      "isomorph": "33",
+      "nb201-string": "|nor_conv_1x1~0|+|avg_pool_3x3~0|avg_pool_3x3~1|+|avg_pool_3x3~0|nor_conv_3x3~1|none~2|"
+    },
+    "34": {
+      "isomorph": "34",
+      "nb201-string": "|none~0|+|none~0|avg_pool_3x3~1|+|nor_conv_3x3~0|avg_pool_3x3~1|none~2|"
+    },
+    "35": {
+      "isomorph": "35",
+      "nb201-string": "|avg_pool_3x3~0|+|avg_pool_3x3~0|avg_pool_3x3~1|+|avg_pool_3x3~0|skip_connect~1|nor_conv_1x1~2|"
+    },
+    "36": {
+      "isomorph": "36",
+      "nb201-string": "|skip_connect~0|+|avg_pool_3x3~0|nor_conv_1x1~1|+|avg_pool_3x3~0|skip_connect~1|nor_conv_3x3~2|"
+    },
+    "37": {
+      "isomorph": "37",
+      "nb201-string": "|none~0|+|skip_connect~0|nor_conv_3x3~1|+|none~0|skip_connect~1|nor_conv_1x1~2|"
+    },
+    "38": {
+      "isomorph": "38",
+      "nb201-string": "|nor_conv_1x1~0|+|skip_connect~0|nor_conv_1x1~1|+|skip_connect~0|nor_conv_3x3~1|skip_connect~2|"
+    },
+    "39": {
+      "isomorph": "39",
+      "nb201-string": "|skip_connect~0|+|skip_connect~0|skip_connect~1|+|nor_conv_3x3~0|avg_pool_3x3~1|nor_conv_3x3~2|"
+    },
+    "40": {
+      "isomorph": "40",
+      "nb201-string": "|nor_conv_1x1~0|+|none~0|nor_conv_1x1~1|+|avg_pool_3x3~0|nor_conv_3x3~1|nor_conv_3x3~2|"
+    },
+    "41": {
+      "isomorph": "41",
+      "nb201-string": "|nor_conv_1x1~0|+|avg_pool_3x3~0|none~1|+|none~0|skip_connect~1|none~2|"
+    },
+    "42": {
+      "isomorph": "42",
+      "nb201-string": "|skip_connect~0|+|nor_conv_1x1~0|skip_connect~1|+|nor_conv_3x3~0|nor_conv_1x1~1|nor_conv_3x3~2|"
+    },
+    "43": {
+      "isomorph": "43",
+      "nb201-string": "|nor_conv_1x1~0|+|none~0|nor_conv_1x1~1|+|none~0|skip_connect~1|nor_conv_3x3~2|"
+    },
+    "44": {
+      "isomorph": "44",
+      "nb201-string": "|none~0|+|nor_conv_1x1~0|none~1|+|avg_pool_3x3~0|skip_connect~1|none~2|"
+    },
+    "45": {
+      "isomorph": "45",
+      "nb201-string": "|avg_pool_3x3~0|+|nor_conv_3x3~0|nor_conv_1x1~1|+|avg_pool_3x3~0|skip_connect~1|none~2|"
+    },
+    "46": {
+      "isomorph": "46",
+      "nb201-string": "|skip_connect~0|+|nor_conv_1x1~0|none~1|+|skip_connect~0|skip_connect~1|nor_conv_1x1~2|"
+    },
+    "47": {
+      "isomorph": "47",
+      "nb201-string": "|nor_conv_3x3~0|+|avg_pool_3x3~0|skip_connect~1|+|nor_conv_1x1~0|nor_conv_1x1~1|none~2|"
+    },
+    "48": {
+      "isomorph": "48",
+      "nb201-string": "|avg_pool_3x3~0|+|avg_pool_3x3~0|skip_connect~1|+|avg_pool_3x3~0|nor_conv_3x3~1|skip_connect~2|"
+    },
+    "49": {
+      "isomorph": "49",
+      "nb201-string": "|nor_conv_3x3~0|+|nor_conv_3x3~0|avg_pool_3x3~1|+|nor_conv_3x3~0|avg_pool_3x3~1|nor_conv_1x1~2|"
+    },
+    "50": {
+      "isomorph": "50",
+      "nb201-string": "|skip_connect~0|+|nor_conv_3x3~0|nor_conv_1x1~1|+|none~0|skip_connect~1|none~2|"
+    },
+    "51": {
+      "isomorph": "51",
+      "nb201-string": "|skip_connect~0|+|none~0|none~1|+|nor_conv_3x3~0|avg_pool_3x3~1|nor_conv_1x1~2|"
+    },
+    "52": {
+      "isomorph": "52",
+      "nb201-string": "|skip_connect~0|+|skip_connect~0|nor_conv_1x1~1|+|nor_conv_3x3~0|none~1|nor_conv_1x1~2|"
+    },
+    "53": {
+      "isomorph": "53",
+      "nb201-string": "|nor_conv_1x1~0|+|skip_connect~0|none~1|+|nor_conv_1x1~0|skip_connect~1|nor_conv_1x1~2|"
+    },
+    "54": {
+      "isomorph": "54",
+      "nb201-string": "|nor_conv_1x1~0|+|avg_pool_3x3~0|skip_connect~1|+|skip_connect~0|avg_pool_3x3~1|none~2|"
+    },
+    "55": {
+      "isomorph": "55",
+      "nb201-string": "|avg_pool_3x3~0|+|none~0|nor_conv_3x3~1|+|none~0|nor_conv_1x1~1|nor_conv_1x1~2|"
+    },
+    "56": {
+      "isomorph": "56",
+      "nb201-string": "|skip_connect~0|+|avg_pool_3x3~0|nor_conv_3x3~1|+|nor_conv_1x1~0|nor_conv_3x3~1|skip_connect~2|"
+    },
+    "57": {
+      "isomorph": "57",
+      "nb201-string": "|avg_pool_3x3~0|+|nor_conv_3x3~0|avg_pool_3x3~1|+|skip_connect~0|avg_pool_3x3~1|avg_pool_3x3~2|"
+    },
+    "58": {
+      "isomorph": "58",
+      "nb201-string": "|avg_pool_3x3~0|+|skip_connect~0|none~1|+|none~0|none~1|skip_connect~2|"
+    },
+    "59": {
+      "isomorph": "59",
+      "nb201-string": "|nor_conv_3x3~0|+|avg_pool_3x3~0|none~1|+|none~0|avg_pool_3x3~1|skip_connect~2|"
+    },
+    "60": {
+      "isomorph": "60",
+      "nb201-string": "|avg_pool_3x3~0|+|avg_pool_3x3~0|none~1|+|avg_pool_3x3~0|none~1|nor_conv_3x3~2|"
+    },
+    "61": {
+      "isomorph": "61",
+      "nb201-string": "|skip_connect~0|+|skip_connect~0|nor_conv_3x3~1|+|nor_conv_3x3~0|nor_conv_3x3~1|none~2|"
+    },
+    "62": {
+      "isomorph": "62",
+      "nb201-string": "|avg_pool_3x3~0|+|skip_connect~0|none~1|+|avg_pool_3x3~0|skip_connect~1|nor_conv_1x1~2|"
+    },
+    "63": {
+      "isomorph": "63",
+      "nb201-string": "|avg_pool_3x3~0|+|skip_connect~0|none~1|+|nor_conv_3x3~0|none~1|nor_conv_3x3~2|"
+    },
+    "64": {
+      "isomorph": "64",
+      "nb201-string": "|nor_conv_3x3~0|+|nor_conv_1x1~0|avg_pool_3x3~1|+|nor_conv_1x1~0|nor_conv_3x3~1|nor_conv_3x3~2|"
+    },
+    "65": {
+      "isomorph": "65",
+      "nb201-string": "|skip_connect~0|+|nor_conv_1x1~0|none~1|+|nor_conv_3x3~0|none~1|nor_conv_1x1~2|"
+    },
+    "66": {
+      "isomorph": "66",
+      "nb201-string": "|nor_conv_3x3~0|+|nor_conv_1x1~0|nor_conv_3x3~1|+|skip_connect~0|skip_connect~1|none~2|"
+    },
+    "67": {
+      "isomorph": "67",
+      "nb201-string": "|nor_conv_1x1~0|+|skip_connect~0|avg_pool_3x3~1|+|avg_pool_3x3~0|nor_conv_1x1~1|none~2|"
+    },
+    "68": {
+      "isomorph": "68",
+      "nb201-string": "|nor_conv_3x3~0|+|nor_conv_3x3~0|none~1|+|skip_connect~0|none~1|nor_conv_3x3~2|"
+    },
+    "69": {
+      "isomorph": "69",
+      "nb201-string": "|nor_conv_3x3~0|+|nor_conv_1x1~0|nor_conv_3x3~1|+|nor_conv_1x1~0|none~1|nor_conv_1x1~2|"
+    },
+    "70": {
+      "isomorph": "70",
+      "nb201-string": "|none~0|+|skip_connect~0|none~1|+|nor_conv_1x1~0|nor_conv_1x1~1|nor_conv_1x1~2|"
+    },
+    "71": {
+      "isomorph": "71",
+      "nb201-string": "|none~0|+|nor_conv_1x1~0|nor_conv_3x3~1|+|nor_conv_1x1~0|none~1|nor_conv_1x1~2|"
+    },
+    "72": {
+      "isomorph": "72",
+      "nb201-string": "|skip_connect~0|+|skip_connect~0|nor_conv_1x1~1|+|nor_conv_3x3~0|avg_pool_3x3~1|nor_conv_1x1~2|"
+    },
+    "73": {
+      "isomorph": "73",
+      "nb201-string": "|none~0|+|nor_conv_3x3~0|avg_pool_3x3~1|+|avg_pool_3x3~0|skip_connect~1|none~2|"
+    },
+    "74": {
+      "isomorph": "74",
+      "nb201-string": "|skip_connect~0|+|nor_conv_1x1~0|nor_conv_3x3~1|+|none~0|avg_pool_3x3~1|skip_connect~2|"
+    },
+    "75": {
+      "isomorph": "75",
+      "nb201-string": "|nor_conv_1x1~0|+|nor_conv_1x1~0|nor_conv_3x3~1|+|skip_connect~0|nor_conv_1x1~1|nor_conv_3x3~2|"
+    },
+    "76": {
+      "isomorph": "76",
+      "nb201-string": "|skip_connect~0|+|none~0|skip_connect~1|+|avg_pool_3x3~0|nor_conv_3x3~1|avg_pool_3x3~2|"
+    },
+    "77": {
+      "isomorph": "77",
+      "nb201-string": "|nor_conv_3x3~0|+|nor_conv_3x3~0|skip_connect~1|+|avg_pool_3x3~0|skip_connect~1|skip_connect~2|"
+    },
+    "78": {
+      "isomorph": "78",
+      "nb201-string": "|skip_connect~0|+|nor_conv_1x1~0|nor_conv_1x1~1|+|avg_pool_3x3~0|skip_connect~1|none~2|"
+    },
+    "79": {
+      "isomorph": "79",
+      "nb201-string": "|avg_pool_3x3~0|+|skip_connect~0|nor_conv_3x3~1|+|nor_conv_1x1~0|nor_conv_1x1~1|none~2|"
+    }
+  }
+}

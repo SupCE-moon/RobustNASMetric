@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robust Metric 总表（公式渲染版）</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [["\\(", "\\)"], ["$", "$"]], displayMath: [["\\[", "\\]"]] },
+      svg: { fontCache: "global" }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    body {
+      margin: 32px auto;
+      max-width: 1280px;
+      padding: 0 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      color: #202124;
+      line-height: 1.55;
+      background: #fafafa;
+    }
+    h1, h2 { line-height: 1.25; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    h2 { font-size: 20px; margin-top: 32px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+    .meta { color: #5f6368; margin-bottom: 24px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      vertical-align: top;
+    }
+    th {
+      background: #f1f3f4;
+      font-weight: 650;
+      text-align: left;
+    }
+    td.metric { white-space: nowrap; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    td.score { text-align: right; white-space: nowrap; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .formula {
+      min-width: 320px;
+      overflow-x: auto;
+    }
+    .note {
+      background: #fff8e1;
+      border: 1px solid #f2d36b;
+      padding: 12px 14px;
+      border-radius: 6px;
+    }
+    code {
+      background: #f1f3f4;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>当前 Robust Metric 总表（公式渲染版）</h1>
+  <p class="meta">日期：2026-07-03；实验结果为与 <code>adv_acc</code> 的 Spearman 相关系数。</p>
+
+  <h2>实验设置</h2>
+  <ul>
+    <li>数据集：CIFAR10 test split</li>
+    <li>模型：10 个 RobustBench CIFAR10 / Linf 模型</li>
+    <li>对抗样本：white-box，每个模型分别生成自己的 \(x_{\mathrm{adv}}\)</li>
+    <li>攻击：PGD-lite，3 steps</li>
+    <li>样本数：512</li>
+    <li><strong>All</strong>：全部 10 个模型；<strong>Robust-only</strong>：去掉自然训练的 Standard 模型</li>
+  </ul>
+
+  <h2>符号说明</h2>
+  <table>
+    <thead>
+      <tr><th>符号</th><th>含义</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>\(x\)</td><td>clean input</td></tr>
+      <tr><td>\(x_{\mathrm{adv}}\)</td><td>adversarial input</td></tr>
+      <tr><td>\(y\)</td><td>true label</td></tr>
+      <tr><td>\(f(x)\)</td><td>model logits</td></tr>
+      <tr><td>\(p(x)=\mathrm{softmax}(f(x))\)</td><td>模型输出概率分布</td></tr>
+      <tr><td>\(F_l(x)\)</td><td>第 \(l\) 个中间层特征图</td></tr>
+      <tr><td>\(\mathrm{GAP}(\cdot)\)</td><td>global average pooling</td></tr>
+      <tr><td>\(\mathrm{CE}(f(x),y)\)</td><td>cross entropy loss</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Metric 总表</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>类型</th>
+        <th>Metric</th>
+        <th>论文具体名称</th>
+        <th>数学原理</th>
+        <th>公式</th>
+        <th>All</th>
+        <th>Robust-only</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>我们提出</td>
+        <td class="metric">feature_delta</td>
+        <td>本研究提出；受 <em>Feature Denoising for Improving Adversarial Robustness</em> 启发</td>
+        <td>鲁棒模型在对抗扰动下，中间特征表示应更稳定。</td>
+        <td class="formula">
+          \[
+          z_l(x)=\mathrm{Norm}(\mathrm{GAP}(F_l(x)))
+          \]
+          \[
+          M=\frac{1}{L}\sum_l \lVert z_l(x_{\mathrm{adv}})-z_l(x)\rVert_2
+          \]
+        </td>
+        <td class="score">-0.6970</td>
+        <td class="score">-0.5833</td>
+      </tr>
+      <tr>
+        <td>我们提出</td>
+        <td class="metric">perturbation_capacity_delta</td>
+        <td>本研究提出；受 activation perturbation / CAS 类分析启发</td>
+        <td>鲁棒模型不应显著放大由扰动引起的激活容量变化。</td>
+        <td class="formula">
+          \[
+          C_l(x)=\sum_c \mathrm{mean}_{h,w}|F_{l,c,h,w}(x)-\mu_{h,w}(F_{l,c}(x))|
+          \]
+          \[
+          M=\frac{1}{L}\sum_l \frac{|C_l(x_{\mathrm{adv}})-C_l(x)|}{|C_l(x)|+\epsilon}
+          \]
+        </td>
+        <td class="score">-0.3939</td>
+        <td class="score">-0.1667</td>
+      </tr>
+      <tr>
+        <td>输出稳定性</td>
+        <td class="metric">logit_kl</td>
+        <td><em>Theoretically Principled Trade-off between Robustness and Accuracy</em> / TRADES</td>
+        <td>clean 与 adversarial 的输出概率分布应尽量一致。</td>
+        <td class="formula">
+          \[
+          M=D_{\mathrm{KL}}(p(x)\parallel p(x_{\mathrm{adv}}))
+          =\sum_k p_k(x)\log \frac{p_k(x)}{p_k(x_{\mathrm{adv}})}
+          \]
+        </td>
+        <td class="score">-0.7455</td>
+        <td class="score">-0.6500</td>
+      </tr>
+      <tr>
+        <td>ARNAS 目标 proxy</td>
+        <td class="metric">natural_loss</td>
+        <td><em>Towards Accurate and Robust Architectures via Neural Architecture Search</em></td>
+        <td>ARNAS 同时关注自然精度目标。</td>
+        <td class="formula">
+          \[
+          M=\mathrm{CE}(f(x),y)=-\log p_y(x)
+          \]
+        </td>
+        <td class="score">0.3939</td>
+        <td class="score">0.1667</td>
+      </tr>
+      <tr>
+        <td>ARNAS 目标 proxy</td>
+        <td class="metric">adversarial_loss</td>
+        <td><em>Towards Accurate and Robust Architectures via Neural Architecture Search</em></td>
+        <td>ARNAS 同时关注对抗鲁棒目标。</td>
+        <td class="formula">
+          \[
+          M=\mathrm{CE}(f(x_{\mathrm{adv}}),y)=-\log p_y(x_{\mathrm{adv}})
+          \]
+        </td>
+        <td class="score">-0.5273</td>
+        <td class="score">-0.3500</td>
+      </tr>
+      <tr>
+        <td>输入损失曲面</td>
+        <td class="metric">input_loss_delta</td>
+        <td><em>AdvRush: Searching for Adversarially Robust Neural Architectures</em>；也与 AWP 相关</td>
+        <td>输入 loss landscape 越平滑，对抗扰动造成的 loss 增量越小。</td>
+        <td class="formula">
+          \[
+          M=\mathrm{CE}(f(x_{\mathrm{adv}}),y)-\mathrm{CE}(f(x),y)
+          \]
+        </td>
+        <td class="score">-0.8182</td>
+        <td class="score">-0.7500</td>
+      </tr>
+      <tr>
+        <td>Jacobian / 输入梯度</td>
+        <td class="metric">input_grad_l2</td>
+        <td><em>Robust Learning with Jacobian Regularization</em>；DSRNA Jacobian norm bound</td>
+        <td>输入梯度越小，模型对输入局部扰动越不敏感。</td>
+        <td class="formula">
+          \[
+          M=\frac{1}{N}\sum_i \left\lVert \nabla_{x_i}\mathrm{CE}(f(x_i),y_i)\right\rVert_2
+          \]
+        </td>
+        <td class="score">-0.7818</td>
+        <td class="score">-0.7000</td>
+      </tr>
+      <tr>
+        <td>Lipschitz proxy</td>
+        <td class="metric">local_logit_lipschitz</td>
+        <td><em>Adversarially Robust Neural Architectures</em>；Parseval / Lipschitz robustness 系列</td>
+        <td>局部 Lipschitz 越小，输入扰动导致的 logit 变化越小。</td>
+        <td class="formula">
+          \[
+          M=\frac{1}{N}\sum_i
+          \frac{\lVert f(x_{\mathrm{adv},i})-f(x_i)\rVert_2}
+          {\lVert x_{\mathrm{adv},i}-x_i\rVert_2+\epsilon}
+          \]
+        </td>
+        <td class="score">-0.6727</td>
+        <td class="score">-0.5500</td>
+      </tr>
+      <tr>
+        <td>Certified-bound proxy</td>
+        <td class="metric">margin_input_grad_ratio</td>
+        <td><em>DSRNA: Differentiable Search of Robust Neural Architectures</em></td>
+        <td>margin 越大、输入梯度越小，局部 certified radius 越可能更大。</td>
+        <td class="formula">
+          \[
+          m_i=f_{y_i}(x_i)-\max_{k\ne y_i}f_k(x_i)
+          \]
+          \[
+          M=\frac{1}{N}\sum_i
+          \frac{\max(m_i,0)}
+          {\lVert \nabla_{x_i}\mathrm{CE}(f(x_i),y_i)\rVert_2+\epsilon}
+          \]
+        </td>
+        <td class="score">-0.7818</td>
+        <td class="score">-0.7000</td>
+      </tr>
+      <tr>
+        <td>FSP / feature-flow</td>
+        <td class="metric">fsp_delta</td>
+        <td><em>When NAS Meets Robustness</em>；FSP 来自 <em>A Gift from Knowledge Distillation</em></td>
+        <td>鲁棒架构应保持 feature-flow / Gram 结构在扰动下稳定。</td>
+        <td class="formula">
+          \[
+          G_l(x)=\frac{\hat A_l(x)\hat A_l(x)^{T}}{S_l}
+          \]
+          \[
+          M=\frac{1}{L}\sum_l
+          \frac{\lVert G_l(x_{\mathrm{adv}})-G_l(x)\rVert_F}
+          {\lVert G_l(x)\rVert_F+\epsilon}
+          \]
+        </td>
+        <td class="score">-0.8909</td>
+        <td class="score">-0.8500</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>方法级必比论文</h2>
+  <table>
+    <thead>
+      <tr><th>论文</th><th>涉及的 robust metric / objective</th><th>当前实验结果</th><th>说明</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><em>Adversarially Robust Neural Architectures</em></td>
+        <td>Architecture-level Lipschitz regularization</td>
+        <td><code>local_logit_lipschitz</code> proxy: All -0.6727, Robust-only -0.5500</td>
+        <td>当前只是 fixed-model proxy；完整方法需要在 architecture/search 阶段复现。</td>
+      </tr>
+      <tr>
+        <td><em>Towards Accurate and Robust Architectures via Neural Architecture Search</em></td>
+        <td>Natural loss + adversarial loss 的 accurate/robust multi-objective NAS</td>
+        <td><code>natural_loss</code>: 0.1667 robust-only；<code>adversarial_loss</code>: -0.3500；<code>input_loss_delta</code>: -0.7500</td>
+        <td>当前只比较 objective proxy；完整 ARNAS 是方法级 baseline。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>当前判断：</strong>
+    <code>fsp_delta</code> 是最强 baseline；<code>input_loss_delta</code> 是最重要的 loss-landscape baseline；
+    我们自己的 <code>feature_delta</code> 有信号，但需要进一步增强。
+  </div>
+</body>
+</html>
