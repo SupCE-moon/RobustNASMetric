@@ -82,6 +82,17 @@ def test_output_equal_root_excludes_audit_artifacts_on_rerun(tmp_path):
     assert paths == ["TRANSFER_STATUS.json", "manifests/a.txt", "manifests/z.txt", "nested.bin"]
 
 
+def test_rerun_excludes_seeded_transaction_leftovers(tmp_path):
+    root = make_bundle(tmp_path)
+    for name in ("source_snapshot.json.tmp", "source_snapshot.json.bak.tmp", "source_snapshot.json.bak",
+                 "manifest_sha256.csv.tmp", "manifest_sha256.csv.bak.tmp", "manifest_sha256.csv.bak",
+                 "file_inventory.csv.tmp", "file_inventory.csv.bak.tmp", "file_inventory.csv.bak"):
+        (root / name).write_bytes(b"stale")
+    assert main(["--root", str(root), "--output-dir", str(root)]) == 0
+    snapshot = json.loads((root / "source_snapshot.json").read_text(encoding="utf-8"))
+    assert snapshot["file_count"] == 4
+
+
 def test_atomic_failure_leaves_no_completed_targets(tmp_path, monkeypatch):
     root = make_bundle(tmp_path)
     output = tmp_path / "out"
@@ -115,6 +126,27 @@ def test_atomic_failure_preserves_existing_outputs(tmp_path, monkeypatch):
 
     monkeypatch.setattr(Path, "replace", fail_replace)
     with pytest.raises(OSError, match="injected failure"):
+        main(["--root", str(root), "--output-dir", str(output)])
+    assert [path.read_bytes() for path in targets] == originals
+
+
+def test_last_replace_failure_restores_first_two_outputs(tmp_path, monkeypatch):
+    root = make_bundle(tmp_path)
+    output = tmp_path / "out"
+    output.mkdir()
+    targets = [output / name for name in ("source_snapshot.json", "manifest_sha256.csv", "file_inventory.csv")]
+    originals = [b"old snapshot", b"old manifest", b"old inventory"]
+    for path, content in zip(targets, originals):
+        path.write_bytes(content)
+    original_replace = Path.replace
+    calls = []
+    def fail_last(self, target):
+        calls.append(Path(target).name)
+        if Path(target).name == "file_inventory.csv":
+            raise OSError("last replace failure")
+        return original_replace(self, target)
+    monkeypatch.setattr(Path, "replace", fail_last)
+    with pytest.raises(OSError, match="last replace failure"):
         main(["--root", str(root), "--output-dir", str(output)])
     assert [path.read_bytes() for path in targets] == originals
 

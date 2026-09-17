@@ -10,7 +10,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
-AUDIT_ARTIFACTS = {"source_snapshot.json", "manifest_sha256.csv", "file_inventory.csv"}
+AUDIT_ARTIFACTS = {
+    f"{name}{suffix}"
+    for name in ("source_snapshot.json", "manifest_sha256.csv", "file_inventory.csv")
+    for suffix in ("", ".tmp", ".bak.tmp", ".bak")
+}
 
 def sha256_file(path: str | Path, chunk_size: int = 8 * 1024 * 1024) -> str:
     digest = hashlib.sha256()
