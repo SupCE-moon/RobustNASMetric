@@ -60,15 +60,9 @@ def _manifest_arch_string(item: BenchmarkManifestItem) -> str:
     value = item.metadata.get("arch_string")
     if isinstance(value, str) and value:
         return value
-    genotype = item.metadata.get("genotype")
-    if isinstance(genotype, str) and genotype:
-        return genotype
-    if isinstance(genotype, dict):
-        for key in ("arch_string", "arch", "nb201-string"):
-            candidate = genotype.get(key)
-            if isinstance(candidate, str) and candidate:
-                return candidate
-    raise ValueError(f"manifest item {item.model_or_arch_id} has no NB201 arch_string")
+    raise ValueError(
+        f"manifest item {item.model_or_arch_id} has no standardized NB201 arch_string"
+    )
 
 
 def make_model_loader(

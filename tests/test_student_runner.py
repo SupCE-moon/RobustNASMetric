@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import importlib.util
+import json
 import os
 import subprocess
 import sys
@@ -11,6 +12,7 @@ from types import SimpleNamespace
 import pytest
 
 from robust_metric_lab.student_benchmark import BenchmarkManifestItem
+from robust_metric_lab.student_benchmark import load_nb201_items
 from robust_metric_lab.student_runner import (
     CSV_COLUMNS,
     append_rows_atomic,
@@ -55,6 +57,13 @@ def _read(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def _write_raw_rows(path: Path, rows: list[dict[str, object]]) -> None:
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(CSV_COLUMNS))
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 def _load_script(path: Path):
     name = f"test_{path.stem}"
     spec = importlib.util.spec_from_file_location(name, path)
@@ -90,6 +99,44 @@ def test_atomic_append_rejects_batch_and_old_duplicates_without_changing_file(tm
 
     with pytest.raises(ValueError, match="duplicate"):
         append_rows_atomic(output, [_row()])
+    assert output.read_bytes() == before
+
+
+def test_atomic_append_rejects_duplicate_keys_already_inside_old_csv(tmp_path: Path):
+    output = tmp_path / "metric_values.csv"
+    _write_raw_rows(output, [_row(), _row()])
+    before = output.read_bytes()
+
+    with pytest.raises(ValueError, match="duplicate.*existing|existing.*duplicate"):
+        append_rows_atomic(output, [_row(model_or_arch_id="new")])
+
+    assert output.read_bytes() == before
+
+
+def test_evaluate_rejects_duplicate_keys_inside_old_csv_before_loader(tmp_path: Path):
+    output = tmp_path / "metric_values.csv"
+    _write_raw_rows(output, [_row(), _row()])
+    before = output.read_bytes()
+    loader_called = False
+
+    def loader():
+        nonlocal loader_called
+        loader_called = True
+        return object()
+
+    with pytest.raises(ValueError, match="duplicate.*existing|existing.*duplicate"):
+        evaluate_items(
+            _items(tmp_path)[:1],
+            lambda item: _Model(item.model_or_arch_id),
+            loader,
+            ["feature_delta"],
+            output,
+            _metadata(),
+            compute_metric=lambda *_: 1.0,
+            torch_module=SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False)),
+        )
+
+    assert loader_called is False
     assert output.read_bytes() == before
 
 
@@ -326,6 +373,163 @@ def test_resume_skips_ok_and_failed_exact_keys_without_loading_models(tmp_path: 
     assert len(_read(output)) == 2
 
 
+def _single_item(tmp_path: Path, benchmark: str) -> BenchmarkManifestItem:
+    if benchmark == "rb40":
+        epoch = None
+    elif benchmark == "nb201":
+        epoch = 5
+    else:
+        epoch = 100
+    return BenchmarkManifestItem(
+        benchmark,
+        f"{benchmark}-id",
+        epoch,
+        (tmp_path / f"{benchmark}.pt").resolve(),
+        0.5,
+        {},
+    )
+
+
+def test_racl_dispatch_keeps_rb40_arch_and_proxy_semantics_separate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    from robust_metric_lab import nasrobbench201
+
+    calls = []
+
+    def fixed(_model):
+        calls.append("fixed")
+        return SimpleNamespace(log_upper=3.0, mode="generic_chain_proxy")
+
+    monkeypatch.setattr(nasrobbench201, "racl_fixed_network_lipschitz_stats", fixed)
+    output = tmp_path / "rb.csv"
+    evaluate_items(
+        [_single_item(tmp_path, "rb40")],
+        lambda _item: _Model("rb"),
+        object(),
+        ["racl_arch_lipschitz_log_upper", "racl_fixed_network_log_upper_proxy"],
+        output,
+        {"run_id": "rb-run", "setting": "rb40_mature"},
+        torch_module=SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False)),
+    )
+    rows = _read(output)
+    assert [row["status"] for row in rows] == ["failed", "ok"]
+    assert "not applicable" in rows[0]["error"].lower()
+    assert rows[1]["metric_value"] == "3.0"
+    assert calls == ["fixed"]
+
+
+def test_racl_dispatch_nb201_uses_arch_helper_and_rejects_fixed_proxy(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    from robust_metric_lab import nasrobbench201
+
+    calls = []
+
+    def architecture(_model):
+        calls.append("arch")
+        return SimpleNamespace(log_upper=2.0, mode="nb201_cell")
+
+    monkeypatch.setattr(nasrobbench201, "racl_architecture_lipschitz_stats", architecture)
+    monkeypatch.setattr(
+        nasrobbench201,
+        "racl_fixed_network_lipschitz_stats",
+        lambda _model: pytest.fail("NB201 must not use fixed-network proxy"),
+    )
+    output = tmp_path / "nb.csv"
+    evaluate_items(
+        [_single_item(tmp_path, "nb201")],
+        lambda _item: _Model("nb"),
+        object(),
+        ["racl_arch_lipschitz_log_upper", "racl_fixed_network_log_upper_proxy"],
+        output,
+        {"run_id": "nb-run", "setting": "nb201_e5"},
+        torch_module=SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False)),
+    )
+    rows = _read(output)
+    assert [row["status"] for row in rows] == ["ok", "failed"]
+    assert rows[0]["metric_value"] == "2.0"
+    assert "not applicable" in rows[1]["error"].lower()
+    assert calls == ["arch"]
+
+
+def test_racl_dispatch_darts_requires_cell_mode_and_rejects_fixed_proxy(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    from robust_metric_lab import nasrobbench201
+
+    modes = iter(("generic_chain_proxy", "darts_cell"))
+
+    def fixed(_model):
+        return SimpleNamespace(log_upper=4.0, mode=next(modes))
+
+    monkeypatch.setattr(nasrobbench201, "racl_fixed_network_lipschitz_stats", fixed)
+    for run_id, expected_status in (("bad-mode", "failed"), ("cell-mode", "ok")):
+        output = tmp_path / f"{run_id}.csv"
+        evaluate_items(
+            [_single_item(tmp_path, "darts")],
+            lambda _item: _Model("darts"),
+            object(),
+            ["racl_arch_lipschitz_log_upper", "racl_fixed_network_log_upper_proxy"],
+            output,
+            {"run_id": run_id, "setting": "darts_e100"},
+            torch_module=SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False)),
+        )
+        rows = _read(output)
+        assert rows[0]["status"] == expected_status
+        assert rows[1]["status"] == "failed"
+        if expected_status == "failed":
+            assert "darts_cell" in rows[0]["error"]
+
+
+def test_metric_helper_families_are_isolated_when_feature_bundle_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    from robust_metric_lab import attacks, metrics, nasrobbench201, trnas
+
+    monkeypatch.setattr(attacks, "make_adversarial", lambda *_args, **_kwargs: "adv")
+    monkeypatch.setattr(
+        metrics,
+        "compute_feature_metrics",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("feature bundle failed")),
+    )
+    monkeypatch.setattr(
+        metrics,
+        "compute_feature_geometry_metrics",
+        lambda *_args, **_kwargs: SimpleNamespace(feature_hausdorff_delta=1.5),
+    )
+    monkeypatch.setattr(
+        nasrobbench201,
+        "racl_architecture_lipschitz_stats",
+        lambda _model: SimpleNamespace(log_upper=2.5, mode="nb201_cell"),
+    )
+    monkeypatch.setattr(
+        trnas,
+        "compute_trnas_metrics",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            activation_psi=3.5, consistency_phi=4.5, r_score=5.5
+        ),
+    )
+    output = tmp_path / "families.csv"
+    evaluate_items(
+        [_single_item(tmp_path, "nb201")],
+        lambda _item: _Model("nb"),
+        ("clean", "labels"),
+        [
+            "feature_delta",
+            "feature_hausdorff_delta",
+            "racl_arch_lipschitz_log_upper",
+            "trnas_activation_psi",
+        ],
+        output,
+        {"run_id": "families", "setting": "nb201_e5"},
+        torch_module=SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False)),
+    )
+    rows = _read(output)
+    assert [row["status"] for row in rows] == ["failed", "ok", "ok", "ok"]
+    assert [row["metric_value"] for row in rows[1:]] == ["1.5", "2.5", "3.5"]
+
+
 def test_cli_help_is_lazy_and_lists_required_flags_and_epoch_choices():
     common = (
         "--bundle-root",
@@ -457,14 +661,75 @@ def test_nb201_adapter_uses_manifest_arch_and_strict_checkpoint(tmp_path: Path):
         built.append((arch_string, C, N))
         return model
 
+    arch = (
+        "|skip_connect~0|+"
+        "|nor_conv_1x1~0|skip_connect~1|+"
+        "|avg_pool_3x3~0|nor_conv_3x3~1|none~2|"
+    )
     item = BenchmarkManifestItem(
-        "nb201", "17", 25, checkpoint, 0.8, {"arch_string": "|skip_connect~0|"}
+        "nb201", "17", 25, checkpoint, 0.8, {"arch_string": arch}
     )
     loaded = module.make_model_loader("cpu", build_model_fn=build, torch_module=fake_torch)(item)
     assert loaded is model
-    assert built == [("|skip_connect~0|", 16, 5)]
+    assert built == [(arch, 16, 5)]
     assert model.loaded == ({"weight": 7}, True)
     assert model.device == "cpu"
+
+
+def test_nb201_adapter_requires_standardized_manifest_arch_string(tmp_path: Path):
+    module = _load_script(SCRIPTS[1])
+    item = BenchmarkManifestItem(
+        "nb201",
+        "17",
+        25,
+        (tmp_path / "exact.pt").resolve(),
+        0.8,
+        {"genotype": {"arch_string": "legacy-ambiguous-value"}},
+    )
+    with pytest.raises(ValueError, match="arch_string"):
+        module.make_model_loader(
+            "cpu",
+            build_model_fn=lambda *_args, **_kwargs: pytest.fail("must reject before build"),
+            torch_module=_FakeTorch(item.checkpoint_path),
+        )(item)
+
+
+def test_nb201_manifest_loader_output_enters_adapter_with_fixed_macro(tmp_path: Path):
+    module = _load_script(SCRIPTS[1])
+    arch = (
+        "|skip_connect~0|+"
+        "|nor_conv_1x1~0|skip_connect~1|+"
+        "|avg_pool_3x3~0|nor_conv_3x3~1|none~2|"
+    )
+    manifest = tmp_path / "nb201.csv"
+    rows = [
+        {
+            "arch_id": "17",
+            "epoch": epoch,
+            "checkpoint_path": f"checkpoints/17-{epoch}.pt",
+            "official_final_robust_accuracy": "0.8",
+            "genotype_json": json.dumps({"arch_string": arch}),
+            "metadata_json": json.dumps({"source": "teacher"}),
+        }
+        for epoch in (0, 5, 10, 25, 50)
+    ]
+    with manifest.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    item = load_nb201_items(manifest, tmp_path)[3]
+    fake_torch = _FakeTorch(item.checkpoint_path)
+    built = []
+    model = _CheckpointModel()
+
+    def build(arch_string, C, N):
+        built.append((arch_string, C, N))
+        return model
+
+    module.make_model_loader(
+        "cpu", build_model_fn=build, torch_module=fake_torch
+    )(item)
+    assert built == [(arch, 16, 5)]
 
 
 def test_darts_adapter_uses_manifest_genotype_and_fixed_macro(tmp_path: Path):

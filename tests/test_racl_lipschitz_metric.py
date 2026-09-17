@@ -7,6 +7,7 @@ import torch.nn as nn
 import pytest
 
 from robust_metric_lab.nasrobbench201 import racl_architecture_lipschitz_stats
+from robust_metric_lab.nb201_space import Nb201TinyNetwork
 
 
 class Identity(nn.Module):
@@ -57,3 +58,12 @@ def test_racl_conv_uses_weight_spectral_norm() -> None:
     cell = InferCell([conv], [[0]])
     stats = racl_architecture_lipschitz_stats(nn.Sequential(cell))
     assert stats.log_upper == pytest.approx(math.log(3.0), rel=1e-5)
+
+
+def test_racl_architecture_helper_recognizes_repository_nb201_cells() -> None:
+    model = Nb201TinyNetwork(("skip_connect",) * 6, c=2, n=1)
+    stats = racl_architecture_lipschitz_stats(model)
+
+    assert stats.mode == "nb201_cell"
+    assert stats.num_cells == len(model.cells)
+    assert stats.num_nodes == len(model.cells) * 3

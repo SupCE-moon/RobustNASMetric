@@ -100,7 +100,41 @@ def _load_items(path: str | Path, root: str | Path | None, *, benchmark: str,
             metadata = dict(metadata_value)
             if needs_genotype:
                 genotype = _json_field(row, "genotype_json", row_number)
-                metadata["genotype"] = genotype
+                if benchmark == "nb201":
+                    if not isinstance(genotype, dict):
+                        raise ValueError(
+                            f"genotype_json arch_string must be an object at manifest row {row_number}"
+                        )
+                    raw_arch = genotype.get("arch_string")
+                    if not isinstance(raw_arch, str) or not raw_arch or raw_arch != raw_arch.strip():
+                        raise ValueError(
+                            f"genotype_json must contain a non-empty canonical arch_string "
+                            f"at manifest row {row_number}"
+                        )
+                    # Keep the heavy torch-backed NAS helper lazy so CLI --help
+                    # remains import-light.
+                    from .nasrobbench201 import make_nb201_arch, parse_nb201_arch
+
+                    operations = parse_nb201_arch(raw_arch)
+                    if operations is None or make_nb201_arch(operations) != raw_arch:
+                        raise ValueError(
+                            f"genotype_json contains a noncanonical arch_string "
+                            f"at manifest row {row_number}"
+                        )
+                    existing_arch = metadata.get("arch_string")
+                    if existing_arch is not None and existing_arch != raw_arch:
+                        raise ValueError(
+                            f"metadata_json arch_string conflicts with genotype_json "
+                            f"at manifest row {row_number}"
+                        )
+                    metadata["arch_string"] = raw_arch
+                    metadata.pop("genotype", None)
+                else:
+                    if not isinstance(genotype, dict):
+                        raise ValueError(
+                            f"genotype_json must be an object at manifest row {row_number}"
+                        )
+                    metadata["genotype"] = genotype
             result.append(BenchmarkManifestItem(
                 benchmark=benchmark,
                 model_or_arch_id=identifier,

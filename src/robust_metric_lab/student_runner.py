@@ -209,7 +209,11 @@ def _read_rows(path: Path) -> list[dict[str, object]]:
         reader = csv.DictReader(handle)
         if reader.fieldnames != list(CSV_COLUMNS):
             raise ValueError("existing CSV schema mismatch")
-        return [_normalise_row(row) for row in reader]
+        rows = [_normalise_row(row) for row in reader]
+    keys = [_row_key(row) for row in rows]
+    if len(keys) != len(set(keys)):
+        raise ValueError("duplicate unique key inside existing CSV")
+    return rows
 
 
 def append_rows_atomic(output: str | Path, rows: Iterable[Mapping[str, object]]) -> int:
@@ -317,8 +321,8 @@ class _DefaultMetricComputer:
         self.samples = samples
         self._adversarial = None
         self._feature: Mapping[str, object] | None = None
+        self._geometry: Mapping[str, object] | None = None
         self._trnas: Mapping[str, object] | None = None
-        self._racl: float | None = None
 
     def _inputs(self):
         if isinstance(self.samples, Mapping):
@@ -340,12 +344,46 @@ class _DefaultMetricComputer:
         return self._adversarial
 
     def __call__(self, metric: str, model: object, _samples: object, _item: BenchmarkManifestItem) -> float:
-        if metric in {"racl_arch_lipschitz_log_upper", "racl_fixed_network_log_upper_proxy"}:
-            if self._racl is None:
+        if metric == "racl_arch_lipschitz_log_upper":
+            if _item.benchmark == "rb40":
+                raise ValueError(
+                    "racl_arch_lipschitz_log_upper is not applicable to RB40 fixed networks"
+                )
+            if _item.benchmark == "nb201":
+                from .nasrobbench201 import racl_architecture_lipschitz_stats
+
+                stats = racl_architecture_lipschitz_stats(model)
+                if stats.mode != "nb201_cell":
+                    raise ValueError(
+                        "NB201 architecture RACL requires mode='nb201_cell'"
+                    )
+                return float(stats.log_upper)
+            if _item.benchmark == "darts":
                 from .nasrobbench201 import racl_fixed_network_lipschitz_stats
 
-                self._racl = float(racl_fixed_network_lipschitz_stats(model).log_upper)
-            return self._racl
+                stats = racl_fixed_network_lipschitz_stats(model)
+                if stats.mode != "darts_cell":
+                    raise ValueError(
+                        "DARTS architecture RACL requires mode='darts_cell'"
+                    )
+                return float(stats.log_upper)
+            raise ValueError(
+                f"racl_arch_lipschitz_log_upper is not applicable to {_item.benchmark}"
+            )
+
+        if metric == "racl_fixed_network_log_upper_proxy":
+            if _item.benchmark != "rb40":
+                raise ValueError(
+                    "racl_fixed_network_log_upper_proxy is not applicable outside RB40"
+                )
+            from .nasrobbench201 import racl_fixed_network_lipschitz_stats
+
+            stats = racl_fixed_network_lipschitz_stats(model)
+            if stats.mode != "generic_chain_proxy":
+                raise ValueError(
+                    "RB40 fixed-network RACL proxy requires mode='generic_chain_proxy'"
+                )
+            return float(stats.log_upper)
 
         if metric.startswith("trnas_"):
             if self._trnas is None:
@@ -361,6 +399,22 @@ class _DefaultMetricComputer:
             if metric not in self._trnas:
                 raise NotImplementedError(f"registered metric has no TRNAS dispatch: {metric}")
             return float(self._trnas[metric])
+
+        from .metrics import GEOMETRY_METRIC_FIELDS
+
+        if metric in GEOMETRY_METRIC_FIELDS:
+            if self._geometry is None:
+                from .metrics import compute_feature_geometry_metrics
+
+                clean, _labels = self._inputs()
+                self._geometry = _result_mapping(
+                    compute_feature_geometry_metrics(model, clean, self._adv(model))
+                )
+            if metric not in self._geometry:
+                raise NotImplementedError(
+                    f"registered metric has no geometry dispatch: {metric}"
+                )
+            return float(self._geometry[metric])
 
         if self._feature is None:
             from .metrics import compute_feature_metrics
