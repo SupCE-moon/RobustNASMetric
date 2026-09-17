@@ -24,6 +24,24 @@ class MetricResult:
     perturbation_capacity_delta: float
     perturbation_capacity_relu_active_delta: float
     perturbation_capacity_above_mean_delta: float
+    perturbation_capacity_signed_delta: float
+    perturbation_capacity_iqr_delta: float
+    perturbation_capacity_multiscale_delta: float
+    perturbation_capacity_relu_active_multiscale_delta: float
+    perturbation_capacity_topk_delta: float
+    perturbation_capacity_iqr_active_delta: float
+    perturbation_capacity_profile_delta: float
+    perturbation_capacity_importance_delta: float
+    perturbation_capacity_gini_delta: float
+    perturbation_capacity_layerprofile_delta: float
+    perturbation_capacity_flow_rel_delta: float
+    perturbation_capacity_channelwise_delta: float
+    feature_spectral_erank_static: float
+    feature_spectral_participation_ratio_static: float
+    feature_spectral_decay_exponent_static: float
+    jacobian_spectral_norm: float
+    jacobian_effective_rank: float
+    jacobian_spectral_decay: float
     logit_kl: float
     natural_loss: float
     adversarial_loss: float
@@ -33,6 +51,9 @@ class MetricResult:
     margin_input_grad_ratio: float
     feature_measure_flow_delta: float
     feature_measure_flow_rel_delta: float
+    feature_measure_flow_rel_multiscale_delta: float
+    feature_measure_flow_rel_allpairs_delta: float
+    feature_measure_flow_corr_rel_delta: float
     feature_measure_spatial_gram_delta: float
     feature_measure_spatial_gram_rel_delta: float
     feature_measure_relu_active_delta: float
@@ -48,6 +69,7 @@ class MetricResult:
     feature_measure_robust_hybrid_rel_delta: float
     fsp_strict_delta: float
     fsp_delta: float
+    feature_measure_fsp_rel_multiscale_delta: float
     clean_acc: float
     adv_acc: float
     num_layers: int
@@ -506,11 +528,320 @@ def _perturbation_capacity_above_mean(
     return _perturbation_capacity_on_support(feature, clean > clean_mean)
 
 
+def _perturbation_capacity_iqr(feature: torch.Tensor) -> torch.Tensor:
+    """Interquartile-range capacity: per-channel Q3-Q1 summed over channels."""
+    flat = feature.flatten(2)  # [B, C, S]
+    q1 = torch.quantile(flat, 0.25, dim=2)  # [B, C]
+    q3 = torch.quantile(flat, 0.75, dim=2)  # [B, C]
+    return (q3 - q1).sum(dim=1)  # [B]
+
+
+def _perturbation_capacity_multiscale(feature: torch.Tensor, num_scales: int = 3) -> torch.Tensor:
+    """Sum of MAD capacity over multiple spatial scales (coarse-to-fine)."""
+    total = feature.new_zeros(feature.shape[0])
+    f = feature
+    for _ in range(num_scales):
+        centered = f - f.mean(dim=(2, 3), keepdim=True)
+        total = total + centered.abs().mean(dim=(2, 3)).sum(dim=1)
+        if f.shape[2] > 1:
+            f = F.avg_pool2d(f, 2)
+        else:
+            break
+    return total
+
+
+def _perturbation_capacity_relu_active_multiscale(
+    clean: torch.Tensor,
+    feature: torch.Tensor,
+    num_scales: int = 3,
+) -> torch.Tensor:
+    """MAD capacity on the ReLU-active (positive) support at multiple scales."""
+    total = feature.new_zeros(feature.shape[0])
+    c, f = clean, feature
+    for _ in range(num_scales):
+        total = total + _perturbation_capacity_on_support(f, c > 0)
+        if c.shape[2] > 1:
+            c = F.avg_pool2d(c, 2)
+            f = F.avg_pool2d(f, 2)
+        else:
+            break
+    return total
+
+
+def _perturbation_capacity_topk(feature: torch.Tensor, k_frac: float = 0.5) -> torch.Tensor:
+    """MAD of the top-k (by magnitude) spatial positions, summed over channels."""
+    flat = feature.flatten(2)  # [B, C, S]
+    k = max(1, int(flat.shape[2] * k_frac))
+    _, idx = flat.abs().topk(k, dim=2)  # [B, C, k]
+    topk_vals = flat.gather(2, idx)  # [B, C, k]
+    m = topk_vals.mean(dim=2, keepdim=True)
+    return (topk_vals - m).abs().mean(dim=2).sum(dim=1)
+
+
+def _perturbation_capacity_iqr_active(
+    clean: torch.Tensor,
+    feature: torch.Tensor,
+) -> torch.Tensor:
+    """Interquartile range of activations on the ReLU-active (positive) support."""
+    flat = feature.flatten(2)  # [B, C, S]
+    active = (clean > 0).flatten(2)  # [B, C, S]
+    nan = torch.tensor(float("nan"), device=flat.device, dtype=flat.dtype)
+    masked = torch.where(active, flat, nan)
+    q1 = torch.nanquantile(masked, 0.25, dim=2)
+    q3 = torch.nanquantile(masked, 0.75, dim=2)
+    iqr = torch.nan_to_num(q3 - q1, nan=0.0)
+    return iqr.sum(dim=1)
+
+
+def _perturbation_capacity_profile_delta(clean: torch.Tensor, adv: torch.Tensor) -> torch.Tensor:
+    """Direction change of the per-channel dispersion (MAD) profile.
+
+    Normalizes the per-channel MAD vector to unit L2 norm, then measures the L2
+    distance between clean and adversarial profiles. Unlike the sum of MADs
+    (additive per-op baseline), this captures how the *shape* of the dispersion
+    across channels changes, which is less op-composition confounded.
+    """
+    def per_channel_mad(f: torch.Tensor) -> torch.Tensor:
+        centered = f - f.mean(dim=(2, 3), keepdim=True)
+        return centered.abs().mean(dim=(2, 3))  # [B, C]
+
+    clean_mad = F.normalize(per_channel_mad(clean), p=2, dim=1, eps=1e-12)
+    adv_mad = F.normalize(per_channel_mad(adv), p=2, dim=1, eps=1e-12)
+    return (adv_mad - clean_mad).norm(p=2, dim=1).mean()
+
+
+def _channel_importance(
+    model: torch.nn.Module,
+    x_clean: torch.Tensor,
+) -> dict[int, torch.Tensor]:
+    """Per-layer channel importance from a single grad-enabled clean forward.
+
+    Hooks the same leaf-module 4D outputs that `ActivationRecorder` (all_leaf)
+    captures, so returned keys align with `clean_features` indices. Importance is
+    the RMS input-gradient of the summed logits w.r.t. each feature map, averaged
+    over batch: a channel that does not feed the output (e.g. a `none` op) gets
+    zero weight, so the metric measures dispersion of *wired* channels only.
+    """
+    model.eval()
+    x = x_clean.detach().clone().requires_grad_(True)
+    handles: list = []
+    feats: list[torch.Tensor] = []
+
+    def hook(_module, _inputs, output):
+        if torch.is_tensor(output) and output.dim() == 4:
+            feats.append(output)
+
+    for module in model.modules():
+        if len(list(module.children())) == 0:
+            handles.append(module.register_forward_hook(hook))
+
+    try:
+        logits = model(x)
+        scalar = logits.sum()
+        grad_pairs = [(pos, f) for pos, f in enumerate(feats) if f.requires_grad]
+        grad_feats = [f for _, f in grad_pairs]
+        grads = (
+            torch.autograd.grad(scalar, grad_feats, retain_graph=False, allow_unused=True)
+            if grad_feats
+            else []
+        )
+        importance: dict[int, torch.Tensor] = {}
+        for pos, f in enumerate(feats):
+            importance[pos] = f.new_zeros(f.shape[1])
+        for (pos, _f), g in zip(grad_pairs, grads):
+            if g is not None:
+                importance[pos] = (g.detach() ** 2).mean(dim=(2, 3)).sqrt().mean(dim=0)
+        return importance
+    finally:
+        for h in handles:
+            h.remove()
+
+
+def _perturbation_capacity_importance(
+    clean: torch.Tensor,
+    adv: torch.Tensor,
+    importance: torch.Tensor | None,
+) -> torch.Tensor:
+    """Importance-weighted MAD capacity relative drift (channel-gated)."""
+    if importance is None:
+        return clean.new_tensor(float("nan"))
+
+    def per_channel_mad(f: torch.Tensor) -> torch.Tensor:
+        centered = f - f.mean(dim=(2, 3), keepdim=True)
+        return centered.abs().mean(dim=(2, 3))  # [B, C]
+
+    w = importance.to(clean.dtype)  # [C]
+    wsum = w.sum().clamp_min(1e-8)
+    clean_cap = (per_channel_mad(clean) * w.unsqueeze(0)).sum(dim=1) / wsum  # [B]
+    adv_cap = (per_channel_mad(adv) * w.unsqueeze(0)).sum(dim=1) / wsum  # [B]
+    return ((adv_cap - clean_cap).abs() / (clean_cap.abs() + 1e-8)).mean()
+
+
+def _spatial_dispersion_gini(feature: torch.Tensor) -> torch.Tensor:
+    """Per-channel Gini of spatial dispersion, averaged over channels (scale-invariant)."""
+    centered = feature - feature.mean(dim=(2, 3), keepdim=True)
+    disp = centered.abs().flatten(2)  # [B, C, S]
+    S = disp.shape[2]
+    total = disp.sum(dim=2).clamp_min(1e-8)  # [B, C]
+    sorted_d, _ = disp.sort(dim=2)
+    idx = torch.arange(S, device=feature.device, dtype=feature.dtype)
+    num = (sorted_d * (2 * idx - S + 1)).sum(dim=2)  # [B, C]
+    gini = (num / (S * total)).clamp(0.0, 1.0)
+    return gini.mean(dim=1)  # [B]
+
+
+def _layer_profile_direction(
+    clean_caps: list[torch.Tensor],
+    adv_caps: list[torch.Tensor],
+) -> torch.Tensor:
+    """Direction change of the cross-layer capacity profile (depth distribution)."""
+    clean_v = torch.stack(clean_caps)
+    adv_v = torch.stack(adv_caps)
+    clean_n = F.normalize(clean_v, p=2, dim=0, eps=1e-12)
+    adv_n = F.normalize(adv_v, p=2, dim=0, eps=1e-12)
+    return (adv_n - clean_n).norm(p=2, dim=0)
+
+
+def _dispersion_map(feature: torch.Tensor) -> torch.Tensor:
+    centered = feature - feature.mean(dim=(2, 3), keepdim=True)
+    return centered.abs()
+
+
+def _dispersion_flow_rel_stats(
+    clean_input: torch.Tensor,
+    clean_output: torch.Tensor,
+    adv_input: torch.Tensor,
+    adv_output: torch.Tensor,
+) -> torch.Tensor:
+    """Cross-layer dispersion (capacity) flow relative drift.
+
+    Same wiring-aware cross-layer correlation as FSP, but applied to absolute
+    dispersion maps instead of raw features: keeps capacity (dispersion) units
+    while encoding which layer connects to which, so it should survive the
+    structural-deconfounding test that collapses per-layer capacity sums.
+    """
+    clean_fsp = _fsp_matrix(_dispersion_map(clean_input), _dispersion_map(clean_output))
+    adv_fsp = _fsp_matrix(_dispersion_map(adv_input), _dispersion_map(adv_output))
+    diff = (adv_fsp - clean_fsp).flatten(1)
+    return (diff.norm(p=2, dim=1) / clean_fsp.flatten(1).norm(p=2, dim=1).clamp_min(1e-8)).mean()
+
+
+def _perturbation_capacity_channelwise(clean: torch.Tensor, adv: torch.Tensor) -> torch.Tensor:
+    """Per-channel relative MAD drift, averaged (scale-invariant per channel)."""
+    def per_channel_mad(f: torch.Tensor) -> torch.Tensor:
+        centered = f - f.mean(dim=(2, 3), keepdim=True)
+        return centered.abs().mean(dim=(2, 3))  # [B, C]
+
+    cm = per_channel_mad(clean)
+    am = per_channel_mad(adv)
+    rel = ((am - cm).abs() / cm.abs().clamp_min(1e-6)).clamp_max(1e3)
+    return rel.mean(dim=1).mean()
+
+
+def _spectral_static_stats(
+    feature: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Static spectral concentration of a feature map [B, C, H, W].
+
+    Returns (effective_rank, participation_ratio, decay_exponent) as batch means.
+    Measures the random-init representation's covariance spectrum shape with no
+    perturbation; complements the perturbation-response delta metrics.
+    """
+    B, C, H, W = feature.shape
+    S = H * W
+    if C < 2 or S < 2:
+        nan = torch.tensor(float("nan"), device=feature.device, dtype=feature.dtype)
+        return nan, nan, nan
+
+    flat = feature.reshape(B, C, S)
+    centered = flat - flat.mean(dim=1, keepdim=True)
+    cov = centered @ centered.transpose(1, 2) / S  # [B, C, C]
+    eigvals = torch.clamp(torch.linalg.eigvalsh(cov), min=0.0)  # [B, C] ascending
+    total = eigvals.sum(dim=1)  # [B]
+
+    probs = (eigvals / total.clamp_min(1e-12).unsqueeze(1)).clamp_min(1e-12)
+    entropy = -(probs * probs.log()).sum(dim=1)  # [B]
+    erank = torch.exp(entropy)  # [B]
+
+    pr = (total ** 2) / (eigvals ** 2).sum(dim=1).clamp_min(1e-12)  # [B]
+
+    lam_desc = torch.flip(eigvals, dims=[1])  # [B, C] descending
+    log_lam = torch.log(lam_desc.clamp_min(1e-12))
+    log_i = torch.log(
+        torch.arange(1, C + 1, device=feature.device, dtype=feature.dtype)
+    )
+    x = log_i - log_i.mean()
+    y = log_lam - log_lam.mean(dim=1, keepdim=True)
+    alpha = -(y * x.unsqueeze(0)).sum(dim=1) / (x ** 2).sum().clamp_min(1e-8)  # [B]
+
+    return erank.mean(), pr.mean(), alpha.mean()
+
+
+def _jacobian_spectral_stats(
+    logits: torch.Tensor,
+    x: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Singular-value spectrum of the input->logit Jacobian at current weights.
+
+    `logits` must carry a grad graph back to `x` (logits = model(x), x requiring
+    grad). Forms J J^T via per-class input gradients and returns
+    (spectral_norm, effective_rank, decay_exponent) as batch means. The spectral
+    norm is the local Lipschitz constant and upper-bounds logit amplification.
+    """
+    B = x.shape[0]
+    K = logits.shape[1]
+    per_class = []
+    for k in range(K):
+        g = torch.autograd.grad(
+            logits[:, k].sum(), x, retain_graph=True, create_graph=False
+        )[0]
+        per_class.append(g.reshape(B, -1))
+    grads = torch.stack(per_class, dim=0)  # [K, B, d]
+    gram = torch.einsum("kbd,lbd->bkl", grads, grads)  # [B, K, K]
+    eigvals = torch.clamp(torch.linalg.eigvalsh(gram), min=0.0)  # [B, K] ascending
+    s = torch.sqrt(eigvals)  # singular values, ascending
+    s_desc = torch.flip(s, dims=[1])  # descending
+
+    norm = s_desc[:, 0]  # [B] = ||J||_2
+    total = s.sum(dim=1)  # [B]
+    probs = (s / total.clamp_min(1e-12).unsqueeze(1)).clamp_min(1e-12)
+    erank = torch.exp(-(probs * probs.log()).sum(dim=1))  # [B]
+
+    log_s = torch.log(s_desc.clamp_min(1e-12))
+    log_i = torch.log(torch.arange(1, K + 1, device=x.device, dtype=x.dtype))
+    xx = log_i - log_i.mean()
+    yy = log_s - log_s.mean(dim=1, keepdim=True)
+    alpha = -(yy * xx.unsqueeze(0)).sum(dim=1) / (xx ** 2).sum().clamp_min(1e-8)  # [B]
+
+    return norm.mean(), erank.mean(), alpha.mean()
+
+
 def _channel_gram(feature: torch.Tensor) -> torch.Tensor:
     # 展开spacial维度，得到 [B, C, H*W]，然后计算 Gram 矩阵
     flat = feature.flatten(2)
     flat = F.normalize(flat, p=2, dim=2, eps=1e-12)
     return torch.bmm(flat, flat.transpose(1, 2)) / flat.shape[2]
+
+
+def _channel_gram_rel_multiscale(
+    clean: torch.Tensor,
+    adv: torch.Tensor,
+    num_scales: int = 3,
+) -> torch.Tensor:
+    """Relative channel-gram (within-layer correlation) drift summed over scales."""
+    rels = []
+    c, a = clean, adv
+    for _ in range(num_scales):
+        cg = _channel_gram(c)
+        ag = _channel_gram(a)
+        scale = cg.flatten(1).norm(p=2, dim=1).clamp_min(1e-8)
+        rels.append(((ag - cg).flatten(1).norm(p=2, dim=1) / scale).mean())
+        if c.shape[2] > 1:
+            c = F.avg_pool2d(c, 2)
+            a = F.avg_pool2d(a, 2)
+        else:
+            break
+    return torch.stack(rels).mean()
 
 
 def _feature_measure_spatial_gram_stats(
@@ -587,7 +918,15 @@ def _fsp_matrix(input_feature: torch.Tensor, output_feature: torch.Tensor) -> to
     input_feature, output_feature = _match_spatial(input_feature, output_feature)
     input_atoms = input_feature.flatten(2)
     output_atoms = output_feature.flatten(2)
-    # 
+    #
+    return torch.bmm(input_atoms, output_atoms.transpose(1, 2)) / input_atoms.shape[2]
+
+
+def _fsp_corr_matrix(input_feature: torch.Tensor, output_feature: torch.Tensor) -> torch.Tensor:
+    """Cross-layer channel correlation (cosine) matrix, channel-wise L2 normalized."""
+    input_feature, output_feature = _match_spatial(input_feature, output_feature)
+    input_atoms = F.normalize(input_feature.flatten(2), p=2, dim=2, eps=1e-12)
+    output_atoms = F.normalize(output_feature.flatten(2), p=2, dim=2, eps=1e-12)
     return torch.bmm(input_atoms, output_atoms.transpose(1, 2)) / input_atoms.shape[2]
 
 
@@ -599,13 +938,72 @@ def _fsp_strict_stats(
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     clean_fsp = _fsp_matrix(clean_input, clean_output)
     adv_fsp = _fsp_matrix(adv_input, adv_output)
-    
+
     diff = (adv_fsp - clean_fsp).flatten(1)
     strict_loss = diff.pow(2).sum(dim=1).mean()
 
     rms_delta = diff.pow(2).mean(dim=1).sqrt().mean()
     rel_delta = (diff.norm(p=2, dim=1) / clean_fsp.flatten(1).norm(p=2, dim=1).clamp_min(1e-8)).mean()
     return strict_loss, rms_delta, rel_delta
+
+
+def _flow_corr_rel_stats(
+    clean_input: torch.Tensor,
+    clean_output: torch.Tensor,
+    adv_input: torch.Tensor,
+    adv_output: torch.Tensor,
+) -> torch.Tensor:
+    """Relative drift of cross-layer channel correlation (direction-only FSP)."""
+    clean_corr = _fsp_corr_matrix(clean_input, clean_output)
+    adv_corr = _fsp_corr_matrix(adv_input, adv_output)
+    diff = (adv_corr - clean_corr).flatten(1)
+    return (diff.norm(p=2, dim=1) / clean_corr.flatten(1).norm(p=2, dim=1).clamp_min(1e-8)).mean()
+
+
+def _flow_rel_allpairs_stats(
+    clean_features: list[torch.Tensor],
+    adv_features: list[torch.Tensor],
+    indices: list[int],
+) -> torch.Tensor:
+    """Relative FSP drift averaged over all layer pairs (i<j), not just adjacent."""
+    rels = []
+    for a in range(len(indices)):
+        for b in range(a + 1, len(indices)):
+            _, _, rel = _fsp_strict_stats(
+                clean_features[indices[a]], clean_features[indices[b]],
+                adv_features[indices[a]], adv_features[indices[b]],
+            )
+            rels.append(rel)
+    return torch.stack(rels).mean()
+
+
+def _fsp_rel_multiscale(
+    clean_input: torch.Tensor,
+    clean_output: torch.Tensor,
+    adv_input: torch.Tensor,
+    adv_output: torch.Tensor,
+    num_scales: int = 3,
+) -> torch.Tensor:
+    """Sum of relative FSP drift across spatial scales (coarse-to-fine)."""
+    rels = []
+    ci, co, ai, ao = clean_input, clean_output, adv_input, adv_output
+    for _ in range(num_scales):
+        ci, co = _match_spatial(ci, co)
+        ai, ao = _match_spatial(ai, ao)
+        clean_fsp = _fsp_matrix(ci, co)
+        adv_fsp = _fsp_matrix(ai, ao)
+        diff = (adv_fsp - clean_fsp).flatten(1)
+        rels.append(
+            (diff.norm(p=2, dim=1) / clean_fsp.flatten(1).norm(p=2, dim=1).clamp_min(1e-8)).mean()
+        )
+        if ci.shape[2] > 1:
+            ci = F.avg_pool2d(ci, 2)
+            co = F.avg_pool2d(co, 2)
+            ai = F.avg_pool2d(ai, 2)
+            ao = F.avg_pool2d(ao, 2)
+        else:
+            break
+    return torch.stack(rels).sum()
 
 
 @torch.no_grad()
@@ -634,11 +1032,16 @@ def compute_feature_metrics(
         adv_features = adv_recorder.outputs
 
     n = min(len(clean_features), len(adv_features))
-    # 
+    #
     indices = _anchor_indices(n, max_layers=max_layers)
     geometry_indices, _ = _geometry_anchor_indices(
         clean_features[:n], max_layers=max_layers
     )
+    # M1 (importance-gated capacity) is disabled here: its extra grad-enabled
+    # forward hangs/OOMs on some RobustBench models, and it showed no benefit on
+    # NB201 (partial 0.280 vs base capacity 0.283). M1 stays nan via the None
+    # guard in _perturbation_capacity_importance; M2/M3/M4/M5 are unaffected.
+    importance_by_layer = {}
 
     feature_deltas = []
     feature_measure_swds = []
@@ -663,7 +1066,23 @@ def compute_feature_metrics(
     capacity_deltas = []
     capacity_relu_active_deltas = []
     capacity_above_mean_deltas = []
+    capacity_signed_deltas = []
+    capacity_iqr_deltas = []
+    capacity_multiscale_deltas = []
+    capacity_relu_active_multiscale_deltas = []
+    capacity_topk_deltas = []
+    capacity_iqr_active_deltas = []
+    capacity_profile_deltas = []
+    capacity_importance_deltas = []
+    capacity_gini_deltas = []
+    capacity_channelwise_deltas = []
+    layer_profile_clean = []
+    layer_profile_adv = []
+    spectral_erank_statics = []
+    spectral_pr_statics = []
+    spectral_decay_statics = []
     fsp_deltas = []
+    fsp_rel_multiscale_deltas = []
     layer_weighted_by_idx = {}
 
     for idx in indices:
@@ -717,12 +1136,64 @@ def compute_feature_metrics(
             ).mean()
         )
 
+        capacity_signed_deltas.append(
+            ((adv_capacity - clean_capacity) / (clean_capacity.abs() + 1e-8)).mean()
+        )
+
+        clean_iqr = _perturbation_capacity_iqr(clean)
+        adv_iqr = _perturbation_capacity_iqr(adv)
+        capacity_iqr_deltas.append(
+            ((adv_iqr - clean_iqr).abs() / (clean_iqr.abs() + 1e-8)).mean()
+        )
+
+        clean_ms = _perturbation_capacity_multiscale(clean)
+        adv_ms = _perturbation_capacity_multiscale(adv)
+        capacity_multiscale_deltas.append(
+            ((adv_ms - clean_ms).abs() / (clean_ms.abs() + 1e-8)).mean()
+        )
+
+        clean_ram = _perturbation_capacity_relu_active_multiscale(clean, clean)
+        adv_ram = _perturbation_capacity_relu_active_multiscale(clean, adv)
+        capacity_relu_active_multiscale_deltas.append(
+            ((adv_ram - clean_ram).abs() / (clean_ram.abs() + 1e-8)).mean()
+        )
+
+        clean_topk = _perturbation_capacity_topk(clean)
+        adv_topk = _perturbation_capacity_topk(adv)
+        capacity_topk_deltas.append(
+            ((adv_topk - clean_topk).abs() / (clean_topk.abs() + 1e-8)).mean()
+        )
+
+        clean_iqr_active = _perturbation_capacity_iqr_active(clean, clean)
+        adv_iqr_active = _perturbation_capacity_iqr_active(clean, adv)
+        capacity_iqr_active_deltas.append(
+            ((adv_iqr_active - clean_iqr_active).abs() / (clean_iqr_active.abs() + 1e-8)).mean()
+        )
+
+        capacity_profile_deltas.append(_perturbation_capacity_profile_delta(clean, adv))
+
+        capacity_importance_deltas.append(
+            _perturbation_capacity_importance(clean, adv, importance_by_layer.get(idx))
+        )
+        clean_gini = _spatial_dispersion_gini(clean)
+        adv_gini = _spatial_dispersion_gini(adv)
+        capacity_gini_deltas.append((adv_gini - clean_gini).abs().mean())
+        capacity_channelwise_deltas.append(_perturbation_capacity_channelwise(clean, adv))
+        layer_profile_clean.append(clean_capacity.mean())
+        layer_profile_adv.append(adv_capacity.mean())
+
+        layer_erank, layer_pr, layer_decay = _spectral_static_stats(clean)
+        spectral_erank_statics.append(layer_erank)
+        spectral_pr_statics.append(layer_pr)
+        spectral_decay_statics.append(layer_decay)
+
         # 原始论文中的G_l(x, theta)
         clean_gram = _channel_gram(clean)
         adv_gram = _channel_gram(adv)
         fsp_scale = clean_gram.flatten(1).norm(p=2, dim=1).clamp_min(1e-8)
         layer_fsp_delta = ((adv_gram - clean_gram).flatten(1).norm(p=2, dim=1) / fsp_scale).mean()
         fsp_deltas.append(layer_fsp_delta)
+        fsp_rel_multiscale_deltas.append(_channel_gram_rel_multiscale(clean, adv))
 
         # 
         feature_measure_moment_deltas.append((layer_feature_delta.pow(2) + layer_fsp_delta.pow(2)).sqrt())
@@ -739,6 +1210,9 @@ def compute_feature_metrics(
     fsp_strict_deltas = []
     feature_measure_flow_deltas = []
     feature_measure_flow_rel_deltas = []
+    feature_measure_flow_rel_multiscale_deltas = []
+    feature_measure_flow_corr_rel_deltas = []
+    capacity_flow_rel_deltas = []
     feature_measure_robust_deltas = []
     feature_measure_robust_rel_deltas = []
     for left_idx, right_idx in zip(indices, indices[1:]):
@@ -751,6 +1225,24 @@ def compute_feature_metrics(
         fsp_strict_deltas.append(layer_fsp_strict_delta)
         feature_measure_flow_deltas.append(layer_fsp_rms_delta)
         feature_measure_flow_rel_deltas.append(layer_fsp_rel_delta)
+        feature_measure_flow_corr_rel_deltas.append(
+            _flow_corr_rel_stats(
+                clean_features[left_idx], clean_features[right_idx],
+                adv_features[left_idx], adv_features[right_idx],
+            )
+        )
+        feature_measure_flow_rel_multiscale_deltas.append(
+            _fsp_rel_multiscale(
+                clean_features[left_idx], clean_features[right_idx],
+                adv_features[left_idx], adv_features[right_idx],
+            )
+        )
+        capacity_flow_rel_deltas.append(
+            _dispersion_flow_rel_stats(
+                clean_features[left_idx], clean_features[right_idx],
+                adv_features[left_idx], adv_features[right_idx],
+            )
+        )
 
         local_pair_delta = 0.5 * (layer_weighted_by_idx[left_idx] + layer_weighted_by_idx[right_idx])
         feature_measure_robust_deltas.append(layer_fsp_rms_delta + local_pair_delta)
@@ -768,6 +1260,9 @@ def compute_feature_metrics(
 
     x_for_grad = x_clean.detach().clone().requires_grad_(True)
     grad_logits = model(x_for_grad)
+    jacobian_spectral_norm, jacobian_effective_rank, jacobian_spectral_decay = (
+        _jacobian_spectral_stats(grad_logits, x_for_grad)
+    )
     grad_loss = F.cross_entropy(grad_logits, labels)
     input_grad = torch.autograd.grad(grad_loss, x_for_grad)[0] * x_for_grad.shape[0]
     input_grad_l2_per_sample = input_grad.flatten(1).norm(p=2, dim=1)
@@ -813,11 +1308,37 @@ def compute_feature_metrics(
         capacity_delta = torch.stack(capacity_deltas).mean().item()
         capacity_relu_active_delta = torch.stack(capacity_relu_active_deltas).mean().item()
         capacity_above_mean_delta = torch.stack(capacity_above_mean_deltas).mean().item()
+        capacity_signed_delta = torch.stack(capacity_signed_deltas).mean().item()
+        capacity_iqr_delta = torch.stack(capacity_iqr_deltas).mean().item()
+        capacity_multiscale_delta = torch.stack(capacity_multiscale_deltas).mean().item()
+        capacity_relu_active_multiscale_delta = torch.stack(capacity_relu_active_multiscale_deltas).mean().item()
+        capacity_topk_delta = torch.stack(capacity_topk_deltas).mean().item()
+        capacity_iqr_active_delta = torch.stack(capacity_iqr_active_deltas).mean().item()
+        capacity_profile_delta = torch.stack(capacity_profile_deltas).mean().item()
+        capacity_importance_delta = torch.stack(capacity_importance_deltas).mean().item()
+        capacity_gini_delta = torch.stack(capacity_gini_deltas).mean().item()
+        capacity_channelwise_delta = torch.stack(capacity_channelwise_deltas).mean().item()
+        capacity_layerprofile_delta = _layer_profile_direction(
+            layer_profile_clean, layer_profile_adv
+        ).item()
+        erank_vals = [v for v in spectral_erank_statics if not torch.isnan(v)]
+        feature_spectral_erank_static = torch.stack(erank_vals).mean().item() if erank_vals else float("nan")
+        pr_vals = [v for v in spectral_pr_statics if not torch.isnan(v)]
+        feature_spectral_participation_ratio_static = torch.stack(pr_vals).mean().item() if pr_vals else float("nan")
+        decay_vals = [v for v in spectral_decay_statics if not torch.isnan(v)]
+        feature_spectral_decay_exponent_static = torch.stack(decay_vals).mean().item() if decay_vals else float("nan")
         fsp_delta = torch.stack(fsp_deltas).mean().item()
+        feature_measure_fsp_rel_multiscale_delta = torch.stack(fsp_rel_multiscale_deltas).mean().item()
         if fsp_strict_deltas:
             fsp_strict_delta = torch.stack(fsp_strict_deltas).mean().item()
             feature_measure_flow_delta = torch.stack(feature_measure_flow_deltas).mean().item()
             feature_measure_flow_rel_delta = torch.stack(feature_measure_flow_rel_deltas).mean().item()
+            feature_measure_flow_rel_multiscale_delta = torch.stack(feature_measure_flow_rel_multiscale_deltas).mean().item()
+            feature_measure_flow_corr_rel_delta = torch.stack(feature_measure_flow_corr_rel_deltas).mean().item()
+            feature_measure_flow_rel_allpairs_delta = _flow_rel_allpairs_stats(
+                clean_features, adv_features, indices
+            ).item()
+            capacity_flow_rel_delta = torch.stack(capacity_flow_rel_deltas).mean().item()
             feature_measure_robust_delta = torch.stack(feature_measure_robust_deltas).mean().item()
             feature_measure_robust_rel_delta = torch.stack(feature_measure_robust_rel_deltas).mean().item()
             feature_measure_robust_hybrid_delta = (
@@ -844,6 +1365,10 @@ def compute_feature_metrics(
             fsp_strict_delta = float("nan")
             feature_measure_flow_delta = float("nan")
             feature_measure_flow_rel_delta = float("nan")
+            feature_measure_flow_rel_multiscale_delta = float("nan")
+            feature_measure_flow_corr_rel_delta = float("nan")
+            feature_measure_flow_rel_allpairs_delta = float("nan")
+            capacity_flow_rel_delta = float("nan")
             feature_measure_robust_delta = float("nan")
             feature_measure_robust_rel_delta = float("nan")
             feature_measure_robust_hybrid_delta = float("nan")
@@ -874,10 +1399,28 @@ def compute_feature_metrics(
         capacity_delta = float("nan")
         capacity_relu_active_delta = float("nan")
         capacity_above_mean_delta = float("nan")
+        capacity_signed_delta = float("nan")
+        capacity_iqr_delta = float("nan")
+        capacity_multiscale_delta = float("nan")
+        capacity_relu_active_multiscale_delta = float("nan")
+        capacity_topk_delta = float("nan")
+        capacity_iqr_active_delta = float("nan")
+        capacity_profile_delta = float("nan")
+        capacity_importance_delta = float("nan")
+        capacity_gini_delta = float("nan")
+        capacity_channelwise_delta = float("nan")
+        capacity_layerprofile_delta = float("nan")
+        capacity_flow_rel_delta = float("nan")
+        feature_spectral_erank_static = float("nan")
+        feature_spectral_participation_ratio_static = float("nan")
+        feature_spectral_decay_exponent_static = float("nan")
         fsp_delta = float("nan")
+        feature_measure_fsp_rel_multiscale_delta = float("nan")
         fsp_strict_delta = float("nan")
         feature_measure_flow_delta = float("nan")
         feature_measure_flow_rel_delta = float("nan")
+        feature_measure_flow_corr_rel_delta = float("nan")
+        feature_measure_flow_rel_allpairs_delta = float("nan")
         feature_measure_robust_delta = float("nan")
         feature_measure_robust_rel_delta = float("nan")
         feature_measure_robust_hybrid_delta = float("nan")
@@ -902,6 +1445,24 @@ def compute_feature_metrics(
         perturbation_capacity_delta=capacity_delta,
         perturbation_capacity_relu_active_delta=capacity_relu_active_delta,
         perturbation_capacity_above_mean_delta=capacity_above_mean_delta,
+        perturbation_capacity_signed_delta=capacity_signed_delta,
+        perturbation_capacity_iqr_delta=capacity_iqr_delta,
+        perturbation_capacity_multiscale_delta=capacity_multiscale_delta,
+        perturbation_capacity_relu_active_multiscale_delta=capacity_relu_active_multiscale_delta,
+        perturbation_capacity_topk_delta=capacity_topk_delta,
+        perturbation_capacity_iqr_active_delta=capacity_iqr_active_delta,
+        perturbation_capacity_profile_delta=capacity_profile_delta,
+        perturbation_capacity_importance_delta=capacity_importance_delta,
+        perturbation_capacity_gini_delta=capacity_gini_delta,
+        perturbation_capacity_channelwise_delta=capacity_channelwise_delta,
+        perturbation_capacity_layerprofile_delta=capacity_layerprofile_delta,
+        perturbation_capacity_flow_rel_delta=capacity_flow_rel_delta,
+        feature_spectral_erank_static=feature_spectral_erank_static,
+        feature_spectral_participation_ratio_static=feature_spectral_participation_ratio_static,
+        feature_spectral_decay_exponent_static=feature_spectral_decay_exponent_static,
+        jacobian_spectral_norm=jacobian_spectral_norm.item(),
+        jacobian_effective_rank=jacobian_effective_rank.item(),
+        jacobian_spectral_decay=jacobian_spectral_decay.item(),
         logit_kl=logit_kl.item(),
         natural_loss=natural_loss.item(),
         adversarial_loss=adversarial_loss.item(),
@@ -911,6 +1472,9 @@ def compute_feature_metrics(
         margin_input_grad_ratio=margin_input_grad_ratio.item(),
         feature_measure_flow_delta=feature_measure_flow_delta,
         feature_measure_flow_rel_delta=feature_measure_flow_rel_delta,
+        feature_measure_flow_rel_multiscale_delta=feature_measure_flow_rel_multiscale_delta,
+        feature_measure_flow_rel_allpairs_delta=feature_measure_flow_rel_allpairs_delta,
+        feature_measure_flow_corr_rel_delta=feature_measure_flow_corr_rel_delta,
         feature_measure_spatial_gram_delta=feature_measure_spatial_gram_delta,
         feature_measure_spatial_gram_rel_delta=feature_measure_spatial_gram_rel_delta,
         feature_measure_relu_active_delta=feature_measure_relu_active_delta,
@@ -926,6 +1490,7 @@ def compute_feature_metrics(
         feature_measure_robust_hybrid_rel_delta=feature_measure_robust_hybrid_rel_delta,
         fsp_strict_delta=fsp_strict_delta,
         fsp_delta=fsp_delta,
+        feature_measure_fsp_rel_multiscale_delta=feature_measure_fsp_rel_multiscale_delta,
         clean_acc=_accuracy(clean_logits, labels),
         adv_acc=_accuracy(adv_logits, labels),
         num_layers=len(indices),
