@@ -8,9 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from robust_metric_lab.student_analysis import REQUIRED_COLUMNS, analyze_frame, write_analysis_outputs
-from robust_metric_lab.metric_registry import METRIC_BY_NAME
-from robust_metric_lab.student_benchmark import SETTING_BY_KEY
+from robust_metric_lab.student_analysis import REQUIRED_COLUMNS, analyze_frame, validate_identifiers, write_analysis_outputs
 
 
 def _parse_inputs(values: list[list[Path]]) -> list[Path]:
@@ -27,6 +25,10 @@ def _load_inputs(paths: list[Path]) -> pd.DataFrame:
         missing = sorted(REQUIRED_COLUMNS - set(frame.columns))
         if missing:
             raise ValueError(f"{path}: missing required columns: {', '.join(missing)}")
+        try:
+            validate_identifiers(frame)
+        except ValueError as exc:
+            raise ValueError(f"{path}: {exc}") from exc
         for row_number, row in frame.iterrows():
             metric = str(row["metric_name"])
             setting = str(row["setting"])

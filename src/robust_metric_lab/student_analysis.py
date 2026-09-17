@@ -44,6 +44,27 @@ def _require_schema(frame: pd.DataFrame) -> None:
         raise ValueError(f"missing required columns: {', '.join(missing)}")
 
 
+def validate_identifiers(frame: pd.DataFrame) -> None:
+    """Reject missing, padded, and unknown metric/setting identifiers by row."""
+    for row_number, (_, row) in enumerate(frame.iterrows(), 2):
+        metric_value = row["metric_name"]
+        setting_value = row["setting"]
+        if pd.isna(metric_value) or not str(metric_value).strip():
+            raise ValueError(f"invalid metric_name at row {row_number}: blank/NaN")
+        if pd.isna(setting_value) or not str(setting_value).strip():
+            raise ValueError(f"invalid setting at row {row_number}: blank/NaN")
+        metric = str(metric_value)
+        setting = str(setting_value)
+        if metric != metric.strip():
+            raise ValueError(f"invalid metric_name at row {row_number}: value must be canonical")
+        if setting != setting.strip():
+            raise ValueError(f"invalid setting at row {row_number}: value must be canonical")
+        if metric not in METRIC_BY_NAME:
+            raise ValueError(f"unknown metric at row {row_number}: {metric}")
+        if setting not in SETTING_BY_KEY:
+            raise ValueError(f"unknown benchmark setting at row {row_number}: {setting}")
+
+
 def _direction_adjust(value: float | None, direction: str) -> float | None:
     if value is None:
         return None
@@ -205,19 +226,7 @@ def _finite_summary(summary: Mapping[str, Any]) -> bool:
 def analyze_frame(frame: pd.DataFrame, *, input_files: Iterable[str] | None = None) -> dict[str, Any]:
     """Analyze a unified metric-value frame under the frozen eight-setting grid."""
     _require_schema(frame)
-    for row_number, (_, row) in enumerate(frame.iterrows(), 2):
-        metric_value = row["metric_name"]
-        setting_value = row["setting"]
-        if pd.isna(metric_value) or not str(metric_value).strip():
-            raise ValueError(f"invalid metric_name at row {row_number}: blank/NaN")
-        if pd.isna(setting_value) or not str(setting_value).strip():
-            raise ValueError(f"invalid setting at row {row_number}: blank/NaN")
-        metric = str(metric_value).strip()
-        setting = str(setting_value).strip()
-        if metric not in METRIC_BY_NAME:
-            raise ValueError(f"unknown metric at row {row_number}: {metric}")
-        if setting not in SETTING_BY_KEY:
-            raise ValueError(f"unknown benchmark setting at row {row_number}: {setting}")
+    validate_identifiers(frame)
 
     metric_names = [spec.name for spec in METRIC_SPECS if spec.name in set(frame["metric_name"].astype(str))]
     correlations: list[dict[str, Any]] = []

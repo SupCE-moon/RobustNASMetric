@@ -126,6 +126,45 @@ def test_blank_or_nan_metric_and_setting_fail_with_row_diagnostic(column, value)
         analyze_frame(frame)
 
 
+@pytest.mark.parametrize(
+    "column,value",
+    [("metric_name", " feature_delta "), ("setting", " rb40_mature ")],
+)
+def test_known_but_noncanonical_metric_and_setting_fail_without_trimming(column, value):
+    frame = pd.DataFrame(_rows())
+    frame.loc[0, column] = value
+    with pytest.raises(ValueError, match=rf"{column}.*row 2"):
+        analyze_frame(frame)
+
+
+def test_noncanonical_identifier_in_complete_input_cannot_produce_mean():
+    rows = []
+    for setting_spec in BENCHMARK_SETTINGS:
+        values = _rows(setting=setting_spec.key, n=setting_spec.expected_rows)
+        if setting_spec.key == "rb40_mature":
+            values[0]["metric_name"] = " feature_delta "
+        rows.extend(values)
+    with pytest.raises(ValueError, match=r"metric_name.*row 2"):
+        analyze_frame(pd.DataFrame(rows))
+
+
+def test_cli_rejects_cross_file_noncanonical_duplicate_variant(tmp_path: Path):
+    first = tmp_path / "first.csv"
+    second = tmp_path / "second.csv"
+    frame = _write_cli_csv(first)
+    variant = frame.head(1).copy()
+    variant.loc[variant.index[0], "setting"] = " rb40_mature "
+    variant.to_csv(second, index=False)
+    script = Path(__file__).parents[1] / "scripts" / "analyze_student_benchmark.py"
+    env = {**__import__("os").environ, "PYTHONPATH": str(script.parents[1] / "src")}
+    completed = subprocess.run(
+        [sys.executable, str(script), "--input", str(first), str(second), "--output-dir", str(tmp_path / "out")],
+        env=env, capture_output=True, text=True,
+    )
+    assert completed.returncode != 0
+    assert "setting" in completed.stderr.lower() and "row" in completed.stderr.lower()
+
+
 def test_runtime_invalid_values_invalidate_setting_and_are_not_averaged():
     frame = pd.DataFrame(_rows())
     frame.loc[0, "runtime_sec"] = np.nan
