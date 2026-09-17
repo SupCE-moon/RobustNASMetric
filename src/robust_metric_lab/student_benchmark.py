@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import csv
+import json
 from math import fsum
+from pathlib import Path
 from typing import Iterable, Mapping
 
 from .metric_registry import METRIC_BY_NAME
@@ -32,6 +35,103 @@ SAMPLE_OFFSET = 0
 NUM_SAMPLES = 64
 SEED = 20260808
 EPSILON = 8 / 255
+
+
+@dataclass(frozen=True)
+class BenchmarkManifestItem:
+    """A single teacher-manifest row, resolved relative to a bundle root."""
+
+    benchmark: str
+    model_or_arch_id: str
+    checkpoint_epoch: int | None
+    checkpoint_path: Path
+    target_value: float
+    metadata: Mapping[str, object] = field(default_factory=dict)
+
+
+def resolve_under_root(root: str | Path, relative_path: str | Path) -> Path:
+    """Resolve an artifact path, rejecting absolute paths and root escapes."""
+    root_path = Path(root).resolve()
+    supplied = Path(relative_path)
+    if supplied.is_absolute():
+        raise ValueError(f"path is outside benchmark root: {relative_path}")
+    candidate = (root_path / supplied).resolve()
+    try:
+        candidate.relative_to(root_path)
+    except ValueError as exc:
+        raise ValueError(f"path is outside benchmark root: {relative_path}") from exc
+    return candidate
+
+
+def _json_field(row: Mapping[str, str], column: str, row_number: int) -> object:
+    try:
+        return json.loads(row[column])
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"invalid JSON in {column} at manifest row {row_number}") from exc
+
+
+def _load_items(path: str | Path, root: str | Path | None, *, benchmark: str,
+                required: set[str], id_column: str, epoch_column: str | None,
+                target_column: str, epochs: set[int | None], needs_genotype: bool) -> list[BenchmarkManifestItem]:
+    manifest = Path(path)
+    benchmark_root = Path(root) if root is not None else manifest.parent
+    with manifest.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        columns = set(reader.fieldnames or [])
+        missing = sorted(required - columns)
+        if missing:
+            raise ValueError(f"missing required columns: {', '.join(missing)}")
+        result: list[BenchmarkManifestItem] = []
+        seen: set[tuple[str, int | None]] = set()
+        for row_number, row in enumerate(reader, 2):
+            identifier = row[id_column].strip()
+            epoch = None if epoch_column is None else int(row[epoch_column])
+            if epoch not in epochs:
+                raise ValueError(f"unsupported checkpoint epoch {epoch} at manifest row {row_number}")
+            key = (identifier, epoch)
+            if key in seen:
+                raise ValueError(f"duplicate model/architecture ID: {identifier} (epoch {epoch})")
+            seen.add(key)
+            metadata_value = _json_field(row, "metadata_json", row_number)
+            if not isinstance(metadata_value, dict):
+                raise ValueError(f"metadata_json must be an object at manifest row {row_number}")
+            metadata = dict(metadata_value)
+            if needs_genotype:
+                genotype = _json_field(row, "genotype_json", row_number)
+                metadata["genotype"] = genotype
+            result.append(BenchmarkManifestItem(
+                benchmark=benchmark,
+                model_or_arch_id=identifier,
+                checkpoint_epoch=epoch,
+                checkpoint_path=resolve_under_root(benchmark_root, row["checkpoint_path"]),
+                target_value=float(row[target_column]),
+                metadata=metadata,
+            ))
+    return result
+
+
+def load_rb40_items(path: str | Path, root: str | Path | None = None) -> list[BenchmarkManifestItem]:
+    with Path(path).open(encoding="utf-8", newline="") as handle:
+        manifest_columns = set(csv.DictReader(handle).fieldnames or [])
+    identity = "model_name" if "model_name" in manifest_columns else "model_id"
+    return _load_items(path, root, benchmark="rb40",
+                       required={identity, "checkpoint_path", "robust_accuracy", "metadata_json"},
+                       id_column=identity, epoch_column=None, target_column="robust_accuracy",
+                       epochs={None}, needs_genotype=False)
+
+
+def load_nb201_items(path: str | Path, root: str | Path | None = None) -> list[BenchmarkManifestItem]:
+    return _load_items(path, root, benchmark="nb201",
+                       required={"arch_id", "epoch", "checkpoint_path", "official_final_robust_accuracy", "genotype_json", "metadata_json"},
+                       id_column="arch_id", epoch_column="epoch", target_column="official_final_robust_accuracy",
+                       epochs={0, 5, 10, 25, 50}, needs_genotype=True)
+
+
+def load_darts_items(path: str | Path, root: str | Path | None = None) -> list[BenchmarkManifestItem]:
+    return _load_items(path, root, benchmark="darts",
+                       required={"arch_id", "epoch", "checkpoint_path", "full_pgd20_accuracy", "genotype_json", "metadata_json"},
+                       id_column="arch_id", epoch_column="epoch", target_column="full_pgd20_accuracy",
+                       epochs={0, 100}, needs_genotype=True)
 
 
 @dataclass(frozen=True)
