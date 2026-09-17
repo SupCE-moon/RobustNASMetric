@@ -71,6 +71,17 @@ def test_output_ancestor_does_not_exclude_bundle(tmp_path):
     assert snapshot["file_count"] == 4
 
 
+def test_output_equal_root_excludes_audit_artifacts_on_rerun(tmp_path):
+    root = make_bundle(tmp_path)
+    assert main(["--root", str(root), "--output-dir", str(root)]) == 0
+    assert main(["--root", str(root), "--output-dir", str(root)]) == 0
+    snapshot = json.loads((root / "source_snapshot.json").read_text(encoding="utf-8"))
+    assert snapshot["file_count"] == 4
+    with (root / "file_inventory.csv").open(newline="", encoding="utf-8") as handle:
+        paths = [row["relative_path"] for row in csv.DictReader(handle)]
+    assert paths == ["TRANSFER_STATUS.json", "manifests/a.txt", "manifests/z.txt", "nested.bin"]
+
+
 def test_atomic_failure_leaves_no_completed_targets(tmp_path, monkeypatch):
     root = make_bundle(tmp_path)
     output = tmp_path / "out"
@@ -108,6 +119,21 @@ def test_atomic_failure_preserves_existing_outputs(tmp_path, monkeypatch):
     assert [path.read_bytes() for path in targets] == originals
 
 
+def test_staging_failure_preserves_existing_outputs(tmp_path, monkeypatch):
+    root = make_bundle(tmp_path)
+    output = tmp_path / "out"
+    output.mkdir()
+    targets = [output / name for name in ("source_snapshot.json", "manifest_sha256.csv", "file_inventory.csv")]
+    originals = [b"old snapshot", b"old manifest", b"old inventory"]
+    for path, content in zip(targets, originals):
+        path.write_bytes(content)
+    import audit_student_benchmark
+    monkeypatch.setattr(audit_student_benchmark, "_write_csv", lambda *args: (_ for _ in ()).throw(OSError("stage failure")))
+    with pytest.raises(OSError, match="stage failure"):
+        main(["--root", str(root), "--output-dir", str(output)])
+    assert [path.read_bytes() for path in targets] == originals
+
+
 def test_missing_status_is_explicitly_unverified(tmp_path):
     root = make_bundle(tmp_path)
     (root / "TRANSFER_STATUS.json").unlink()
@@ -120,11 +146,21 @@ def test_missing_status_is_explicitly_unverified(tmp_path):
 def test_snapshot_records_status_text_and_digest(tmp_path):
     root = make_bundle(tmp_path)
     raw = '{"status":"IN_PROGRESS","note":"exact"}\n'
-    (root / "TRANSFER_STATUS.json").write_text(raw, encoding="utf-8")
+    (root / "TRANSFER_STATUS.json").write_bytes(raw.encode("utf-8"))
     snapshot = build_snapshot(root)
     import hashlib
     assert snapshot["raw_status_text"] == raw
     assert snapshot["raw_status_sha256"] == hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def test_snapshot_hashes_status_crlf_bytes_exactly(tmp_path):
+    root = make_bundle(tmp_path)
+    raw = b'{"status":"IN_PROGRESS"}\r\n'
+    (root / "TRANSFER_STATUS.json").write_bytes(raw)
+    snapshot = build_snapshot(root)
+    import hashlib
+    assert snapshot["raw_status_text"] == raw.decode("utf-8")
+    assert snapshot["raw_status_sha256"] == hashlib.sha256(raw).hexdigest()
 
 
 def test_external_status_symlink_is_rejected(tmp_path):
