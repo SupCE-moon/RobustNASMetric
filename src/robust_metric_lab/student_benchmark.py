@@ -53,7 +53,7 @@ def resolve_under_root(root: str | Path, relative_path: str | Path) -> Path:
     """Resolve an artifact path, rejecting absolute paths and root escapes."""
     root_path = Path(root).resolve()
     supplied = Path(relative_path)
-    if supplied.is_absolute():
+    if supplied.is_absolute() or ".." in supplied.parts:
         raise ValueError(f"path is outside benchmark root: {relative_path}")
     candidate = (root_path / supplied).resolve()
     try:
@@ -83,6 +83,7 @@ def _load_items(path: str | Path, root: str | Path | None, *, benchmark: str,
             raise ValueError(f"missing required columns: {', '.join(missing)}")
         result: list[BenchmarkManifestItem] = []
         seen: set[tuple[str, int | None]] = set()
+        epochs_by_id: dict[str, set[int | None]] = {}
         for row_number, row in enumerate(reader, 2):
             identifier = row[id_column].strip()
             epoch = None if epoch_column is None else int(row[epoch_column])
@@ -92,6 +93,7 @@ def _load_items(path: str | Path, root: str | Path | None, *, benchmark: str,
             if key in seen:
                 raise ValueError(f"duplicate model/architecture ID: {identifier} (epoch {epoch})")
             seen.add(key)
+            epochs_by_id.setdefault(identifier, set()).add(epoch)
             metadata_value = _json_field(row, "metadata_json", row_number)
             if not isinstance(metadata_value, dict):
                 raise ValueError(f"metadata_json must be an object at manifest row {row_number}")
@@ -107,16 +109,24 @@ def _load_items(path: str | Path, root: str | Path | None, *, benchmark: str,
                 target_value=float(row[target_column]),
                 metadata=metadata,
             ))
+        if epoch_column is not None:
+            # Compare against the frozen grid explicitly; this also makes a
+            # truncated manifest fail before any runner can use it.
+            incomplete = {
+                identifier: sorted(set(epochs) - set(epochs_by_id[identifier]), key=lambda value: -1 if value is None else value)
+                for identifier in epochs_by_id
+                if set(epochs) - set(epochs_by_id[identifier])
+            }
+            if incomplete:
+                details = ", ".join(f"{identifier}: {missing}" for identifier, missing in incomplete.items())
+                raise ValueError(f"missing epochs for architecture IDs: {details}")
     return result
 
 
 def load_rb40_items(path: str | Path, root: str | Path | None = None) -> list[BenchmarkManifestItem]:
-    with Path(path).open(encoding="utf-8", newline="") as handle:
-        manifest_columns = set(csv.DictReader(handle).fieldnames or [])
-    identity = "model_name" if "model_name" in manifest_columns else "model_id"
     return _load_items(path, root, benchmark="rb40",
-                       required={identity, "checkpoint_path", "robust_accuracy", "metadata_json"},
-                       id_column=identity, epoch_column=None, target_column="robust_accuracy",
+                       required={"model_name", "checkpoint_path", "robust_accuracy", "metadata_json"},
+                       id_column="model_name", epoch_column=None, target_column="robust_accuracy",
                        epochs={None}, needs_genotype=False)
 
 

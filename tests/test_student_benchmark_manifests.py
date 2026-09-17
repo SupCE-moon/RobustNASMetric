@@ -24,7 +24,7 @@ def test_resolve_under_root_accepts_nested_artifact(tmp_path: Path):
     assert resolve_under_root(tmp_path, "nb201_64/checkpoints/a.pt") == expected.resolve()
 
 
-@pytest.mark.parametrize("relative", ["../secret.pt", "C:/secret.pt", "/tmp/secret.pt"])
+@pytest.mark.parametrize("relative", ["../secret.pt", "dir/../secret.pt", "C:/secret.pt", "/tmp/secret.pt"])
 def test_resolve_under_root_rejects_escape(tmp_path: Path, relative: str):
     with pytest.raises(ValueError, match="outside benchmark root"):
         resolve_under_root(tmp_path, relative)
@@ -55,10 +55,15 @@ def test_loaders_reject_missing_columns_and_duplicate_ids(tmp_path: Path):
         load_nb201_items(missing, tmp_path)
 
     duplicate = tmp_path / "duplicate.csv"
-    row = {"model_id": "m", "checkpoint_path": "m.pt", "robust_accuracy": "0.5", "metadata_json": "{}"}
+    row = {"model_name": "m", "checkpoint_path": "m.pt", "robust_accuracy": "0.5", "metadata_json": "{}"}
     write_csv(duplicate, [row, row])
     with pytest.raises(ValueError, match="duplicate"):
         load_rb40_items(duplicate, tmp_path)
+
+    incompatible = tmp_path / "incompatible.csv"
+    write_csv(incompatible, [{"model_id": "m", "checkpoint_path": "m.pt", "robust_accuracy": "0.5", "metadata_json": "{}"}])
+    with pytest.raises(ValueError, match="missing required columns.*model_name"):
+        load_rb40_items(incompatible, tmp_path)
 
 
 def test_darts_loader_covers_epoch_grid_and_json(tmp_path: Path):
@@ -69,3 +74,27 @@ def test_darts_loader_covers_epoch_grid_and_json(tmp_path: Path):
     items = load_darts_items(manifest, tmp_path)
     assert [item.checkpoint_epoch for item in items] == [0, 100]
     assert items[1].target_value == 0.25
+
+
+@pytest.mark.parametrize("loader, epochs, columns", [
+    (load_nb201_items, (0, 5, 10, 25), ("arch_id", "epoch", "checkpoint_path", "official_final_robust_accuracy", "genotype_json", "metadata_json")),
+    (load_darts_items, (0,), ("arch_id", "epoch", "checkpoint_path", "full_pgd20_accuracy", "genotype_json", "metadata_json")),
+])
+def test_loaders_reject_incomplete_epoch_grid(tmp_path: Path, loader, epochs, columns):
+    manifest = tmp_path / "incomplete.csv"
+    rows = [{key: (epoch if key == "epoch" else "a" if key == "arch_id" else "{}" if key.endswith("json") else "a.pt" if key == "checkpoint_path" else "0.5") for key in columns} for epoch in epochs]
+    write_csv(manifest, rows)
+    with pytest.raises(ValueError, match="missing epochs"):
+        loader(manifest, tmp_path)
+
+
+def test_resolve_under_root_rejects_symlink_escape(tmp_path: Path):
+    external = tmp_path.parent / "outside-artifact.pt"
+    external.write_text("x", encoding="utf-8")
+    link = tmp_path / "link.pt"
+    try:
+        link.symlink_to(external)
+    except (OSError, NotImplementedError):
+        pytest.skip("symbolic links unavailable")
+    with pytest.raises(ValueError, match="outside benchmark root"):
+        resolve_under_root(tmp_path, "link.pt")
