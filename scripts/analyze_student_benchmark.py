@@ -54,6 +54,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     paths = _parse_inputs(args.input)
     try:
+        output = args.output_dir
+        targets = [output / "correlations.csv", output / "all_setting_table.csv", output / "analysis_report.md"]
+        existing = [path.name for path in targets if path.exists()]
+        if existing:
+            raise FileExistsError("refusing to overwrite existing output: " + ", ".join(existing))
         frame = _load_inputs(paths)
         result = analyze_frame(frame, input_files=[str(path) for path in paths])
         write_analysis_outputs(result, args.output_dir)
@@ -64,4 +69,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

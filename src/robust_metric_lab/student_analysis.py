@@ -26,6 +26,7 @@ REQUIRED_COLUMNS = {
 }
 BOOTSTRAP_REPEATS = 2000
 BOOTSTRAP_SEED = 20260808
+BOOTSTRAP_MIN_VALID_REPEATS = 2
 SETTING_KEYS = tuple(setting.key for setting in BENCHMARK_SETTINGS)
 
 
@@ -51,16 +52,22 @@ def _direction_adjust(value: float | None, direction: str) -> float | None:
 
 def _correlations(metric_values: list[float], targets: list[float], direction: str) -> dict[str, float | None]:
     if len(metric_values) < 2:
-        return {"raw_spearman": None, "spearman": None, "pearson": None, "kendall": None}
+        return {
+            "raw_spearman": None, "spearman": None,
+            "raw_pearson": None, "direction_adjusted_pearson": None,
+            "raw_kendall": None, "direction_adjusted_kendall": None,
+        }
     with warnings.catch_warnings(), np.errstate(all="ignore"):
         warnings.simplefilter("ignore")
         raw_spearman = float(stats.spearmanr(metric_values, targets).statistic)
         pearson = float(stats.pearsonr(metric_values, targets).statistic)
         kendall = float(stats.kendalltau(metric_values, targets).statistic)
     values: dict[str, float | None] = {}
-    for key, value in (("raw_spearman", raw_spearman), ("pearson", pearson), ("kendall", kendall)):
+    for key, value in (("raw_spearman", raw_spearman), ("raw_pearson", pearson), ("raw_kendall", kendall)):
         values[key] = value if math.isfinite(value) else None
     values["spearman"] = _direction_adjust(values["raw_spearman"], direction)
+    values["direction_adjusted_pearson"] = _direction_adjust(values["raw_pearson"], direction)
+    values["direction_adjusted_kendall"] = _direction_adjust(values["raw_kendall"], direction)
     return values
 
 
@@ -73,12 +80,15 @@ def _bootstrap(metric_values: list[float], targets: list[float], direction: str)
     values: list[float] = []
     for _ in range(BOOTSTRAP_REPEATS):
         indexes = rng.integers(0, len(metric_array), size=len(metric_array))
-        with warnings.catch_warnings(), np.errstate(all="ignore"):
-            warnings.simplefilter("ignore")
-            value = float(stats.spearmanr(metric_array[indexes], target_array[indexes]).statistic)
+        sampled_metric = stats.rankdata(metric_array[indexes])
+        sampled_target = stats.rankdata(target_array[indexes])
+        centered_metric = sampled_metric - sampled_metric.mean()
+        centered_target = sampled_target - sampled_target.mean()
+        denominator = float(np.sqrt(np.dot(centered_metric, centered_metric) * np.dot(centered_target, centered_target)))
+        value = float(np.dot(centered_metric, centered_target) / denominator) if denominator else float("nan")
         if math.isfinite(value):
             values.append(-value if direction == "lower" else value)
-    if len(values) < 2:
+    if len(values) < BOOTSTRAP_MIN_VALID_REPEATS:
         return None, None, len(values)
     low, high = np.percentile(np.asarray(values), [2.5, 97.5])
     return float(low), float(high), len(values)
@@ -99,6 +109,7 @@ def summarize_metric(frame: pd.DataFrame, metric_name: str, setting: str) -> dic
     valid_targets: list[float] = []
     valid_ids: list[str] = []
     runtime_values: list[float] = []
+    runtime_invalid_rows = 0
     has_runtime = "runtime_sec" in selected.columns
 
     for _, row in selected.iterrows():
@@ -116,7 +127,9 @@ def summarize_metric(frame: pd.DataFrame, metric_name: str, setting: str) -> dic
         valid_ids.append(str(row.get("model_or_arch_id", "")))
         if has_runtime:
             runtime = _as_float(row.get("runtime_sec"))
-            if runtime is not None:
+            if runtime is None or runtime < 0:
+                runtime_invalid_rows += 1
+            else:
                 runtime_values.append(runtime)
 
     duplicate_ids = len(valid_ids) - len(set(valid_ids))
@@ -129,6 +142,8 @@ def summarize_metric(frame: pd.DataFrame, metric_name: str, setting: str) -> dic
         reasons.append(f"{invalid_rows} invalid/nonfinite row(s)")
     if duplicate_ids:
         reasons.append(f"duplicate model/architecture ID(s): {duplicate_ids}")
+    if runtime_invalid_rows:
+        reasons.append(f"{runtime_invalid_rows} invalid runtime_sec value(s)")
 
     correlations = _correlations(valid_values, valid_targets, METRIC_BY_NAME[metric_name].direction)
     ci_low, ci_high, bootstrap_valid = _bootstrap(
@@ -136,13 +151,17 @@ def summarize_metric(frame: pd.DataFrame, metric_name: str, setting: str) -> dic
     )
     if len(valid_values) < 2:
         reasons.append("insufficient valid samples")
-    elif correlations["spearman"] is None or correlations["pearson"] is None or correlations["kendall"] is None:
+    elif (
+        correlations["spearman"] is None
+        or correlations["direction_adjusted_pearson"] is None
+        or correlations["direction_adjusted_kendall"] is None
+    ):
         reasons.append("constant vector or undefined correlation")
     if ci_low is None or ci_high is None:
         reasons.append("insufficient defined bootstrap repeats")
 
     status = "ok" if not reasons else "invalid"
-    runtime_total = sum(runtime_values) if has_runtime and runtime_values else None
+    runtime_total = sum(runtime_values) if has_runtime and runtime_values and not runtime_invalid_rows else None
     runtime_mean = (runtime_total / len(runtime_values)) if runtime_total is not None else None
     result: dict[str, Any] = {
         "metric_name": metric_name,
@@ -152,13 +171,18 @@ def summarize_metric(frame: pd.DataFrame, metric_name: str, setting: str) -> dic
         "valid_rows": len(valid_values),
         "failed_rows": failed_rows,
         "invalid_rows": invalid_rows,
+        "runtime_invalid_rows": runtime_invalid_rows,
         "duplicate_ids": duplicate_ids,
         "raw_spearman": correlations["raw_spearman"],
         "direction_adjusted_spearman": correlations["spearman"],
         "spearman": correlations["spearman"],
-        "pearson": correlations["pearson"],
-        "kendall": correlations["kendall"],
-        "kendall_tau": correlations["kendall"],
+        "raw_pearson": correlations["raw_pearson"],
+        "direction_adjusted_pearson": correlations["direction_adjusted_pearson"],
+        "pearson": correlations["direction_adjusted_pearson"],
+        "raw_kendall": correlations["raw_kendall"],
+        "direction_adjusted_kendall": correlations["direction_adjusted_kendall"],
+        "kendall": correlations["direction_adjusted_kendall"],
+        "kendall_tau": correlations["direction_adjusted_kendall"],
         "ci_low": ci_low,
         "ci_high": ci_high,
         "bootstrap_repeats": BOOTSTRAP_REPEATS,
@@ -181,12 +205,19 @@ def _finite_summary(summary: Mapping[str, Any]) -> bool:
 def analyze_frame(frame: pd.DataFrame, *, input_files: Iterable[str] | None = None) -> dict[str, Any]:
     """Analyze a unified metric-value frame under the frozen eight-setting grid."""
     _require_schema(frame)
-    unknown_metrics = sorted({str(value) for value in frame["metric_name"].dropna() if str(value) not in METRIC_BY_NAME})
-    if unknown_metrics:
-        raise ValueError(f"unknown metric: {', '.join(unknown_metrics)}")
-    unknown_settings = sorted({str(value) for value in frame["setting"].dropna() if str(value) not in SETTING_BY_KEY})
-    if unknown_settings:
-        raise ValueError(f"unknown benchmark setting: {', '.join(unknown_settings)}")
+    for row_number, (_, row) in enumerate(frame.iterrows(), 2):
+        metric_value = row["metric_name"]
+        setting_value = row["setting"]
+        if pd.isna(metric_value) or not str(metric_value).strip():
+            raise ValueError(f"invalid metric_name at row {row_number}: blank/NaN")
+        if pd.isna(setting_value) or not str(setting_value).strip():
+            raise ValueError(f"invalid setting at row {row_number}: blank/NaN")
+        metric = str(metric_value).strip()
+        setting = str(setting_value).strip()
+        if metric not in METRIC_BY_NAME:
+            raise ValueError(f"unknown metric at row {row_number}: {metric}")
+        if setting not in SETTING_BY_KEY:
+            raise ValueError(f"unknown benchmark setting at row {row_number}: {setting}")
 
     metric_names = [spec.name for spec in METRIC_SPECS if spec.name in set(frame["metric_name"].astype(str))]
     correlations: list[dict[str, Any]] = []
@@ -236,8 +267,9 @@ def analyze_frame(frame: pd.DataFrame, *, input_files: Iterable[str] | None = No
 
 
 CORRELATION_FIELDS = [
-    "metric_name", "setting", "expected_rows", "total_rows", "valid_rows", "failed_rows", "invalid_rows",
-    "duplicate_ids", "raw_spearman", "direction_adjusted_spearman", "pearson", "kendall", "ci_low", "ci_high",
+    "metric_name", "setting", "expected_rows", "total_rows", "valid_rows", "failed_rows", "invalid_rows", "runtime_invalid_rows",
+    "duplicate_ids", "raw_spearman", "direction_adjusted_spearman", "raw_pearson", "direction_adjusted_pearson",
+    "raw_kendall", "direction_adjusted_kendall", "ci_low", "ci_high",
     "bootstrap_repeats", "bootstrap_valid_repeats", "runtime_total_sec", "runtime_mean_sec", "status", "reason",
 ]
 TABLE_FIELDS = ["metric_name", *SETTING_KEYS, "all_setting_mean", "status", "reason"]
