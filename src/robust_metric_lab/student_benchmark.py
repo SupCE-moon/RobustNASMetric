@@ -26,6 +26,12 @@ BENCHMARK_SETTINGS = (
     BenchmarkSetting("darts_e0", "darts", 0, "full_pgd20_accuracy", 100),
     BenchmarkSetting("darts_e100", "darts", 100, "full_pgd20_accuracy", 100),
 )
+SETTING_BY_KEY = {setting.key: setting for setting in BENCHMARK_SETTINGS}
+
+SAMPLE_OFFSET = 0
+NUM_SAMPLES = 64
+SEED = 20260808
+EPSILON = 8 / 255
 
 
 @dataclass(frozen=True)
@@ -41,13 +47,30 @@ class MetricValueRow:
     seed: int
     sample_offset: int
     num_samples: int
-    epsilon: float | str
+    epsilon: float
     direction: str
     status: str = "ok"
     error: str | None = None
     metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        setting = SETTING_BY_KEY.get(self.setting)
+        if setting is None:
+            raise ValueError(f"unknown benchmark setting: {self.setting}")
+        if self.checkpoint_epoch != setting.checkpoint_epoch:
+            raise ValueError(
+                f"checkpoint epoch mismatch for {self.setting}: "
+                f"expected {setting.checkpoint_epoch}, got {self.checkpoint_epoch}"
+            )
+        protocol_values = (
+            ("seed", self.seed, SEED),
+            ("sample_offset", self.sample_offset, SAMPLE_OFFSET),
+            ("num_samples", self.num_samples, NUM_SAMPLES),
+            ("epsilon", self.epsilon, EPSILON),
+        )
+        for name, value, expected in protocol_values:
+            if value != expected:
+                raise ValueError(f"{name} must be frozen at {expected!r}, got {value!r}")
         spec = METRIC_BY_NAME.get(self.metric_name)
         if spec is None:
             raise ValueError(f"unknown metric: {self.metric_name}")
