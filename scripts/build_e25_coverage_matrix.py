@@ -41,10 +41,13 @@ def _canonical(value: str, label: str, source: Path, line: int) -> str:
 
 
 def _epoch(value: str, setting_key: str, source: Path, line: int) -> int | None:
-    value = "" if value is None else value.strip()
+    if value is None:
+        raise ValueError(f"missing checkpoint_epoch at {source}:{line}")
     if value == "":
         result = None
     else:
+        if value != value.strip():
+            raise ValueError(f"noncanonical checkpoint_epoch at {source}:{line}")
         try:
             result = int(value)
         except ValueError as exc:
@@ -71,6 +74,8 @@ def build_coverage_matrix(inputs: Iterable[str | Path]) -> OrderedDict[str, dict
     # (setting, metric) -> id -> status; this makes mixed status for one ID fail closed.
     observations: dict[tuple[str, str], dict[str, str]] = {}
     seen_keys: set[tuple[object, ...]] = set()
+    prefix_modes: dict[tuple[object, ...], tuple[str, Path, int]] = {}
+    setting_ids: dict[str, dict[str, tuple[Path, int]]] = {}
     degraded = False
     for input_name in inputs:
         source = Path(input_name)
@@ -93,8 +98,8 @@ def build_coverage_matrix(inputs: Iterable[str | Path]) -> OrderedDict[str, dict
                     raise ValueError(f"unknown metric at {source}:{line}: {metric}")
                 epoch = _epoch(raw.get("checkpoint_epoch"), setting, source, line)
                 status = raw.get("status")
-                if status is None or status == "" or status != status.strip():
-                    raise ValueError(f"empty/noncanonical status at {source}:{line}")
+                if status is None or status.strip() == "":
+                    raise ValueError(f"empty status at {source}:{line}")
                 if full_key:
                     protocol = tuple(raw.get(field) for field in PROTOCOL)
                     if any(value is None or value == "" or value != value.strip() for value in protocol):
@@ -102,9 +107,23 @@ def build_coverage_matrix(inputs: Iterable[str | Path]) -> OrderedDict[str, dict
                     key = (setting, model_id, epoch, metric, *protocol)
                 else:
                     key = (setting, model_id, epoch, metric)
+                prefix = (setting, model_id, epoch, metric)
+                previous = prefix_modes.get(prefix)
+                if previous is not None and previous[0] != ("full" if full_key else "degraded_prefix"):
+                    raise ValueError(
+                        f"protocol key mode conflict: first {previous[0]} at {previous[1]}:{previous[2]}, "
+                        f"again {'full' if full_key else 'degraded_prefix'} at {source}:{line}"
+                    )
+                prefix_modes.setdefault(prefix, ("full" if full_key else "degraded_prefix", source, line))
                 if key in seen_keys:
                     raise ValueError(f"duplicate unique key at {source}:{line}")
                 seen_keys.add(key)
+                ids_for_setting = setting_ids.setdefault(setting, {})
+                if model_id not in ids_for_setting:
+                    ids_for_setting[model_id] = (source, line)
+                    if len(ids_for_setting) > SETTING_BY_KEY[setting].expected_rows:
+                        first_source, first_line = ids_for_setting[model_id]
+                        raise ValueError(f"excess model IDs for {setting}: introduced {model_id} at {first_source}:{first_line}")
                 state = "ok" if status == "ok" else "failed"
                 by_id = observations.setdefault((setting, metric), {})
                 # Any failed observation makes that model ID fail closed.
@@ -147,7 +166,10 @@ def write_matrix(matrix: OrderedDict[str, dict[str, object]], output: str | Path
             writer.writerows(matrix.values())
             handle.flush()
             os.fsync(handle.fileno())
-        tmp.replace(destination)
+        # link() publishes only if destination does not exist, including races
+        # after the initial existence check; unlike replace(), it never overwrites.
+        os.link(tmp, destination)
+        tmp.unlink()
     except Exception:
         try:
             tmp.unlink()

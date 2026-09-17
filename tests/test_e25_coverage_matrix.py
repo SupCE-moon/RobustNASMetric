@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.build_e25_coverage_matrix import coverage_state, build_coverage_matrix
+from scripts.build_e25_coverage_matrix import coverage_state, build_coverage_matrix, write_matrix
 from robust_metric_lab.metric_registry import METRIC_SPECS
 from robust_metric_lab.student_benchmark import BENCHMARK_SETTINGS
 
@@ -66,3 +66,72 @@ def test_cli_success_and_existing_output_rejected(tmp_path):
     assert out.exists()
     bad = subprocess.run([sys.executable, str(script), "--input", str(p), "--output", str(out)], capture_output=True, text=True)
     assert bad.returncode != 0
+
+
+def test_degraded_mode_and_full_degraded_conflict(tmp_path):
+    base = {"setting": "rb40_mature", "metric_name": METRIC_SPECS[0].name, "model_or_arch_id": "m1", "checkpoint_epoch": "", "status": "ok"}
+    degraded = tmp_path / "degraded.csv"; _write(degraded, [base], fields=list(base))
+    assert build_coverage_matrix([degraded])[METRIC_SPECS[0].name]["protocol_key_mode"] == "degraded_prefix"
+    full = dict(base, seed="1", sample_offset="0", num_samples="64")
+    complete = tmp_path / "full.csv"; _write(complete, [full])
+    with pytest.raises(ValueError, match="first|duplicate|conflict"):
+        build_coverage_matrix([degraded, complete])
+
+
+def test_setting_global_excess_across_metrics_and_epoch_whitespace(tmp_path):
+    rows = []
+    for i in range(41):
+        rows.append({"setting": "rb40_mature", "metric_name": METRIC_SPECS[i % 2].name, "model_or_arch_id": f"m{i}", "checkpoint_epoch": "", "status": "ok", "seed": "1", "sample_offset": "0", "num_samples": "64"})
+    p = tmp_path / "excess.csv"; _write(p, rows)
+    with pytest.raises(ValueError, match="excess"):
+        build_coverage_matrix([p])
+    bad = dict(rows[0], checkpoint_epoch=" ")
+    p = tmp_path / "space.csv"; _write(p, [bad])
+    with pytest.raises(ValueError, match="canonical"):
+        build_coverage_matrix([p])
+
+
+def test_atomic_publish_failure_cleans_tmp_and_does_not_overwrite(tmp_path, monkeypatch):
+    p = tmp_path / "input.csv"
+    _write(p, [{"setting": "rb40_mature", "metric_name": METRIC_SPECS[0].name, "model_or_arch_id": "m1", "checkpoint_epoch": "", "status": "ok", "seed": "1", "sample_offset": "0", "num_samples": "64"}])
+    matrix = build_coverage_matrix([p]); out = tmp_path / "out.csv"
+    monkeypatch.setattr("scripts.build_e25_coverage_matrix.os.link", lambda *_: (_ for _ in ()).throw(OSError("publish")))
+    with pytest.raises(OSError): write_matrix(matrix, out)
+    assert not out.exists()
+    assert not list(tmp_path.glob(".out.csv.*.tmp"))
+    out.write_text("original", encoding="utf-8")
+    with pytest.raises(FileExistsError): write_matrix(matrix, out)
+    assert out.read_text(encoding="utf-8") == "original"
+
+
+def test_missing_metric_and_mixed_states_and_output_header(tmp_path):
+    name = METRIC_SPECS[0].name
+    rows = [
+        {"setting": "rb40_mature", "metric_name": name, "model_or_arch_id": "a", "checkpoint_epoch": "", "status": "ok", "seed": "1", "sample_offset": "0", "num_samples": "64"},
+        {"setting": "nb201_e0", "metric_name": name, "model_or_arch_id": "b", "checkpoint_epoch": "0", "status": "bad", "seed": "1", "sample_offset": "0", "num_samples": "64"},
+        {"setting": "nb201_e5", "metric_name": name, "model_or_arch_id": "c", "checkpoint_epoch": "5", "status": "ok", "seed": "1", "sample_offset": "0", "num_samples": "64"},
+    ]
+    p = tmp_path / "mix.csv"; _write(p, rows)
+    matrix = build_coverage_matrix([p]); row = matrix[name]
+    assert row["rb40_mature_state"] == "partial"
+    assert row["nb201_e0_state"] == "failed"
+    assert row["nb201_e5_state"] == "partial"
+    absent = matrix[METRIC_SPECS[-1].name]
+    assert all(absent[f"{s.key}_state"] == "missing" and absent[f"{s.key}_valid_count"] == 0 for s in BENCHMARK_SETTINGS)
+    out = tmp_path / "matrix.csv"; write_matrix(matrix, out)
+    with out.open(newline="", encoding="utf-8") as f:
+        header = next(csv.reader(f))
+    expected = ["metric_name", "attribution", "direction", "reference", "protocol_key_mode"]
+    for s in BENCHMARK_SETTINGS: expected += [f"{s.key}_state", f"{s.key}_expected_count", f"{s.key}_valid_count", f"{s.key}_failed_count"]
+    assert header == expected
+
+
+def test_missing_schema_and_noncanonical_model_fail(tmp_path):
+    p = tmp_path / "schema.csv"
+    _write(p, [{"setting": "rb40_mature"}], fields=["setting"])
+    with pytest.raises(ValueError, match="missing required"):
+        build_coverage_matrix([p])
+    row = {"setting": "rb40_mature", "metric_name": METRIC_SPECS[0].name, "model_or_arch_id": " m1", "checkpoint_epoch": "", "status": "ok", "seed": "1", "sample_offset": "0", "num_samples": "64"}
+    _write(p, [row])
+    with pytest.raises(ValueError, match="canonical"):
+        build_coverage_matrix([p])
