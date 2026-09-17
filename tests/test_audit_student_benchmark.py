@@ -64,6 +64,13 @@ def test_snapshot_and_cli_have_stable_inventory_and_manifest(tmp_path):
     assert [row["relative_path"] for row in inventory] == ["TRANSFER_STATUS.json", "manifests/a.txt", "manifests/z.txt", "nested.bin"]
 
 
+def test_output_ancestor_does_not_exclude_bundle(tmp_path):
+    root = make_bundle(tmp_path)
+    assert main(["--root", str(root), "--output-dir", str(tmp_path)]) == 0
+    snapshot = json.loads((tmp_path / "source_snapshot.json").read_text(encoding="utf-8"))
+    assert snapshot["file_count"] == 4
+
+
 def test_atomic_failure_leaves_no_completed_targets(tmp_path, monkeypatch):
     root = make_bundle(tmp_path)
     output = tmp_path / "out"
@@ -80,6 +87,27 @@ def test_atomic_failure_leaves_no_completed_targets(tmp_path, monkeypatch):
     assert not any((output / name).exists() for name in ("source_snapshot.json", "manifest_sha256.csv", "file_inventory.csv"))
 
 
+def test_atomic_failure_preserves_existing_outputs(tmp_path, monkeypatch):
+    root = make_bundle(tmp_path)
+    output = tmp_path / "out"
+    output.mkdir()
+    targets = [output / name for name in ("source_snapshot.json", "manifest_sha256.csv", "file_inventory.csv")]
+    originals = [b"old snapshot", b"old manifest", b"old inventory"]
+    for path, content in zip(targets, originals):
+        path.write_bytes(content)
+    original_replace = Path.replace
+
+    def fail_replace(self, target):
+        if str(target).endswith("manifest_sha256.csv"):
+            raise OSError("injected failure")
+        return original_replace(self, target)
+
+    monkeypatch.setattr(Path, "replace", fail_replace)
+    with pytest.raises(OSError, match="injected failure"):
+        main(["--root", str(root), "--output-dir", str(output)])
+    assert [path.read_bytes() for path in targets] == originals
+
+
 def test_missing_status_is_explicitly_unverified(tmp_path):
     root = make_bundle(tmp_path)
     (root / "TRANSFER_STATUS.json").unlink()
@@ -87,6 +115,30 @@ def test_missing_status_is_explicitly_unverified(tmp_path):
     assert snapshot["raw_status"] is None
     assert snapshot["audit_result"] == "RECORDED_NOT_VERIFIED"
     assert snapshot["status_state"] == "MISSING"
+
+
+def test_snapshot_records_status_text_and_digest(tmp_path):
+    root = make_bundle(tmp_path)
+    raw = '{"status":"IN_PROGRESS","note":"exact"}\n'
+    (root / "TRANSFER_STATUS.json").write_text(raw, encoding="utf-8")
+    snapshot = build_snapshot(root)
+    import hashlib
+    assert snapshot["raw_status_text"] == raw
+    assert snapshot["raw_status_sha256"] == hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def test_external_status_symlink_is_rejected(tmp_path):
+    root = make_bundle(tmp_path)
+    external = tmp_path / "external-status.json"
+    external.write_text('{"status":"COMPLETE"}', encoding="utf-8")
+    status = root / "TRANSFER_STATUS.json"
+    status.unlink()
+    try:
+        status.symlink_to(external)
+    except (OSError, NotImplementedError):
+        pytest.skip("symbolic links unavailable")
+    with pytest.raises(ValueError, match="TRANSFER_STATUS.json.*symlink"):
+        build_snapshot(root)
 
 
 def test_output_inside_root_is_excluded_from_snapshot(tmp_path):

@@ -28,13 +28,20 @@ def _files_under(root: Path, excluded: Path | None = None) -> list[Path]:
         if not path.is_file() or path.is_symlink():
             continue
         resolved = path.resolve()
-        if excluded is not None:
+        if excluded is not None and excluded != root:
             try:
-                resolved.relative_to(excluded)
+                excluded.relative_to(root)
             except ValueError:
-                pass
+                excluded_inside = False
             else:
-                continue
+                excluded_inside = True
+            if excluded_inside:
+                try:
+                    resolved.relative_to(excluded)
+                except ValueError:
+                    pass
+                else:
+                    continue
         result.append(path)
     return sorted(result, key=lambda p: p.relative_to(root).as_posix())
 
@@ -43,17 +50,20 @@ def _relative(root: Path, path: Path) -> str:
     return path.relative_to(root).as_posix()
 
 
-def _status(root: Path) -> tuple[object, str]:
+def _status(root: Path) -> tuple[object, str, str | None]:
     path = root / "TRANSFER_STATUS.json"
+    if path.is_symlink():
+        raise ValueError("TRANSFER_STATUS.json must not be a symlink")
     if not path.exists():
-        return None, "MISSING"
+        return None, "MISSING", None
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
+        raw_text = path.read_text(encoding="utf-8")
+        value = json.loads(raw_text)
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise ValueError(f"invalid TRANSFER_STATUS.json: {exc}") from exc
     if not isinstance(value, dict):
         raise ValueError("invalid TRANSFER_STATUS.json: expected a JSON object")
-    return value, "COMPLETE" if value.get("status") == "COMPLETE" else "NON_COMPLETE"
+    return value, "COMPLETE" if value.get("status") == "COMPLETE" else "NON_COMPLETE", raw_text
 
 
 def build_snapshot(root: str | Path, *, output_dir: str | Path | None = None) -> dict[str, object]:
@@ -61,7 +71,7 @@ def build_snapshot(root: str | Path, *, output_dir: str | Path | None = None) ->
     if not root_path.is_dir():
         raise ValueError(f"benchmark root is not a directory: {root}")
     excluded = Path(output_dir).resolve() if output_dir is not None else None
-    raw_status, status_state = _status(root_path)
+    raw_status, status_state, raw_status_text = _status(root_path)
     files = _files_under(root_path, excluded)
     manifest_files = [p for p in files if p.is_relative_to(root_path / "manifests")]
     manifest_rows = [(_relative(root_path / "manifests", p), p.stat().st_size, sha256_file(p)) for p in manifest_files]
@@ -71,6 +81,8 @@ def build_snapshot(root: str | Path, *, output_dir: str | Path | None = None) ->
         "timestamp_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "root": str(root_path),
         "raw_status": raw_status,
+        "raw_status_text": raw_status_text,
+        "raw_status_sha256": None if raw_status_text is None else hashlib.sha256(raw_status_text.encode("utf-8")).hexdigest(),
         "status_state": status_state,
         "manifest_digest": manifest_digest,
         "file_count": len(files),
@@ -106,23 +118,25 @@ def main(argv: list[str] | None = None) -> int:
     targets = [("source_snapshot.json", lambda p: _write_json(p, snapshot)),
                ("manifest_sha256.csv", lambda p: _write_csv(p, ["relative_path", "bytes", "sha256"], manifest_rows)),
                ("file_inventory.csv", lambda p: _write_csv(p, ["relative_path", "bytes"], inventory_rows))]
-    replaced: list[Path] = []
     temps: list[Path] = []
+    prior = {output / name: (output / name).read_bytes() if (output / name).exists() else None for name, _ in targets}
     try:
         for name, writer in targets:
-            target = output / name
             temp = output / (name + ".tmp")
             temps.append(temp)
             writer(temp)
-            temp.replace(target)
-            replaced.append(target)
+        for name, _ in targets:
+            (output / (name + ".tmp")).replace(output / name)
     except Exception:
         for temp in temps:
             if temp.exists():
                 temp.unlink()
-        for target in replaced:
-            if target.exists():
-                target.unlink()
+        for target, content in prior.items():
+            if content is None:
+                if target.exists():
+                    target.unlink()
+            else:
+                target.write_bytes(content)
         raise
     return 0
 
