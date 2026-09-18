@@ -116,6 +116,52 @@ def test_darts_loader_covers_epoch_grid_and_json(tmp_path: Path):
     assert items[1].target_value == 0.25
 
 
+def test_rb40_loader_accepts_teacher_compact_manifest(tmp_path: Path):
+    manifest = tmp_path / "rb40-teacher.csv"
+    write_csv(manifest, [{
+        "model_name": "Standard",
+        "robust_accuracy": "0.0",
+        "artifact_files": "Standard.pt",
+        "server_model_root": "/root/robust_metric_lab_nas/shared_benchmarks/robust_metric_v1/rb40/models/cifar10/Linf",
+        "architecture": "WideResNet-28-10",
+    }])
+    items = load_rb40_items(manifest, tmp_path)
+    assert len(items) == 1
+    assert items[0].checkpoint_path == (tmp_path / "rb40/models/cifar10/Linf/Standard.pt").resolve()
+    assert items[0].metadata["artifact_files"] == ["Standard.pt"]
+
+
+def test_nb201_loader_expands_teacher_compact_manifest(tmp_path: Path):
+    manifest = tmp_path / "nb201-teacher.csv"
+    write_csv(manifest, [{
+        "arch_id": "11566",
+        "arch_string": NB201_ARCH,
+        "official_final_robust_accuracy": "0.3722",
+        "available_checkpoint_epochs": "0;5;10;25;50",
+        "server_checkpoint_pattern": "/root/robust_metric_lab_nas/shared_benchmarks/robust_metric_v1/nb201_64/checkpoints/arch_11566_epoch_{epoch}_seed_0.pt",
+    }])
+    items = load_nb201_items(manifest, tmp_path)
+    assert [item.checkpoint_epoch for item in items] == [0, 5, 10, 25, 50]
+    assert items[-1].checkpoint_path == (tmp_path / "nb201_64/checkpoints/arch_11566_epoch_50_seed_0.pt").resolve()
+    assert items[0].metadata["arch_string"] == NB201_ARCH
+
+
+def test_darts_loader_expands_teacher_compact_manifest(tmp_path: Path):
+    manifest = tmp_path / "darts-teacher.csv"
+    genotype = {"normal": [], "normal_concat": [2, 3, 4, 5], "reduce": [], "reduce_concat": [2, 3, 4, 5]}
+    write_csv(manifest, [{
+        "arch_id": "0",
+        "genotype_json": json.dumps(genotype),
+        "final_robust_accuracy": "0.4802",
+        "available_checkpoint_epochs": "0;100",
+        "server_checkpoint_pattern": "/root/robust_metric_lab_nas/shared_benchmarks/robust_metric_v1/darts100/checkpoints/arch_0_epoch_{epoch}_seed_0.pt",
+    }])
+    items = load_darts_items(manifest, tmp_path)
+    assert [item.checkpoint_epoch for item in items] == [0, 100]
+    assert items[-1].checkpoint_path == (tmp_path / "darts100/checkpoints/arch_0_epoch_100_seed_0.pt").resolve()
+    assert items[0].metadata["genotype"] == genotype
+
+
 @pytest.mark.parametrize("loader, epochs, columns", [
     (load_nb201_items, (0, 5, 10, 25), ("arch_id", "epoch", "checkpoint_path", "official_final_robust_accuracy", "genotype_json", "metadata_json")),
     (load_darts_items, (0,), ("arch_id", "epoch", "checkpoint_path", "full_pgd20_accuracy", "genotype_json", "metadata_json")),

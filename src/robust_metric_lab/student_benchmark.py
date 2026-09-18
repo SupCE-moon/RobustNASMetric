@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import csv
 import json
 from math import fsum
-from pathlib import Path, PureWindowsPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Iterable, Mapping
 
 from .metric_registry import METRIC_BY_NAME
@@ -75,7 +75,7 @@ def _load_items(path: str | Path, root: str | Path | None, *, benchmark: str,
                 target_column: str, epochs: set[int | None], needs_genotype: bool) -> list[BenchmarkManifestItem]:
     manifest = Path(path)
     benchmark_root = Path(root) if root is not None else manifest.parent
-    with manifest.open(newline="", encoding="utf-8") as handle:
+    with manifest.open(newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
         columns = set(reader.fieldnames or [])
         missing = sorted(required - columns)
@@ -157,7 +157,133 @@ def _load_items(path: str | Path, root: str | Path | None, *, benchmark: str,
     return result
 
 
+def _manifest_columns(path: str | Path) -> set[str]:
+    with Path(path).open(newline="", encoding="utf-8-sig") as handle:
+        return set(csv.DictReader(handle).fieldnames or [])
+
+
+def _teacher_relative_path(value: str, row_number: int) -> str:
+    text = value.strip().replace("\\", "/")
+    marker = "/shared_benchmarks/robust_metric_v1/"
+    if marker in text:
+        text = text.split(marker, 1)[1]
+    elif PurePosixPath(text).is_absolute() or PureWindowsPath(text).is_absolute():
+        raise ValueError(f"unsupported teacher checkpoint root at manifest row {row_number}")
+    if not text:
+        raise ValueError(f"empty teacher checkpoint path at manifest row {row_number}")
+    return text
+
+
+def _teacher_rows(path: str | Path, required: set[str]) -> Iterable[tuple[int, dict[str, str]]]:
+    with Path(path).open(newline="", encoding="utf-8-sig") as handle:
+        reader = csv.DictReader(handle)
+        columns = set(reader.fieldnames or [])
+        missing = sorted(required - columns)
+        if missing:
+            raise ValueError(f"missing required columns: {', '.join(missing)}")
+        for row_number, row in enumerate(reader, 2):
+            yield row_number, row
+
+
+def _teacher_metadata(row: Mapping[str, str], excluded: set[str]) -> dict[str, object]:
+    return {key: value for key, value in row.items() if key not in excluded and value not in {None, ""}}
+
+
+def _load_teacher_rb40(path: str | Path, root: str | Path | None) -> list[BenchmarkManifestItem]:
+    benchmark_root = Path(root) if root is not None else Path(path).parent
+    required = {"model_name", "robust_accuracy", "artifact_files", "server_model_root"}
+    result: list[BenchmarkManifestItem] = []
+    seen: set[str] = set()
+    for row_number, row in _teacher_rows(path, required):
+        identifier = row["model_name"].strip()
+        if not identifier or identifier in seen:
+            raise ValueError(f"duplicate model/architecture ID: {identifier} (epoch None)")
+        seen.add(identifier)
+        artifacts = [value.strip() for value in row["artifact_files"].split(";") if value.strip()]
+        if not artifacts:
+            raise ValueError(f"artifact_files is empty at manifest row {row_number}")
+        resolved = [resolve_under_root(benchmark_root, f"rb40/models/cifar10/Linf/{name}") for name in artifacts]
+        metadata = _teacher_metadata(row, {"model_name", "robust_accuracy", "artifact_files"})
+        metadata["artifact_files"] = artifacts
+        metadata["artifact_paths"] = [str(value) for value in resolved]
+        result.append(BenchmarkManifestItem(
+            benchmark="rb40", model_or_arch_id=identifier, checkpoint_epoch=None,
+            checkpoint_path=resolved[0], target_value=float(row["robust_accuracy"]), metadata=metadata,
+        ))
+    return result
+
+
+def _teacher_epochs(value: str, expected: tuple[int, ...], row_number: int) -> tuple[int, ...]:
+    try:
+        observed = tuple(int(item) for item in value.split(";") if item != "")
+    except ValueError as exc:
+        raise ValueError(f"invalid available_checkpoint_epochs at manifest row {row_number}") from exc
+    if observed != expected:
+        raise ValueError(
+            f"unsupported checkpoint epoch grid {observed} at manifest row {row_number}; expected {expected}"
+        )
+    return observed
+
+
+def _load_teacher_nb201(path: str | Path, root: str | Path | None) -> list[BenchmarkManifestItem]:
+    benchmark_root = Path(root) if root is not None else Path(path).parent
+    required = {"arch_id", "arch_string", "official_final_robust_accuracy", "available_checkpoint_epochs", "server_checkpoint_pattern"}
+    result: list[BenchmarkManifestItem] = []
+    seen: set[str] = set()
+    expected = (0, 5, 10, 25, 50)
+    for row_number, row in _teacher_rows(path, required):
+        identifier = row["arch_id"].strip()
+        if not identifier or identifier in seen:
+            raise ValueError(f"duplicate model/architecture ID: {identifier}")
+        seen.add(identifier)
+        raw_arch = row["arch_string"].strip()
+        from .nasrobbench201 import make_nb201_arch, parse_nb201_arch
+        operations = parse_nb201_arch(raw_arch)
+        if operations is None or make_nb201_arch(operations) != raw_arch:
+            raise ValueError(f"arch_string is noncanonical at manifest row {row_number}")
+        epochs = _teacher_epochs(row["available_checkpoint_epochs"], expected, row_number)
+        metadata = _teacher_metadata(row, {"arch_id", "arch_string", "official_final_robust_accuracy", "available_checkpoint_epochs", "server_checkpoint_pattern"})
+        metadata["arch_string"] = raw_arch
+        for epoch in epochs:
+            source_path = row["server_checkpoint_pattern"].format(epoch=epoch)
+            checkpoint = resolve_under_root(benchmark_root, _teacher_relative_path(source_path, row_number))
+            result.append(BenchmarkManifestItem(
+                benchmark="nb201", model_or_arch_id=identifier, checkpoint_epoch=epoch,
+                checkpoint_path=checkpoint, target_value=float(row["official_final_robust_accuracy"]), metadata=dict(metadata),
+            ))
+    return result
+
+
+def _load_teacher_darts(path: str | Path, root: str | Path | None) -> list[BenchmarkManifestItem]:
+    benchmark_root = Path(root) if root is not None else Path(path).parent
+    required = {"arch_id", "genotype_json", "final_robust_accuracy", "available_checkpoint_epochs", "server_checkpoint_pattern"}
+    result: list[BenchmarkManifestItem] = []
+    seen: set[str] = set()
+    expected = (0, 100)
+    for row_number, row in _teacher_rows(path, required):
+        identifier = row["arch_id"].strip()
+        if not identifier or identifier in seen:
+            raise ValueError(f"duplicate model/architecture ID: {identifier}")
+        seen.add(identifier)
+        genotype = _json_field(row, "genotype_json", row_number)
+        if not isinstance(genotype, dict):
+            raise ValueError(f"genotype_json must be an object at manifest row {row_number}")
+        epochs = _teacher_epochs(row["available_checkpoint_epochs"], expected, row_number)
+        metadata = _teacher_metadata(row, {"arch_id", "genotype_json", "final_robust_accuracy", "available_checkpoint_epochs", "server_checkpoint_pattern"})
+        metadata["genotype"] = genotype
+        for epoch in epochs:
+            source_path = row["server_checkpoint_pattern"].format(epoch=epoch)
+            checkpoint = resolve_under_root(benchmark_root, _teacher_relative_path(source_path, row_number))
+            result.append(BenchmarkManifestItem(
+                benchmark="darts", model_or_arch_id=identifier, checkpoint_epoch=epoch,
+                checkpoint_path=checkpoint, target_value=float(row["final_robust_accuracy"]), metadata=dict(metadata),
+            ))
+    return result
+
+
 def load_rb40_items(path: str | Path, root: str | Path | None = None) -> list[BenchmarkManifestItem]:
+    if {"artifact_files", "server_model_root"} <= _manifest_columns(path):
+        return _load_teacher_rb40(path, root)
     return _load_items(path, root, benchmark="rb40",
                        required={"model_name", "checkpoint_path", "robust_accuracy", "metadata_json"},
                        id_column="model_name", epoch_column=None, target_column="robust_accuracy",
@@ -165,6 +291,8 @@ def load_rb40_items(path: str | Path, root: str | Path | None = None) -> list[Be
 
 
 def load_nb201_items(path: str | Path, root: str | Path | None = None) -> list[BenchmarkManifestItem]:
+    if {"arch_string", "available_checkpoint_epochs", "server_checkpoint_pattern"} <= _manifest_columns(path):
+        return _load_teacher_nb201(path, root)
     return _load_items(path, root, benchmark="nb201",
                        required={"arch_id", "epoch", "checkpoint_path", "official_final_robust_accuracy", "genotype_json", "metadata_json"},
                        id_column="arch_id", epoch_column="epoch", target_column="official_final_robust_accuracy",
@@ -172,6 +300,8 @@ def load_nb201_items(path: str | Path, root: str | Path | None = None) -> list[B
 
 
 def load_darts_items(path: str | Path, root: str | Path | None = None) -> list[BenchmarkManifestItem]:
+    if {"final_robust_accuracy", "available_checkpoint_epochs", "server_checkpoint_pattern"} <= _manifest_columns(path):
+        return _load_teacher_darts(path, root)
     return _load_items(path, root, benchmark="darts",
                        required={"arch_id", "epoch", "checkpoint_path", "full_pgd20_accuracy", "genotype_json", "metadata_json"},
                        id_column="arch_id", epoch_column="epoch", target_column="full_pgd20_accuracy",
