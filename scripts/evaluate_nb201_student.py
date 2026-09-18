@@ -25,18 +25,25 @@ from robust_metric_lab.student_runner import (  # noqa: E402
 )
 
 
-def build_nb201_model(arch_string: str, C: int = 16, N: int = 5):
-    """Build the repository's fixed NB201 macro from a manifest architecture string."""
+def build_nb201_model(
+    arch_string: str,
+    C: int = 16,
+    N: int = 5,
+    *,
+    library_root: str | Path | None = None,
+):
+    """Build the teacher checkpoint's official NAS-Bench-201 network."""
 
     import torch
     import torch.nn as nn
 
-    from robust_metric_lab.nasrobbench201 import parse_nb201_arch
-    from robust_metric_lab.nb201_space import Nb201TinyNetwork
-
-    operations = parse_nb201_arch(arch_string)
-    if operations is None:
-        raise ValueError("manifest does not contain a valid NB201 architecture string")
+    lib = Path(library_root) if library_root is not None else ROOT / "third_party" / "nasrobbench201" / "libnas" / "lib"
+    if not lib.is_dir():
+        raise FileNotFoundError(f"official NAS-Bench-201 library not found: {lib}")
+    if str(lib) not in sys.path:
+        sys.path.insert(0, str(lib))
+    from config_utils import dict2config
+    from models import CellStructure, get_cell_based_tiny_net
 
     class Normalize(nn.Module):
         def __init__(self):
@@ -53,7 +60,19 @@ def build_nb201_model(arch_string: str, C: int = 16, N: int = 5):
         def forward(self, inputs):
             return (inputs - self.mean) / self.std
 
-    return nn.Sequential(Normalize(), Nb201TinyNetwork(operations, c=C, n=N, num_classes=10))
+    network = get_cell_based_tiny_net(
+        dict2config(
+            {
+                "name": "infer.tiny",
+                "C": C,
+                "N": N,
+                "genotype": CellStructure.str2structure(arch_string),
+                "num_classes": 10,
+            },
+            None,
+        )
+    )
+    return nn.Sequential(Normalize(), network)
 
 
 def _manifest_arch_string(item: BenchmarkManifestItem) -> str:

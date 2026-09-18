@@ -676,6 +676,54 @@ def test_nb201_adapter_uses_manifest_arch_and_strict_checkpoint(tmp_path: Path):
     assert model.device == "cpu"
 
 
+def test_nb201_builder_uses_official_teacher_library_api(tmp_path: Path, monkeypatch):
+    module = _load_script(SCRIPTS[1])
+    library_root = tmp_path / "libnas" / "lib"
+    library_root.mkdir(parents=True)
+    calls = {}
+
+    def dict2config(value, logger):
+        calls["config"] = value
+        calls["logger"] = logger
+        return value
+
+    class CellStructure:
+        @staticmethod
+        def str2structure(value):
+            calls["arch"] = value
+            return ("teacher-structure", value)
+
+    def get_cell_based_tiny_net(config):
+        import torch.nn as nn
+        calls["network_config"] = config
+        return nn.Identity()
+
+    monkeypatch.setitem(sys.modules, "config_utils", SimpleNamespace(dict2config=dict2config))
+    monkeypatch.setitem(
+        sys.modules,
+        "models",
+        SimpleNamespace(
+            CellStructure=CellStructure,
+            get_cell_based_tiny_net=get_cell_based_tiny_net,
+        ),
+    )
+    arch = (
+        "|skip_connect~0|+"
+        "|nor_conv_1x1~0|skip_connect~1|+"
+        "|avg_pool_3x3~0|nor_conv_3x3~1|none~2|"
+    )
+    model = module.build_nb201_model(arch, C=16, N=5, library_root=library_root)
+    assert calls["arch"] == arch
+    assert calls["config"] == {
+        "name": "infer.tiny",
+        "C": 16,
+        "N": 5,
+        "genotype": ("teacher-structure", arch),
+        "num_classes": 10,
+    }
+    assert len(model) == 2
+
+
 def test_nb201_adapter_requires_standardized_manifest_arch_string(tmp_path: Path):
     module = _load_script(SCRIPTS[1])
     item = BenchmarkManifestItem(
