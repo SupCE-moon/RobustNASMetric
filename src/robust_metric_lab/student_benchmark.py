@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import csv
 import json
 from math import fsum
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from typing import Iterable, Mapping
 
 from .metric_registry import METRIC_BY_NAME
@@ -53,7 +53,7 @@ def resolve_under_root(root: str | Path, relative_path: str | Path) -> Path:
     """Resolve an artifact path, rejecting absolute paths and root escapes."""
     root_path = Path(root).resolve()
     supplied = Path(relative_path)
-    if supplied.is_absolute() or ".." in supplied.parts:
+    if supplied.is_absolute() or PureWindowsPath(str(relative_path)).is_absolute() or ".." in supplied.parts:
         raise ValueError(f"path is outside benchmark root: {relative_path}")
     candidate = (root_path / supplied).resolve()
     try:
