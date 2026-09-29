@@ -119,6 +119,15 @@ METRIC_SPECS = [
     MetricSpec("feature_measure_spectrum_hellinger_delta", "lower", "Ours E36 (spectrum Hellinger drift)", "Ours"),
     MetricSpec("feature_measure_flow_corr_angular_delta", "lower", "Ours E36 (flow-correlation angular drift)", "Ours"),
     MetricSpec("feature_measure_flow_corr_symmetric_rel_delta", "lower", "Ours E36 (flow-correlation symmetric drift)", "Ours"),
+    MetricSpec("feature_measure_flow_corr_worst_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_flow_corr_rms_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_flow_corr_tophalf_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_spectrum_fisher_rao_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_spectrum_triangular_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_spectrum_ks_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_multiview_geometric_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_multiview_max_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_multiview_rms_delta", "lower", "Ours E37 preregistered", "Ours"),
 ]
 
 
