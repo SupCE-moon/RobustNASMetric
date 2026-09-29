@@ -1177,10 +1177,10 @@ def compute_feature_metrics(
     geometry_indices, _ = _geometry_anchor_indices(
         clean_features[:n], max_layers=max_layers
     )
-    # M1 (importance-gated capacity) is disabled here: its extra grad-enabled
-    # forward hangs/OOMs on some RobustBench models, and it showed no benefit on
-    # NB201 (partial 0.280 vs base capacity 0.283). M1 stays nan via the None
-    # guard in _perturbation_capacity_importance; M2/M3/M4/M5 are unaffected.
+    # M1 is intentionally not computed in this one-pass metric bundle.  Its
+    # frozen definition uses one global importance vector over all 64 samples;
+    # the exact memory-bounded two-pass implementation lives in
+    # importance_batched.py and is run by evaluate_importance_student.py.
     importance_by_layer = {}
 
     feature_deltas = []
