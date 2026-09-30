@@ -27,6 +27,8 @@ RUN_ID=e37_full_metric_design_v1 bash scripts/run_e37_full.sh full
 
 The smoke phase evaluates four predeclared manifest-prefix objects in every setting. Each script creates an immutable `run_manifest.json` before evaluation, records per-object runtime in the raw CSV, prints PyTorch peak CUDA allocation per setting, and verifies row count, keys, metric names, finiteness and status before writing `state=COMPLETE`.
 
+`scripts/wait_and_run_strict_smoke.sh` is the unattended launcher. It requires at least three consecutive one-minute samples with total compute-process GPU use at or below 1,000 MiB. Every setting repeats the same gate. After both smoke grids pass their built-in assertions, the launcher automatically runs the complete 560-row importance grid and 5,040-row E37 grid.
+
 ## Release checks
 
 Build the ranking from raw CSV files with `scripts/build_strict_metric_ranking.py`, then run `scripts/verify_strict_release.py` against the three teacher manifests and the frozen eligibility registry. A metric is absent from the total table unless all 560 raw rows pass. `scripts/repair_existing_metric_grid.py` may replace only failed rows with matching frozen fields and always emits source/repair/target hashes and exact replaced keys.

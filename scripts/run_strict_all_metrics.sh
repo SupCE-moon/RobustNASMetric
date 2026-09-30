@@ -37,8 +37,18 @@ PY
 fi
 
 export PYTHONPATH="$project/src:$project"
+wait_for_gpu() {
+  local stable=0 used_mib
+  while (( stable < 3 )); do
+    used_mib="$(nvidia-smi --query-compute-apps=used_memory --format=csv,noheader,nounits 2>/dev/null | awk '{sum += $1} END {print sum + 0}')"
+    printf 'gpu_gate_utc=%s used_mib=%s stable=%s\n' "$(date -u +%FT%TZ)" "$used_mib" "$stable" >> "$run_dir/STATUS.env"
+    if (( used_mib <= 1000 )); then stable=$((stable + 1)); else stable=0; fi
+    (( stable < 3 )) && sleep 60
+  done
+}
 run_setting() {
   local label="$1"; shift
+  wait_for_gpu
   "$project/.venv/bin/python" "$project/scripts/evaluate_importance_student.py" \
     "$@" --bundle-root "$bundle" --data-root "$data_root" --output-dir "$output_base" \
     --run-id "$run_id" --batch-size "$batch_size" --device "$device" "${item_args[@]}" \
