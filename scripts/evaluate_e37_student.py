@@ -4,6 +4,8 @@ import argparse
 from pathlib import Path
 import sys
 
+import torch
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -127,7 +129,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     print(
         f"output={output} written={result.written} failed={result.failed} "
-        f"skipped={result.skipped} batch_size={args.batch_size}"
+        f"skipped={result.skipped} batch_size={args.batch_size} "
+        f"peak_cuda_memory_mib={torch.cuda.max_memory_allocated() / (1024 ** 2):.1f}"
     )
     return 0
 
