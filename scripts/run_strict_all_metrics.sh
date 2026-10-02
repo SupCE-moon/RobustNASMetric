@@ -45,6 +45,7 @@ wait_for_gpu() {
     if (( used_mib <= 1000 )); then stable=$((stable + 1)); else stable=0; fi
     (( stable < 3 )) && sleep 60
   done
+  return 0
 }
 run_setting() {
   local label="$1"; shift
