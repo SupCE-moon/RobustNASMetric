@@ -591,6 +591,32 @@ def _fsp_matrix(input_feature: torch.Tensor, output_feature: torch.Tensor) -> to
     return torch.bmm(input_atoms, output_atoms.transpose(1, 2)) / input_atoms.shape[2]
 
 
+def _fsp_corr_matrix(input_feature: torch.Tensor, output_feature: torch.Tensor) -> torch.Tensor:
+    """Cross-layer channel correlation (cosine) matrix, channel-wise L2 normalized."""
+    input_feature, output_feature = _match_spatial(input_feature, output_feature)
+    input_atoms = F.normalize(input_feature.flatten(2), p=2, dim=2, eps=1e-12)
+    output_atoms = F.normalize(output_feature.flatten(2), p=2, dim=2, eps=1e-12)
+    return torch.bmm(input_atoms, output_atoms.transpose(1, 2)) / input_atoms.shape[2]
+
+
+def _safe_cosine_distance(
+    clean_value: torch.Tensor,
+    adv_value: torch.Tensor,
+    eps: float = 1e-12,
+) -> torch.Tensor:
+    """Per-sample cosine distance with an exact zero for two zero vectors."""
+    clean_flat = clean_value.flatten(1)
+    adv_flat = adv_value.flatten(1)
+    clean_norm = clean_flat.norm(p=2, dim=1)
+    adv_norm = adv_flat.norm(p=2, dim=1)
+    denom = clean_norm * adv_norm
+    cosine = (clean_flat * adv_flat).sum(dim=1) / denom.clamp_min(eps)
+    distance = (1.0 - cosine.clamp(-1.0, 1.0)).clamp_min(0.0)
+    distance = torch.where(distance <= 1e-6, torch.zeros_like(distance), distance)
+    both_zero = (clean_norm <= eps) & (adv_norm <= eps)
+    return torch.where(both_zero, torch.zeros_like(distance), distance)
+
+
 def _fsp_strict_stats(
     clean_input: torch.Tensor,
     clean_output: torch.Tensor,
