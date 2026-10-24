@@ -147,6 +147,12 @@ def build_payload(
             "max_layers": 4,
         },
         "source_sha256": source_hashes,
+        "input_paths": {
+            "original_e37_manifest": str(original_manifest.resolve()),
+            "bundle_manifest": str(bundle_manifest.resolve()),
+            "strict_csv": str(strict_csv.resolve()),
+            "control_csv": str(control_csv.resolve()),
+        },
         "original_e37_manifest_sha256": sha256_file(original_manifest),
         "bundle_manifest_sha256": sha256_file(bundle_manifest),
         "strict_csv_sha256": sha256_file(strict_csv),

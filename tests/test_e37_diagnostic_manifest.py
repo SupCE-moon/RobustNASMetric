@@ -93,6 +93,8 @@ def test_payload_hashes_all_200_checkpoints_and_pinned_sources(tmp_path) -> None
     assert payload["source_sha256"]["src/robust_metric_lab/e37_metrics.py"] == source_digest
     assert payload["objects"][0]["checkpoint_sha256"] == hashlib.sha256(b"checkpoint").hexdigest()
     assert payload["protocol"]["num_samples"] == 64
+    assert payload["input_paths"]["original_e37_manifest"] == str(original_manifest.resolve())
+    assert payload["input_paths"]["strict_csv"] == str(strict_csv.resolve())
     source.write_bytes(b"changed source")
     with pytest.raises(ValueError, match="pinned source mismatch"):
         build_payload(
