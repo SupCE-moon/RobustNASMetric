@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import copy
+import os
+from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -138,3 +142,14 @@ def test_corrupt_manifest_still_yields_fail_evidence(tmp_path) -> None:
     assert "nonfinite JSON token" in result["reasons"][0]
     assert (output / "verification.json").exists()
     assert not (output / "canonical_numeric.jsonl").exists()
+
+
+def test_verifier_cli_starts_without_external_pythonpath() -> None:
+    project = Path(__file__).resolve().parents[1]
+    environment = dict(os.environ)
+    environment.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [sys.executable, str(project / "scripts/verify_e37_layer_diagnostic.py"), "--help"],
+        cwd=project, env=environment, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr

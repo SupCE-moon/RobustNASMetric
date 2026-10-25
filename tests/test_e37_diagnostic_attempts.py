@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
+from pathlib import Path
+import subprocess
+import sys
 from types import SimpleNamespace
 
 import pytest
@@ -54,6 +58,17 @@ def test_smoke_is_exact_two_predeclared_ids_at_both_stages() -> None:
 def test_smoke_and_formal_attempts_have_separate_roots(tmp_path) -> None:
     assert attempts_root_for_mode(tmp_path, True) == tmp_path / "smoke_attempts"
     assert attempts_root_for_mode(tmp_path, False) == tmp_path / "attempts"
+
+
+def test_runner_cli_starts_without_external_pythonpath() -> None:
+    project = Path(__file__).resolve().parents[1]
+    environment = dict(os.environ)
+    environment.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [sys.executable, str(project / "scripts/run_e37_layer_diagnostic.py"), "--help"],
+        cwd=project, env=environment, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def test_one_success_and_one_loader_failure_keep_provenance(tmp_path) -> None:
