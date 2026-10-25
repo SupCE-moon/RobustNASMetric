@@ -6,7 +6,9 @@ from types import SimpleNamespace
 import pytest
 
 from scripts.run_e37_layer_diagnostic import (
+    attempts_root_for_mode,
     run_one,
+    select_smoke_keys,
     validate_repair_keys,
     write_attempt,
 )
@@ -35,6 +37,23 @@ def test_repair_is_exact_failed_or_missing_set() -> None:
         validate_repair_keys({("darts_e100", "other")}, expected, successful)
     with pytest.raises(ValueError, match="all missing/failed"):
         validate_repair_keys(set(), expected, successful)
+
+
+def test_smoke_is_exact_two_predeclared_ids_at_both_stages() -> None:
+    expected = {(f"darts_e{stage}", str(identifier)) for stage in (0, 100) for identifier in range(100)}
+    assert select_smoke_keys("0,1", expected) == {
+        ("darts_e0", "0"), ("darts_e100", "0"),
+        ("darts_e0", "1"), ("darts_e100", "1"),
+    }
+    with pytest.raises(ValueError, match="two distinct"):
+        select_smoke_keys("0,0", expected)
+    with pytest.raises(ValueError, match="unknown"):
+        select_smoke_keys("0,other", expected)
+
+
+def test_smoke_and_formal_attempts_have_separate_roots(tmp_path) -> None:
+    assert attempts_root_for_mode(tmp_path, True) == tmp_path / "smoke_attempts"
+    assert attempts_root_for_mode(tmp_path, False) == tmp_path / "attempts"
 
 
 def test_one_success_and_one_loader_failure_keep_provenance(tmp_path) -> None:

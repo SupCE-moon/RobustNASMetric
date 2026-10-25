@@ -52,6 +52,24 @@ def validate_repair_keys(
         raise ValueError("repair keys must equal all missing/failed keys")
 
 
+def select_smoke_keys(
+    two_ids: str, expected: set[tuple[str, str]]
+) -> set[tuple[str, str]]:
+    identifiers = two_ids.split(",")
+    if len(identifiers) != 2 or len(set(identifiers)) != 2 or any(
+        not identifier or identifier != identifier.strip() for identifier in identifiers
+    ):
+        raise ValueError("smoke requires two distinct canonical architecture IDs")
+    keys = {(f"darts_e{stage}", identifier) for identifier in identifiers for stage in (0, 100)}
+    if not keys <= expected:
+        raise ValueError(f"unknown smoke keys: {sorted(keys - expected)}")
+    return keys
+
+
+def attempts_root_for_mode(output_root: Path, smoke: bool) -> Path:
+    return output_root / ("smoke_attempts" if smoke else "attempts")
+
+
 def _key(record: dict) -> tuple[str, str]:
     return str(record["setting"]), str(record["model_or_arch_id"])
 
@@ -186,6 +204,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--attempt-id", required=True)
     parser.add_argument("--device", required=True)
     parser.add_argument("--repair-keys", type=Path)
+    parser.add_argument("--smoke-ids", help="Exactly two predeclared IDs, e.g. 0,1; isolated from formal attempts")
     return parser
 
 
@@ -205,12 +224,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     objects = {_key(row): row for row in payload["objects"]}
     expected = set(objects)
-    attempts_root = output_root / "attempts"
+    smoke = args.smoke_ids is not None
+    if smoke and args.repair_keys is not None:
+        raise ValueError("smoke and repair modes are mutually exclusive")
+    attempts_root = attempts_root_for_mode(output_root, smoke)
     previous = read_previous_attempts(attempts_root)
     successful = {_key(row) for row in previous if row["status"] == "ok"}
     if len(successful) != sum(row["status"] == "ok" for row in previous):
         raise ValueError("duplicate previous successful attempt")
-    if args.repair_keys is None:
+    if smoke:
+        if previous:
+            raise ValueError("prior smoke attempts exist; use a new diagnostic run directory")
+        requested = select_smoke_keys(args.smoke_ids, expected)
+    elif args.repair_keys is None:
         if previous:
             raise ValueError("prior attempts exist; use exact repair-keys CSV")
         requested = expected
