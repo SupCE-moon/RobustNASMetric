@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+import os
+from pathlib import Path
+import subprocess
+import sys
+
 import pytest
 
-from scripts.analyze_e37_layer_diagnostic import analyze_records, join_controls, paired_spearman
+from scripts.analyze_e37_layer_diagnostic import analyze_records, join_controls, metric_stage_correlations, paired_spearman
+from robust_metric_lab.e37_metrics import E37_METRIC_NAMES
 
 
 def test_constant_component_is_undefined_without_dropping_pairs() -> None:
@@ -45,3 +51,32 @@ def test_analysis_emits_all_39_components_for_all_100_pairs() -> None:
     assert all(row["pair_count"] == 100 for row in correlations)
     assert all(row["stage_spearman"] is None for row in correlations)
     assert all(row["structure_interpretation"] == "exploratory_noncausal" for row in correlations)
+
+
+def test_all_nine_original_scores_get_paired_stage_correlations() -> None:
+    records = [
+        {
+            "setting": f"darts_e{stage}", "model_or_arch_id": str(identifier),
+            "diagnostic": {"metric_values": {
+                name: float(identifier) if stage == 0 else float(99 - identifier)
+                for name in E37_METRIC_NAMES
+            }},
+        }
+        for stage in (0, 100) for identifier in range(100)
+    ]
+    rows = metric_stage_correlations(records)
+    assert {row["metric_name"] for row in rows} == set(E37_METRIC_NAMES)
+    assert len(rows) == 9
+    assert all(row["pair_count"] == 100 and row["stage_spearman"] == pytest.approx(-1.0) for row in rows)
+    assert all(row["direction"] == "lower" for row in rows)
+
+
+def test_analysis_cli_starts_without_external_pythonpath() -> None:
+    project = Path(__file__).resolve().parents[1]
+    environment = dict(os.environ)
+    environment.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [sys.executable, str(project / "scripts/analyze_e37_layer_diagnostic.py"), "--help"],
+        cwd=project, env=environment, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr

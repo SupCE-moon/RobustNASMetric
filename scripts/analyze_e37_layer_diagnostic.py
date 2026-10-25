@@ -13,6 +13,11 @@ import numpy as np
 from scipy.stats import rankdata, spearmanr
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from robust_metric_lab.e37_metrics import E37_METRIC_NAMES  # noqa: E402
 
 
 def paired_spearman(e0_values: list[float], e100_values: list[float]) -> float | None:
@@ -65,6 +70,26 @@ def _components(record: dict) -> dict[tuple[str, int, str], float]:
             sample["transitions"][slot]["flow"] for sample in samples
         ])
     return output
+
+
+def metric_stage_correlations(records: list[dict]) -> list[dict]:
+    """Report every frozen E37 score's e0/e100 rank stability, without selection."""
+    by_key = {(row["setting"], str(row["model_or_arch_id"])): row for row in records}
+    identifiers = sorted({identifier for _, identifier in by_key})
+    expected = {(f"darts_e{stage}", identifier) for stage in (0, 100) for identifier in identifiers}
+    if len(records) != 200 or len(by_key) != 200 or len(identifiers) != 100 or set(by_key) != expected:
+        raise ValueError("nine-score analysis requires exact 200-key paired grid")
+    rows: list[dict] = []
+    for name in E37_METRIC_NAMES:
+        e0 = [float(by_key[("darts_e0", identifier)]["diagnostic"]["metric_values"][name]) for identifier in identifiers]
+        e100 = [float(by_key[("darts_e100", identifier)]["diagnostic"]["metric_values"][name]) for identifier in identifiers]
+        rows.append({
+            "metric_name": name,
+            "direction": "lower",
+            "pair_count": 100,
+            "stage_spearman": paired_spearman(e0, e100),
+        })
+    return rows
 
 
 def analyze_records(records: list[dict], controls: list[dict]) -> tuple[list[dict], list[dict]]:
@@ -132,9 +157,11 @@ def main(argv: list[str] | None = None) -> int:
     with args.control_csv.open(newline="", encoding="utf-8-sig") as handle:
         controls = list(csv.DictReader(handle))
     rows, correlations = analyze_records(records, controls)
+    metric_correlations = metric_stage_correlations(records)
     _write_csv(directory / "paired_layer.csv", rows)
     _write_csv(directory / "component_correlations.csv", correlations)
-    print(f"paired_rows={len(rows)} components={len(correlations)}")
+    _write_csv(directory / "metric_stage_correlations.csv", metric_correlations)
+    print(f"paired_rows={len(rows)} components={len(correlations)} metrics={len(metric_correlations)}")
     return 0
 
 
