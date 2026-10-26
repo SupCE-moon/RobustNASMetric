@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 import os
@@ -20,6 +21,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from robust_metric_lab.e37_metrics import E37_METRIC_NAMES  # noqa: E402
+from robust_metric_lab.metrics import _anchor_indices  # noqa: E402
 from scripts.run_e37_layer_diagnostic import load_frozen_manifest  # noqa: E402
 
 ANCHOR_COMPONENTS = {
@@ -67,6 +69,69 @@ def _expected_checkpoint(frozen_hashes: Mapping, key: tuple[str, str]) -> str:
     return str(value[key] if isinstance(value, dict) else value)
 
 
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def load_legacy_attestation(
+    path: Path, *, attempts_dir: Path, manifest_hash: str,
+    code_hashes: dict[str, str], code_manifest_path: Path, launcher_log_path: Path,
+) -> set[str]:
+    """Bind pre-provenance attempt bytes to the contemporaneous v4 code/log evidence."""
+    document = read_json_strict(path)
+    if document.get("schema") != "legacy_e37_diag_batch_v1":
+        raise ValueError("legacy attestation schema mismatch")
+    if document.get("frozen_manifest_sha256") != manifest_hash:
+        raise ValueError("legacy attestation frozen manifest mismatch")
+    if document.get("diagnostic_code_sha256") != code_hashes:
+        raise ValueError("legacy attestation diagnostic code mismatch")
+    if _sha256_file(code_manifest_path) != document.get("code_manifest_sha256"):
+        raise ValueError("legacy code manifest hash mismatch")
+    code_document = read_json_strict(code_manifest_path)["sha256"]
+    if code_document.get("src/robust_metric_lab/e37_layer_diagnostic.py") != code_hashes["collector"]:
+        raise ValueError("legacy collector code manifest mismatch")
+    if code_document.get("scripts/run_e37_layer_diagnostic.py") != code_hashes["runner"]:
+        raise ValueError("legacy runner code manifest mismatch")
+    if _sha256_file(launcher_log_path) != document.get("launcher_log_sha256"):
+        raise ValueError("legacy launcher log hash mismatch")
+    if code_hashes["runner"] not in launcher_log_path.read_text(encoding="utf-8"):
+        raise ValueError("legacy runner hash absent from launcher log")
+    actual = {
+        file.relative_to(attempts_dir).as_posix(): _sha256_file(file)
+        for file in sorted(attempts_dir.rglob("*.json"))
+    }
+    if not actual or actual != document.get("attempt_file_sha256"):
+        raise ValueError("legacy attempt file set/hash mismatch")
+    return set(actual)
+
+
+def _component_scores(samples: list[dict]) -> dict[str, float]:
+    totals = {name: 0.0 for name in E37_METRIC_NAMES}
+    for sample in samples:
+        anchors = sample["anchors"]
+        flows = [float(item["flow"]) for item in sample["transitions"]]
+        channel = sum(float(item["channel"]) for item in anchors) / 4.0
+        spatial = sum(float(item["spatial"]) for item in anchors) / 4.0
+        flow = sum(flows) / 3.0
+        if any(value < 0.0 for value in (channel, spatial, flow)):
+            raise ValueError("negative E37 drift component")
+        bounded = [value / (1.0 + value) for value in (channel, spatial, flow)]
+        values = (
+            max(flows),
+            math.sqrt(sum(value * value for value in flows) / 3.0),
+            sum(sorted(flows, reverse=True)[:2]) / 2.0,
+            sum(float(item["spectrum_fisher"]) for item in anchors) / 4.0,
+            sum(float(item["spectrum_triangular"]) for item in anchors) / 4.0,
+            sum(float(item["spectrum_ks"]) for item in anchors) / 4.0,
+            max(math.prod(bounded), 0.0) ** (1.0 / 3.0),
+            max(bounded),
+            math.sqrt(sum(value * value for value in bounded) / 3.0),
+        )
+        for name, value in zip(E37_METRIC_NAMES, values, strict=True):
+            totals[name] += _finite_number(value, f"component reconstruction {name}")
+    return {name: total / len(samples) for name, total in totals.items()}
+
+
 def _check_success(record: dict, strict_values: Mapping[str, float]) -> tuple[float, float]:
     diagnostic = record["diagnostic"]
     if diagnostic.get("sample_count") != 64:
@@ -76,7 +141,10 @@ def _check_success(record: dict, strict_values: Mapping[str, float]) -> tuple[fl
         raise ValueError("anchor_metadata does not contain four anchors")
     if not isinstance(diagnostic.get("feature_count"), int) or diagnostic["feature_count"] < 4:
         raise ValueError("invalid feature_count")
+    expected_indices = tuple(_anchor_indices(diagnostic["feature_count"], max_layers=4))
     for slot, anchor in enumerate(anchors):
+        if type(anchor.get("anchor_index")) is not int or anchor["anchor_index"] != expected_indices[slot]:
+            raise ValueError(f"anchor {slot} original index mismatch")
         if not isinstance(anchor.get("module_path"), str) or not anchor["module_path"]:
             raise ValueError(f"anchor {slot} missing module_path")
         if not isinstance(anchor.get("invocation"), int) or anchor["invocation"] < 1:
@@ -111,11 +179,16 @@ def _check_success(record: dict, strict_values: Mapping[str, float]) -> tuple[fl
         raise ValueError("nine E37 metric names differ")
     if set(strict_values) != set(E37_METRIC_NAMES):
         raise ValueError("strict reference lacks nine E37 metrics")
+    reconstructed = _component_scores(samples)
     max_abs = 0.0
     max_rel = 0.0
     for name in E37_METRIC_NAMES:
         actual = _finite_number(values[name], name)
         expected = _finite_number(strict_values[name], f"strict {name}")
+        component_value = _finite_number(reconstructed[name], f"reconstructed {name}")
+        component_difference = abs(component_value - actual)
+        if component_difference > 3e-8 + 3e-5 * abs(actual):
+            raise ValueError(f"component reconstruction mismatch: {name} abs={component_difference}")
         difference = abs(actual - expected)
         max_abs = max(max_abs, difference)
         max_rel = max(max_rel, difference / max(abs(expected), 1e-12))
@@ -129,12 +202,14 @@ def verify_records(
     expected_keys: set[tuple[str, str]],
     strict_scores: Mapping[tuple[str, str], Mapping[str, float]],
     frozen_hashes: Mapping,
+    legacy_attested_indices: set[int] | None = None,
 ) -> dict:
     reasons: list[str] = []
     successes: dict[tuple[str, str], dict] = {}
     failed_count = 0
     max_abs = 0.0
     max_rel = 0.0
+    legacy_attested_indices = legacy_attested_indices or set()
     for index, record in enumerate(records):
         try:
             key = _record_key(record)
@@ -146,6 +221,14 @@ def verify_records(
                 raise ValueError("checkpoint hash mismatch")
             if "manifest_sha256" in frozen_hashes and record.get("manifest_sha256") != frozen_hashes["manifest_sha256"]:
                 raise ValueError("manifest hash mismatch")
+            if "protocol" in frozen_hashes and record.get("protocol") != frozen_hashes["protocol"]:
+                raise ValueError("protocol mismatch")
+            if "diagnostic_code_sha256" in frozen_hashes:
+                if index in legacy_attested_indices:
+                    if "diagnostic_code_sha256" in record:
+                        raise ValueError("legacy attempt unexpectedly has per-record diagnostic code")
+                elif record.get("diagnostic_code_sha256") != frozen_hashes["diagnostic_code_sha256"]:
+                    raise ValueError("diagnostic code hash mismatch")
             status = record.get("status")
             if status == "failed":
                 failed_count += 1
@@ -233,6 +316,13 @@ def write_verification_output(output_dir: Path, result: dict) -> None:
         raise FileExistsError(f"verification output already exists: {output_dir}")
     output_dir.mkdir(parents=True, exist_ok=False)
     summary = {key: value for key, value in result.items() if key not in {"canonical_records", "reconstruction_rows"}}
+    canonical_bytes = b""
+    if result["status"] == "PASS":
+        canonical_bytes = "".join(
+            json.dumps(record, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n"
+            for record in result["canonical_records"]
+        ).encode("utf-8")
+        summary["canonical_numeric_sha256"] = hashlib.sha256(canonical_bytes).hexdigest()
     with (output_dir / "verification.json").open("x", encoding="utf-8") as handle:
         json.dump(summary, handle, indent=2, ensure_ascii=False, allow_nan=False)
         handle.write("\n")
@@ -244,16 +334,19 @@ def write_verification_output(output_dir: Path, result: dict) -> None:
             writer.writerow(["setting", "model_or_arch_id"])
             writer.writerows(result["repair_keys"])
     if result["status"] == "PASS":
-        with (output_dir / "canonical_numeric.jsonl").open("x", encoding="utf-8") as handle:
-            for record in result["canonical_records"]:
-                handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False, allow_nan=False) + "\n")
+        with (output_dir / "canonical_numeric.jsonl").open("xb") as handle:
+            handle.write(canonical_bytes)
         with (output_dir / "reconstruction_errors.csv").open("x", newline="", encoding="utf-8") as handle:
             writer = csv.DictWriter(handle, fieldnames=list(result["reconstruction_rows"][0]))
             writer.writeheader()
             writer.writerows(result["reconstruction_rows"])
 
 
-def verify_attempts(manifest: Path, attempts_dir: Path, strict_csv: Path, output_dir: Path) -> dict:
+def verify_attempts(
+    manifest: Path, attempts_dir: Path, strict_csv: Path, output_dir: Path, *,
+    code_hash_manifest: Path | None = None,
+    legacy_attestation: Path | None = None,
+) -> dict:
     try:
         manifest_document = read_json_strict(manifest)
         bundle_manifest = Path(manifest_document["frozen_payload"]["input_paths"]["bundle_manifest"])
@@ -263,12 +356,50 @@ def verify_attempts(manifest: Path, attempts_dir: Path, strict_csv: Path, output
             "source_sha256": payload["source_sha256"],
             "checkpoint_sha256": {(row["setting"], row["model_or_arch_id"]): row["checkpoint_sha256"] for row in payload["objects"]},
             "manifest_sha256": manifest_hash,
+            "protocol": {
+                "epsilon": payload["protocol"]["epsilon"],
+                "sample_count": payload["protocol"]["num_samples"],
+                "batch_size": payload["protocol"]["batch_size"],
+            },
         }
+        if code_hash_manifest is None:
+            raise ValueError("diagnostic code hash manifest is required")
+        code_document = read_json_strict(code_hash_manifest)["sha256"]
+        hashes["diagnostic_code_sha256"] = {
+            "collector": code_document["src/robust_metric_lab/e37_layer_diagnostic.py"],
+            "runner": code_document["scripts/run_e37_layer_diagnostic.py"],
+        }
+        if _sha256_file(ROOT / "src/robust_metric_lab/e37_layer_diagnostic.py") != hashes["diagnostic_code_sha256"]["collector"]:
+            raise ValueError("current diagnostic collector differs from frozen code hash")
         if strict_csv.resolve() != Path(payload["input_paths"]["strict_csv"]).resolve():
             raise ValueError("strict CSV path differs from frozen input")
-        records = [read_json_strict(path) for path in sorted(attempts_dir.glob("*/*/*.json"))]
+        attempt_paths = sorted(attempts_dir.rglob("*.json"))
+        legacy_indices: set[int] = set()
+        if legacy_attestation is not None:
+            if code_hash_manifest.parent.resolve() != manifest.parent.resolve() or legacy_attestation.parent.resolve() != manifest.parent.resolve():
+                raise ValueError("legacy provenance files must be in frozen run directory")
+            attested = load_legacy_attestation(
+                legacy_attestation, attempts_dir=attempts_dir, manifest_hash=manifest_hash,
+                code_hashes=hashes["diagnostic_code_sha256"],
+                code_manifest_path=code_hash_manifest,
+                launcher_log_path=manifest.parent / "full_01_launcher.log",
+            )
+            legacy_indices = {
+                index for index, path in enumerate(attempt_paths)
+                if path.relative_to(attempts_dir).as_posix() in attested
+            }
+        records = [read_json_strict(path) for path in attempt_paths]
         strict_scores = load_strict_scores(strict_csv, expected)
-        result = verify_records(records, expected_keys=expected, strict_scores=strict_scores, frozen_hashes=hashes)
+        result = verify_records(
+            records, expected_keys=expected, strict_scores=strict_scores,
+            frozen_hashes=hashes, legacy_attested_indices=legacy_indices,
+        )
+        result["frozen_manifest_sha256"] = manifest_hash
+        result["diagnostic_code_sha256"] = hashes["diagnostic_code_sha256"]
+        result["code_hash_manifest_sha256"] = _sha256_file(code_hash_manifest)
+        if legacy_attestation is not None:
+            result["legacy_attestation_sha256"] = _sha256_file(legacy_attestation)
+            result["legacy_attested_attempt_count"] = len(legacy_indices)
     except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
         result = {
             "status": "FAIL", "reasons": [f"verification input error: {type(exc).__name__}: {exc}"],
@@ -284,13 +415,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--frozen-manifest", required=True, type=Path)
     parser.add_argument("--attempts-dir", required=True, type=Path)
     parser.add_argument("--strict-csv", required=True, type=Path)
+    parser.add_argument("--code-hash-manifest", required=True, type=Path)
+    parser.add_argument("--legacy-attestation", type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     args = parser.parse_args(argv)
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,80}", args.output_dir.name):
         raise ValueError("verification directory name must be safe")
     if not args.output_dir.resolve().is_relative_to(ROOT):
         raise ValueError("verification output must stay inside RobustMetric project")
-    result = verify_attempts(args.frozen_manifest, args.attempts_dir, args.strict_csv, args.output_dir)
+    result = verify_attempts(
+        args.frozen_manifest, args.attempts_dir, args.strict_csv, args.output_dir,
+        code_hash_manifest=args.code_hash_manifest,
+        legacy_attestation=args.legacy_attestation,
+    )
     print(f"status={result['status']} successes={result['successful_key_count']} pairs={result['paired_architecture_count']}")
     return 0 if result["status"] == "PASS" else 1
 

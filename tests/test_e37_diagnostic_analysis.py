@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import hashlib
 
 import pytest
 
@@ -80,3 +81,28 @@ def test_analysis_cli_starts_without_external_pythonpath() -> None:
         cwd=project, env=environment, capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_analysis_inputs_require_frozen_control_and_canonical_hash(tmp_path: Path) -> None:
+    from scripts.analyze_e37_layer_diagnostic import validate_analysis_inputs
+
+    control = tmp_path / "control.csv"
+    canonical = tmp_path / "canonical_numeric.jsonl"
+    control.write_text("model_or_arch_id,log_parameter_count\n0,1\n", encoding="utf-8")
+    canonical.write_text('{"setting":"darts_e0"}\n', encoding="utf-8")
+    digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+    payload = {
+        "input_paths": {"control_csv": str(control)},
+        "control_csv_sha256": digest(control),
+    }
+    verification = {"status": "PASS", "canonical_numeric_sha256": digest(canonical)}
+    validate_analysis_inputs(payload, verification, control, canonical)
+    control.write_text("model_or_arch_id,log_parameter_count\n0,-1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="control.*hash"):
+        validate_analysis_inputs(payload, verification, control, canonical)
+    control.write_text("model_or_arch_id,log_parameter_count\n0,1\n", encoding="utf-8")
+    canonical.write_text('{"setting":"darts_e100"}\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="canonical.*hash"):
+        validate_analysis_inputs(payload, verification, control, canonical)
+    with pytest.raises(ValueError, match="control.*path"):
+        validate_analysis_inputs(payload, verification, tmp_path / "different.csv", canonical)

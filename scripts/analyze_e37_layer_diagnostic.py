@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -18,6 +19,19 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from robust_metric_lab.e37_metrics import E37_METRIC_NAMES  # noqa: E402
+
+
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def validate_analysis_inputs(payload: dict, verification: dict, control_csv: Path, canonical: Path) -> None:
+    if control_csv.resolve() != Path(payload["input_paths"]["control_csv"]).resolve():
+        raise ValueError("control CSV path differs from frozen input")
+    if _sha256_file(control_csv) != payload["control_csv_sha256"]:
+        raise ValueError("control CSV hash differs from frozen input")
+    if _sha256_file(canonical) != verification.get("canonical_numeric_sha256"):
+        raise ValueError("canonical numeric hash differs from verification")
 
 
 def paired_spearman(e0_values: list[float], e100_values: list[float]) -> float | None:
@@ -145,6 +159,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--verification-dir", type=Path, required=True)
     parser.add_argument("--control-csv", type=Path, required=True)
+    parser.add_argument("--frozen-manifest", type=Path, required=True)
     args = parser.parse_args(argv)
     directory = args.verification_dir.resolve()
     if not directory.is_relative_to(ROOT):
@@ -152,7 +167,16 @@ def main(argv: list[str] | None = None) -> int:
     verification = json.loads((directory / "verification.json").read_text(encoding="utf-8"))
     if verification.get("status") != "PASS":
         raise ValueError("analysis requires verification PASS")
-    with (directory / "canonical_numeric.jsonl").open(encoding="utf-8") as handle:
+    manifest = json.loads(args.frozen_manifest.read_text(encoding="utf-8"))
+    payload = manifest["frozen_payload"]
+    frozen_digest = hashlib.sha256(json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False,
+    ).encode("utf-8")).hexdigest()
+    if manifest.get("frozen_sha256") != frozen_digest or verification.get("frozen_manifest_sha256") != frozen_digest:
+        raise ValueError("analysis frozen manifest hash differs from verification")
+    canonical = directory / "canonical_numeric.jsonl"
+    validate_analysis_inputs(payload, verification, args.control_csv, canonical)
+    with canonical.open(encoding="utf-8") as handle:
         records = [json.loads(line) for line in handle]
     with args.control_csv.open(newline="", encoding="utf-8-sig") as handle:
         controls = list(csv.DictReader(handle))

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import copy
+import hashlib
+import json
+import math
 import os
 from pathlib import Path
 import subprocess
@@ -15,7 +18,13 @@ from scripts.verify_e37_layer_diagnostic import read_json_strict, verify_attempt
 @pytest.fixture
 def valid_grid():
     keys = {(f"darts_e{stage}", str(i)) for stage in (0, 100) for i in range(100)}
-    scores = {key: {name: 0.5 for name in E37_METRIC_NAMES} for key in keys}
+    bounded = [value / (1.0 + value) for value in (0.1, 0.2, 0.1)]
+    consistent_scores = dict(zip(E37_METRIC_NAMES, (
+        0.1, 0.1, 0.1, 0.3, 0.4, 0.5,
+        math.prod(bounded) ** (1.0 / 3.0),
+        max(bounded), math.sqrt(sum(value * value for value in bounded) / 3.0),
+    ), strict=True))
+    scores = {key: dict(consistent_scores) for key in keys}
     anchors = [
         {"module_path": f"layer{slot}", "invocation": 1, "shape": [1, 2, 4, 4], "anchor_index": slot}
         for slot in range(4)
@@ -34,6 +43,8 @@ def valid_grid():
             "setting": setting, "model_or_arch_id": identifier,
             "status": "ok", "source_sha256": {"e37": "source"},
             "checkpoint_sha256": "ck", "manifest_sha256": "manifest",
+            "diagnostic_code_sha256": {"collector": "collector-hash", "runner": "runner-hash"},
+            "protocol": {"epsilon": 8 / 255, "sample_count": 64, "batch_size": 1},
             "diagnostic": {
                 "sample_count": 64, "feature_count": 4,
                 "anchor_metadata": copy.deepcopy(anchors), "sample_components": samples,
@@ -45,6 +56,8 @@ def valid_grid():
     return records, keys, scores, {
         "source_sha256": {"e37": "source"},
         "checkpoint_sha256": "ck", "manifest_sha256": "manifest",
+        "diagnostic_code_sha256": {"collector": "collector-hash", "runner": "runner-hash"},
+        "protocol": {"epsilon": 8 / 255, "sample_count": 64, "batch_size": 1},
     }
 
 
@@ -103,10 +116,48 @@ def test_failed_attempt_then_success_keeps_audit_and_passes(valid_grid) -> None:
         "error_type": "RuntimeError", "error": "OOM", "traceback": "RuntimeError: OOM",
         "source_sha256": {"e37": "source"}, "checkpoint_sha256": "ck",
         "manifest_sha256": "manifest",
+        "diagnostic_code_sha256": {"collector": "collector-hash", "runner": "runner-hash"},
+        "protocol": {"epsilon": 8 / 255, "sample_count": 64, "batch_size": 1},
     })
     result = _verify(valid_grid, records)
     assert result["status"] == "PASS"
     assert result["failed_attempt_count"] == 1
+
+
+@pytest.mark.parametrize("mutation", [
+    "finite_channel", "finite_flow", "singular_channel", "missing_anchor_index", "duplicate_anchor_index",
+    "wrong_anchor_index", "wrong_protocol", "wrong_diagnostic_code", "missing_diagnostic_code",
+])
+def test_finite_component_or_anchor_or_protocol_corruption_fails(valid_grid, mutation) -> None:
+    records = copy.deepcopy(valid_grid[0])
+    row = records[0]
+    if mutation == "finite_channel":
+        row["diagnostic"]["sample_components"][0]["anchors"][0]["channel"] = 123456.0
+    elif mutation == "singular_channel":
+        for sample in row["diagnostic"]["sample_components"]:
+            for anchor in sample["anchors"]:
+                anchor["channel"] = -1.0
+    elif mutation == "finite_flow":
+        row["diagnostic"]["sample_components"][0]["transitions"][1]["flow"] = 2.0
+    elif mutation == "missing_anchor_index":
+        for item in records:
+            for anchor in item["diagnostic"]["anchor_metadata"]:
+                anchor.pop("anchor_index")
+    elif mutation == "duplicate_anchor_index":
+        for item in records:
+            for anchor in item["diagnostic"]["anchor_metadata"]:
+                anchor["anchor_index"] = 0
+    elif mutation == "wrong_anchor_index":
+        row["diagnostic"]["anchor_metadata"][2]["anchor_index"] = 99
+    elif mutation == "wrong_protocol":
+        row["protocol"] = {"epsilon": 0, "sample_count": 64, "batch_size": 64}
+    elif mutation == "wrong_diagnostic_code":
+        row["diagnostic_code_sha256"]["collector"] = "changed"
+    elif mutation == "missing_diagnostic_code":
+        row.pop("diagnostic_code_sha256")
+    result = _verify(valid_grid, records)
+    assert result["status"] == "FAIL", mutation
+    assert result["reasons"]
 
 
 def test_duplicate_json_field_and_nonfinite_token_are_rejected(tmp_path) -> None:
@@ -153,3 +204,44 @@ def test_verifier_cli_starts_without_external_pythonpath() -> None:
         cwd=project, env=environment, capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_legacy_attestation_binds_exact_original_attempt_files(tmp_path: Path) -> None:
+    from scripts.verify_e37_layer_diagnostic import load_legacy_attestation
+
+    attempts = tmp_path / "attempts"
+    record = attempts / "attempt_01" / "darts_e0" / "17.json"
+    record.parent.mkdir(parents=True)
+    record.write_text('{"status":"ok"}\n', encoding="utf-8")
+    launcher = tmp_path / "full_01_launcher.log"
+    launcher.write_text("runner_sha256=runner-hash\n", encoding="utf-8")
+    code_manifest = tmp_path / "diagnostic_code_sha256_v4.json"
+    code_manifest.write_text(json.dumps({"sha256": {
+        "scripts/run_e37_layer_diagnostic.py": "runner-hash",
+        "src/robust_metric_lab/e37_layer_diagnostic.py": "collector-hash",
+    }}) + "\n", encoding="utf-8")
+    digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+    attestation = tmp_path / "legacy_attestation_v1.json"
+    attestation.write_text(json.dumps({
+        "schema": "legacy_e37_diag_batch_v1",
+        "frozen_manifest_sha256": "frozen-hash",
+        "diagnostic_code_sha256": {"collector": "collector-hash", "runner": "runner-hash"},
+        "code_manifest_sha256": digest(code_manifest),
+        "launcher_log_sha256": digest(launcher),
+        "attempt_file_sha256": {"attempt_01/darts_e0/17.json": digest(record)},
+    }), encoding="utf-8")
+    kwargs = dict(
+        attempts_dir=attempts, manifest_hash="frozen-hash",
+        code_hashes={"collector": "collector-hash", "runner": "runner-hash"},
+        code_manifest_path=code_manifest, launcher_log_path=launcher,
+    )
+    assert load_legacy_attestation(attestation, **kwargs) == {"attempt_01/darts_e0/17.json"}
+    record.write_text('{"status":"failed"}\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="attempt.*hash"):
+        load_legacy_attestation(attestation, **kwargs)
+    record.write_text('{"status":"ok"}\n', encoding="utf-8")
+    extra = attempts / "unexpected" / "extra.json"
+    extra.parent.mkdir(parents=True)
+    extra.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="attempt.*hash"):
+        load_legacy_attestation(attestation, **kwargs)

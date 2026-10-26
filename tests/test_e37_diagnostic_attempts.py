@@ -89,11 +89,13 @@ def test_one_success_and_one_loader_failure_keep_provenance(tmp_path) -> None:
         item, obj, loader=lambda _: object(), samples=(object(), object()),
         diagnose=lambda *_args, **_kwargs: diagnostic,
         manifest_hash="manifest", source_hashes={"e37": "source"}, epsilon=8 / 255,
+        diagnostic_code_hashes={"collector": "collector-hash", "runner": "runner-hash"},
     )
     assert success["status"] == "ok"
     assert success["diagnostic"]["sample_count"] == 64
     assert success["manifest_sha256"] == "manifest"
     assert success["checkpoint_sha256"] == obj["checkpoint_sha256"]
+    assert success["diagnostic_code_sha256"] == {"collector": "collector-hash", "runner": "runner-hash"}
 
     def fail(_item):
         raise RuntimeError("out of memory")
@@ -102,6 +104,7 @@ def test_one_success_and_one_loader_failure_keep_provenance(tmp_path) -> None:
         item, obj, loader=fail, samples=(object(), object()),
         diagnose=lambda *_args, **_kwargs: diagnostic,
         manifest_hash="manifest", source_hashes={"e37": "source"}, epsilon=8 / 255,
+        diagnostic_code_hashes={"collector": "collector-hash", "runner": "runner-hash"},
     )
     assert failure["status"] == "failed"
     assert failure["error_type"] == "RuntimeError"
@@ -109,3 +112,4 @@ def test_one_success_and_one_loader_failure_keep_provenance(tmp_path) -> None:
     assert "RuntimeError: out of memory" in failure["traceback"]
     assert "diagnostic" not in failure
     assert failure["manifest_sha256"] == "manifest"
+    assert failure["diagnostic_code_sha256"] == success["diagnostic_code_sha256"]

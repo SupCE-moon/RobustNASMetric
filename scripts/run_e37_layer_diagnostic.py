@@ -157,6 +157,7 @@ def run_one(
     diagnose: Callable,
     manifest_hash: str,
     source_hashes: dict,
+    diagnostic_code_hashes: dict,
     epsilon: float,
     device: str = "cpu",
 ) -> dict:
@@ -171,6 +172,7 @@ def run_one(
         "model_or_arch_id": str(item.model_or_arch_id),
         "manifest_sha256": manifest_hash,
         "source_sha256": source_hashes,
+        "diagnostic_code_sha256": diagnostic_code_hashes,
         "checkpoint_sha256": frozen_object["checkpoint_sha256"],
         "protocol": {"epsilon": epsilon, "sample_count": 64, "batch_size": 1},
         "started_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -260,6 +262,10 @@ def main(argv: list[str] | None = None) -> int:
         })
         raise
     failures = 0
+    diagnostic_code_hashes = {
+        "collector": sha256_file(ROOT / "src/robust_metric_lab/e37_layer_diagnostic.py"),
+        "runner": sha256_file(Path(__file__)),
+    }
     with log_path.open("x", encoding="utf-8") as log:
         for item in sorted(items, key=lambda row: (row.checkpoint_epoch, str(row.model_or_arch_id))):
             key = (f"darts_e{item.checkpoint_epoch}", str(item.model_or_arch_id))
@@ -268,6 +274,7 @@ def main(argv: list[str] | None = None) -> int:
             record = run_one(
                 item, objects[key], loader=loader, samples=samples, diagnose=diagnose_e37,
                 manifest_hash=manifest_hash, source_hashes=payload["source_sha256"],
+                diagnostic_code_hashes=diagnostic_code_hashes,
                 epsilon=EPSILON, device=args.device,
             )
             write_attempt(attempt_root / key[0] / f"{key[1]}.json", record)
