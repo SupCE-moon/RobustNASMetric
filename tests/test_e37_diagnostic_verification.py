@@ -124,6 +124,74 @@ def test_failed_attempt_then_success_keeps_audit_and_passes(valid_grid) -> None:
     assert result["failed_attempt_count"] == 1
 
 
+def test_invalid_ok_record_remains_exact_repair_key(valid_grid) -> None:
+    records = copy.deepcopy(valid_grid[0])
+    row = records[0]
+    row["diagnostic"]["sample_components"][0]["anchors"][0]["channel"] = 123456.0
+    result = _verify(valid_grid, records)
+    assert result["status"] == "FAIL"
+    assert (row["setting"], row["model_or_arch_id"]) in result["repair_keys"]
+
+
+@pytest.mark.parametrize("bad_first", [True, False])
+def test_invalid_ok_then_one_valid_repair_passes_with_rejection_evidence(valid_grid, bad_first) -> None:
+    records = copy.deepcopy(valid_grid[0])
+    bad = copy.deepcopy(records[0])
+    bad["diagnostic"]["sample_components"][0]["anchors"][0]["channel"] = 123456.0
+    records.insert(0 if bad_first else 1, bad)
+    result = _verify(valid_grid, records)
+    assert result["status"] == "PASS"
+    assert result["successful_key_count"] == 200
+    assert result["rejected_attempt_count"] == 1
+    assert result["rejected_attempts"][0]["key"] == [bad["setting"], bad["model_or_arch_id"]]
+    assert not result["repair_keys"]
+
+
+def test_provenance_mismatch_remains_fatal_after_valid_repair(valid_grid) -> None:
+    records = copy.deepcopy(valid_grid[0])
+    bad = copy.deepcopy(records[0])
+    bad["source_sha256"] = {"e37": "wrong"}
+    records.insert(0, bad)
+    result = _verify(valid_grid, records)
+    assert result["status"] == "FAIL"
+    assert any("source hash mismatch" in reason for reason in result["reasons"])
+
+
+def test_component_reconstruction_must_match_strict_directly(valid_grid) -> None:
+    records = copy.deepcopy(valid_grid[0])
+    row = records[0]
+    row["diagnostic"]["sample_components"] = copy.deepcopy(row["diagnostic"]["sample_components"])
+    name = "feature_measure_spectrum_fisher_rao_delta"
+    row["diagnostic"]["metric_values"] = dict(row["diagnostic"]["metric_values"])
+    row["diagnostic"]["metric_values"][name] = 0.300007
+    for sample in row["diagnostic"]["sample_components"]:
+        for anchor in sample["anchors"]:
+            anchor["spectrum_fisher"] = 0.300014
+    result = _verify(valid_grid, records)
+    assert result["status"] == "FAIL"
+    assert (row["setting"], row["model_or_arch_id"]) in result["repair_keys"]
+
+
+@pytest.mark.parametrize("mutation", ["diagnostic", "anchor", "sample", "huge_feature_count", "huge_component"])
+def test_null_nested_record_yields_fail_evidence(valid_grid, mutation) -> None:
+    records = copy.deepcopy(valid_grid[0])
+    row = records[0]
+    if mutation == "diagnostic":
+        row["diagnostic"] = None
+    elif mutation == "anchor":
+        row["diagnostic"]["anchor_metadata"][0] = None
+    elif mutation == "sample":
+        row["diagnostic"]["sample_components"] = [None] * 64
+    elif mutation == "huge_feature_count":
+        row["diagnostic"]["feature_count"] = 10 ** 100
+    else:
+        row["diagnostic"]["sample_components"][0]["anchors"][0]["channel"] = 10 ** 1000
+    result = _verify(valid_grid, records)
+    assert result["status"] == "FAIL"
+    assert result["reasons"]
+    assert (row["setting"], row["model_or_arch_id"]) in result["repair_keys"]
+
+
 @pytest.mark.parametrize("mutation", [
     "finite_channel", "finite_flow", "singular_channel", "missing_anchor_index", "duplicate_anchor_index",
     "wrong_anchor_index", "wrong_protocol", "wrong_diagnostic_code", "missing_diagnostic_code",

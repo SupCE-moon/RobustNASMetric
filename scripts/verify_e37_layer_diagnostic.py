@@ -33,7 +33,10 @@ ANCHOR_COMPONENTS = {
 def _finite_number(value: object, where: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ValueError(f"non-numeric {where}")
-    number = float(value)
+    try:
+        number = float(value)
+    except OverflowError as exc:
+        raise ValueError(f"nonfinite {where}") from exc
     if not math.isfinite(number):
         raise ValueError(f"nonfinite {where}")
     return number
@@ -134,15 +137,19 @@ def _component_scores(samples: list[dict]) -> dict[str, float]:
 
 def _check_success(record: dict, strict_values: Mapping[str, float]) -> tuple[float, float]:
     diagnostic = record["diagnostic"]
+    if not isinstance(diagnostic, dict):
+        raise ValueError("diagnostic is not an object")
     if diagnostic.get("sample_count") != 64:
         raise ValueError("sample_count is not 64")
     anchors = diagnostic.get("anchor_metadata")
     if not isinstance(anchors, list) or len(anchors) != 4:
         raise ValueError("anchor_metadata does not contain four anchors")
-    if not isinstance(diagnostic.get("feature_count"), int) or diagnostic["feature_count"] < 4:
+    if type(diagnostic.get("feature_count")) is not int or not 4 <= diagnostic["feature_count"] <= 1_000_000:
         raise ValueError("invalid feature_count")
     expected_indices = tuple(_anchor_indices(diagnostic["feature_count"], max_layers=4))
     for slot, anchor in enumerate(anchors):
+        if not isinstance(anchor, dict):
+            raise ValueError(f"anchor {slot} is not an object")
         if type(anchor.get("anchor_index")) is not int or anchor["anchor_index"] != expected_indices[slot]:
             raise ValueError(f"anchor {slot} original index mismatch")
         if not isinstance(anchor.get("module_path"), str) or not anchor["module_path"]:
@@ -158,6 +165,8 @@ def _check_success(record: dict, strict_values: Mapping[str, float]) -> tuple[fl
     if not isinstance(samples, list) or len(samples) != 64:
         raise ValueError("sample_components does not contain 64 samples")
     for index, sample in enumerate(samples):
+        if not isinstance(sample, dict):
+            raise ValueError(f"sample {index} is not an object")
         if sample.get("sample_index") != index:
             raise ValueError(f"sample index mismatch at {index}")
         layers, transitions = sample.get("anchors"), sample.get("transitions")
@@ -166,11 +175,15 @@ def _check_success(record: dict, strict_values: Mapping[str, float]) -> tuple[fl
         if not isinstance(transitions, list) or len(transitions) != 3:
             raise ValueError(f"sample {index} lacks three transitions")
         for slot, layer in enumerate(layers):
+            if not isinstance(layer, dict):
+                raise ValueError(f"sample {index} anchor {slot} is not an object")
             if set(layer) != ANCHOR_COMPONENTS:
                 raise ValueError(f"sample {index} anchor {slot} components differ")
             for name, value in layer.items():
                 _finite_number(value, f"sample {index} anchor {slot} {name}")
         for slot, transition in enumerate(transitions):
+            if not isinstance(transition, dict):
+                raise ValueError(f"sample {index} transition {slot} is not an object")
             if set(transition) != {"flow"}:
                 raise ValueError(f"sample {index} transition {slot} differs")
             _finite_number(transition["flow"], f"sample {index} transition {slot}")
@@ -194,6 +207,9 @@ def _check_success(record: dict, strict_values: Mapping[str, float]) -> tuple[fl
         max_rel = max(max_rel, difference / max(abs(expected), 1e-12))
         if difference > 3e-8 + 3e-5 * abs(expected):
             raise ValueError(f"strict reconstruction mismatch: {name} abs={difference}")
+        direct_difference = abs(component_value - expected)
+        if direct_difference > 3e-8 + 3e-5 * abs(expected):
+            raise ValueError(f"component versus strict mismatch: {name} abs={direct_difference}")
     return max_abs, max_rel
 
 
@@ -206,6 +222,7 @@ def verify_records(
 ) -> dict:
     reasons: list[str] = []
     successes: dict[tuple[str, str], dict] = {}
+    rejected_attempts: list[dict] = []
     failed_count = 0
     max_abs = 0.0
     max_rel = 0.0
@@ -235,10 +252,17 @@ def verify_records(
                 if "diagnostic" in record or not record.get("traceback"):
                     raise ValueError("failed attempt has invented values or no traceback")
             elif status == "ok":
+                try:
+                    abs_error, rel_error = _check_success(record, strict_scores[key])
+                except (KeyError, TypeError, ValueError) as exc:
+                    rejected_attempts.append({
+                        "record_index": index, "key": list(key),
+                        "reason": f"{type(exc).__name__}: {exc}",
+                    })
+                    continue
                 if key in successes:
                     raise ValueError(f"duplicate successful key {key}")
                 successes[key] = record
-                abs_error, rel_error = _check_success(record, strict_scores[key])
                 max_abs = max(max_abs, abs_error)
                 max_rel = max(max_rel, rel_error)
             else:
@@ -282,6 +306,8 @@ def verify_records(
         "expected_key_count": len(expected_keys),
         "successful_key_count": len(successes),
         "failed_attempt_count": failed_count,
+        "rejected_attempt_count": len(rejected_attempts),
+        "rejected_attempts": rejected_attempts,
         "paired_architecture_count": paired_count,
         "pair_mismatches": pair_mismatches,
         "repair_keys": missing,
@@ -343,7 +369,7 @@ def write_verification_output(output_dir: Path, result: dict) -> None:
 
 
 def verify_attempts(
-    manifest: Path, attempts_dir: Path, strict_csv: Path, output_dir: Path, *,
+    manifest: Path, attempts_dir: Path, strict_csv: Path, output_dir: Path | None, *,
     code_hash_manifest: Path | None = None,
     legacy_attestation: Path | None = None,
 ) -> dict:
@@ -394,6 +420,10 @@ def verify_attempts(
             records, expected_keys=expected, strict_scores=strict_scores,
             frozen_hashes=hashes, legacy_attested_indices=legacy_indices,
         )
+        for rejected in result["rejected_attempts"]:
+            path = attempt_paths[rejected["record_index"]]
+            rejected["attempt_path"] = path.relative_to(attempts_dir).as_posix()
+            rejected["attempt_sha256"] = _sha256_file(path)
         result["frozen_manifest_sha256"] = manifest_hash
         result["diagnostic_code_sha256"] = hashes["diagnostic_code_sha256"]
         result["code_hash_manifest_sha256"] = _sha256_file(code_hash_manifest)
@@ -406,7 +436,8 @@ def verify_attempts(
             "repair_keys": [], "canonical_records": [],
             "successful_key_count": 0, "paired_architecture_count": 0,
         }
-    write_verification_output(output_dir, result)
+    if output_dir is not None:
+        write_verification_output(output_dir, result)
     return result
 
 

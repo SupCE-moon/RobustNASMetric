@@ -54,6 +54,18 @@ def validate_repair_keys(
         raise ValueError("repair keys must equal all missing/failed keys")
 
 
+def validate_verified_repair(
+    requested: set[tuple[str, str]], expected: set[tuple[str, str]], verified: dict,
+) -> None:
+    if any(not str(reason).startswith("missing successful keys:") for reason in verified.get("reasons", [])):
+        raise ValueError("fatal verification reason; repair is not safe")
+    missing = {tuple(key) for key in verified.get("repair_keys", [])}
+    if not missing or not missing <= expected or requested != missing:
+        raise ValueError("repair must equal the exact verified missing/rejected key set")
+    if verified.get("successful_key_count") is not None and verified["successful_key_count"] != len(expected - missing):
+        raise ValueError("fatal verifier success-count mismatch")
+
+
 def select_smoke_keys(
     two_ids: str, expected: set[tuple[str, str]]
 ) -> set[tuple[str, str]]:
@@ -208,6 +220,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--attempt-id", required=True)
     parser.add_argument("--device", required=True)
     parser.add_argument("--repair-keys", type=Path)
+    parser.add_argument("--code-hash-manifest", type=Path,
+                        help="Frozen diagnostic code hashes; required for verified repair")
+    parser.add_argument("--legacy-attestation", type=Path,
+                        help="Byte attestation for original attempts without per-record code hashes")
     parser.add_argument("--smoke-ids", help="Exactly two predeclared IDs, e.g. 0,1; isolated from formal attempts")
     return parser
 
@@ -233,9 +249,6 @@ def main(argv: list[str] | None = None) -> int:
         raise ValueError("smoke and repair modes are mutually exclusive")
     attempts_root = attempts_root_for_mode(output_root, smoke)
     previous = read_previous_attempts(attempts_root)
-    successful = {_key(row) for row in previous if row["status"] == "ok"}
-    if len(successful) != sum(row["status"] == "ok" for row in previous):
-        raise ValueError("duplicate previous successful attempt")
     if smoke:
         if previous:
             raise ValueError("prior smoke attempts exist; use a new diagnostic run directory")
@@ -246,7 +259,16 @@ def main(argv: list[str] | None = None) -> int:
         requested = expected
     else:
         requested = _read_repair_keys(args.repair_keys)
-        validate_repair_keys(requested, expected, successful)
+        if args.code_hash_manifest is None:
+            raise ValueError("verified repair requires --code-hash-manifest")
+        from scripts.verify_e37_layer_diagnostic import verify_attempts
+        verified = verify_attempts(
+            args.frozen_manifest, attempts_root,
+            Path(payload["input_paths"]["strict_csv"]), None,
+            code_hash_manifest=args.code_hash_manifest,
+            legacy_attestation=args.legacy_attestation,
+        )
+        validate_verified_repair(requested, expected, verified)
     attempt_root = attempts_root / args.attempt_id
     if attempt_root.exists():
         raise FileExistsError(f"attempt ID already exists: {args.attempt_id}")

@@ -14,6 +14,7 @@ from scripts.run_e37_layer_diagnostic import (
     run_one,
     select_smoke_keys,
     validate_repair_keys,
+    validate_verified_repair,
     write_attempt,
 )
 
@@ -41,6 +42,20 @@ def test_repair_is_exact_failed_or_missing_set() -> None:
         validate_repair_keys({("darts_e100", "other")}, expected, successful)
     with pytest.raises(ValueError, match="all missing/failed"):
         validate_repair_keys(set(), expected, successful)
+
+
+def test_repair_requires_clean_verifier_classification() -> None:
+    expected = {("darts_e0", "17"), ("darts_e100", "17")}
+    requested = {("darts_e100", "17")}
+    verified = {
+        "status": "FAIL", "reasons": ["missing successful keys: 1; examples=[]"],
+        "repair_keys": [["darts_e100", "17"]],
+    }
+    validate_verified_repair(requested, expected, verified)
+    with pytest.raises(ValueError, match="fatal"):
+        validate_verified_repair(requested, expected, {**verified, "reasons": ["source hash mismatch"]})
+    with pytest.raises(ValueError, match="exact"):
+        validate_verified_repair({("darts_e0", "17")}, expected, verified)
 
 
 def test_smoke_is_exact_two_predeclared_ids_at_both_stages() -> None:
