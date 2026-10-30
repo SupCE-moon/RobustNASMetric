@@ -12,7 +12,14 @@ import csv
 import json
 import os
 from pathlib import Path
+import sys
 from typing import Iterator, Sequence
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "src"))
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 
@@ -33,7 +40,6 @@ from robust_metric_lab.student_runner import CSV_COLUMNS
 from scripts.activation_survival_manifest import require_project_path, sha256_file
 
 
-ROOT = Path(__file__).resolve().parents[1]
 CANDIDATE = "feature_activation_sign_survival_sum"
 RACL_EXCLUSIONS = frozenset({"racl_arch_lipschitz_log_upper",
                              "racl_fixed_network_log_upper_proxy"})

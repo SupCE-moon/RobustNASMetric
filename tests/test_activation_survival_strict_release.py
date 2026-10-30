@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 
+import pandas as pd
 import pytest
 
 from robust_metric_lab.metric_eligibility import (
@@ -15,6 +16,7 @@ from scripts.build_activation_survival_strict_release import (
     require_release_inputs,
 )
 from robust_metric_lab.student_runner import CSV_COLUMNS
+from robust_metric_lab.strict_ranking import ManifestExpectation, validate_metric_grid
 
 
 def _historical() -> list[MetricEligibilityRecord]:
@@ -82,3 +84,29 @@ def test_historical_snapshot_detects_changed_exclusion_evidence(tmp_path) -> Non
     before = _snapshot_tree(old)
     excluded.write_text("RACL included\n", encoding="utf-8")
     assert _snapshot_tree(old) != before
+
+
+def test_temporary_registration_accepts_only_complete_higher_direction_grid() -> None:
+    counts = {"rb40_mature": 40, **{f"nb201_e{epoch}": 64 for epoch in (0, 5, 10, 25, 50)},
+              **{f"darts_e{epoch}": 100 for epoch in (0, 100)}}
+    rows = []
+    expected = {}
+    for setting, count in counts.items():
+        benchmark = "rb40" if setting == "rb40_mature" else setting.split("_e")[0]
+        epoch = None if setting == "rb40_mature" else int(setting.rsplit("e", 1)[1])
+        expected[setting] = ManifestExpectation(benchmark, epoch,
+                                                {str(index): 0.5 for index in range(count)})
+        for index in range(count):
+            rows.append({"run_id": "test", "benchmark": benchmark, "setting": setting,
+                         "model_or_arch_id": str(index), "checkpoint_epoch": epoch,
+                         "metric_name": CANDIDATE, "direction": "higher",
+                         "metric_value": 1.0, "target_value": 0.5, "status": "ok",
+                         "error": "", "runtime_sec": 1.0, "seed": 20260808,
+                         "sample_offset": 0, "num_samples": 64,
+                         "epsilon": 8 / 255, "checkpoint_path": "weight.pt"})
+    frame = pd.DataFrame(rows)
+    with candidate_registration():
+        assert len(validate_metric_grid(frame, CANDIDATE, expected)) == 560
+        frame.loc[0, "direction"] = "lower"
+        with pytest.raises(ValueError, match="direction mismatch"):
+            validate_metric_grid(frame, CANDIDATE, expected)
