@@ -25,6 +25,10 @@ python scripts/activation_survival_manifest.py \
 
 同一时刻 GPU 使用率 100%，空闲显存约 9961 MiB；没有启动候选的 GPU 计算，没有结束或调整他人进程。待冻结成功后，按项目显存门槛进行不参与排名的运行检查，再启动正式实验。
 
+## 严格发布接口核对
+
+16:05 UTC 只读检查服务器严格发布脚本：旧 `build_adv_excess_strict_release.py` 把上一候选的名称、方向及 48,160 行终态写死，不能直接拿来发布本候选。通用 `build_strict_metric_ranking.py` 与 `verify_strict_release.py` 使用 `metric_eligibility` 和 `METRIC_BY_NAME` 校验方向、八设置、唯一性及完整性。因此本候选算完后必须使用单独、经测试的新发布入口，在其进程内显式登记 `feature_activation_sign_survival_sum`（higher、Ours、cross_space），调用相同的通用严格排名与验证函数；不能更改当前正在冻结的服务器 `src/`，也不能放宽旧 RACL 排除。新入口及其哈希须写入新发布的出处记录。此项尚未实施，不能将候选 CSV 直接宣称为严格总榜。
+
 ## 待补证据
 
 - 冻结任务终态、560 键与全部输入哈希，失败时保留 `freeze.log` 原文。
