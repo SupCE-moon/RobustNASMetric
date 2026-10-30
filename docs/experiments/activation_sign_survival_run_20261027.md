@@ -35,3 +35,11 @@ python scripts/activation_survival_manifest.py \
 - 三空间运行检查的样本数、层调用对齐、耗时、峰值显存和原始失败证据。
 - 560/560 唯一、有限、`status=ok` 核验；严格新发布；与 Φ 的八设置差值和架构配对区间。
 - 若主榜胜出，再按独立验证计划冻结三空间留出材料；未过独立门槛不得宣布超过 Φ。
+
+## 2026-10-30/31 输入冻结与显存等待
+
+冻结任务成功生成 `frozen_manifest.json`，摘要 `6584139ffb2562a80ec58eaa9e893a7e4e63b5940962bc38a1e03806d17400f9`。独立读取核对：payload 摘要相符、560/560 键唯一、560 个不同权重路径、八设置分别为 40/64×5/100×2；服务器注册表哈希 `1aab7d25894de7cc77c24effda8f9e669bfc8a61c373839a04ba7c316e6a63db` 与隔离副本相同。`freeze.log` 原始输出保留在新目录。以上只证明输入清单冻结成功，不是任何指标结果。
+
+审批恢复后，新增非排名运行检查脚本，仅新建 `scripts/smoke_activation_survival.py` 与 `scripts/wait_and_run_activation_survival_smoke.sh`，本地/容器 SHA-256 逐份一致，分别为 `7efe020bdb409a0745aac0e1ce203ac1c017ef0c8817af10bb7d557a53a13698`、`145eff171b9f34fac629b99e94362dc8e9bb37b0a6adb99147eed1b199b9110d`。容器 `bash -n` 及 Python `--help` 通过，本地完整测试 154/154 通过。
+
+20:36 UTC 在 `wangjiahao` 中启动独立 `docker exec -d` 显存监控，PID 143655；状态保存在新目录 `smoke_launcher/STATUS.env`。它沿用项目原门槛：其他计算进程总显存占用不超过 1000 MiB，连续三次、相隔 60 秒；满足后才对 RB40、NB201 e0、DARTS e0 各一个冻结清单中的最小权重模型运行固定 64 样本检查。启动时占用 8412 MiB，状态为 `WAITING_GPU`，**未开始 GPU 指标计算**。失败写独立尝试 JSON 和日志，不能当作正式排名。
