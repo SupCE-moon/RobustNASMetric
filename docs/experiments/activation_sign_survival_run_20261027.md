@@ -43,3 +43,5 @@ python scripts/activation_survival_manifest.py \
 审批恢复后，新增非排名运行检查脚本，仅新建 `scripts/smoke_activation_survival.py` 与 `scripts/wait_and_run_activation_survival_smoke.sh`，本地/容器 SHA-256 逐份一致，分别为 `7efe020bdb409a0745aac0e1ce203ac1c017ef0c8817af10bb7d557a53a13698`、`145eff171b9f34fac629b99e94362dc8e9bb37b0a6adb99147eed1b199b9110d`。容器 `bash -n` 及 Python `--help` 通过，本地完整测试 154/154 通过。
 
 20:36 UTC 在 `wangjiahao` 中启动独立 `docker exec -d` 显存监控，PID 143655；状态保存在新目录 `smoke_launcher/STATUS.env`。它沿用项目原门槛：其他计算进程总显存占用不超过 1000 MiB，连续三次、相隔 60 秒；满足后才对 RB40、NB201 e0、DARTS e0 各一个冻结清单中的最小权重模型运行固定 64 样本检查。启动时占用 8412 MiB，状态为 `WAITING_GPU`，**未开始 GPU 指标计算**。失败写独立尝试 JSON 和日志，不能当作正式排名。
+
+20:40 UTC 另启动完整主网格的**等待器**（PID 143784），脚本 SHA-256 `5c3b9795bd377df34d1ddefb8c3be38d6aed578ec82415e487d53e9b225121d7` 与本地相同，容器 `bash -n` 通过，初始 `state=WAITING_SMOKE`。它仅在三空间非排名 smoke 全部 PASS 且再次满足相同显存门槛后才按固定八设置运行 560 键；每个设置有独立追加式尝试目录与日志，任一失败即停，原始失败键保留，后续仅能用同源同清单补缺失键。目前等待器**没有运行正式指标**。新严格发布仍须 560/560 核验和独立合并，等待器完成不等于入榜。
