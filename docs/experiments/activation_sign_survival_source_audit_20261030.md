@@ -19,4 +19,6 @@ The prior full-run manifest pins the three shared benchmark CSVs at `shared_benc
 
 Strict tooling hashes observed in-container: `build_adv_excess_strict_release.py` `a346c9110a6ebbcc0dfeea09c0fdb101b32eaa123cfba9e1e5af2e35154bc19a`; `verify_strict_release.py` `4d6e603a3eccc2bb61360b43e38fe4083088663a3d8829585e81f300df35de6e`; `build_strict_metric_ranking.py` `1b01e216c9c773c7e6654eb458dd0a57244a31d73a58df1705affb08f7e2f975`. Existing resource-wait script `wait_and_run_strict_smoke.sh` hashes to `2867c08c32aaa1cbe3c8e41ed02762fab91c9e71be22c7f61fdd88a7e2d437f5`; inspect its threshold and scope before reuse. No script was executed by this audit.
 
+2026-10-30 16:11 UTC, 为新候选的严格发布入口补镜像四份服务器源码；SFTP 只读提取后，本地 SHA-256 与 `wangjiahao` 内逐份相同：`strict_ranking.py` `ab1cff50f13fcfc536258ca73717614ab2cf7e21c1715243dc0fabd4b83a04c1`；`release.py` `e71b51684bee6837b5b7f790efe797f07a8f387772b2c9bbf07f45cbe660d2eb`；`metric_eligibility.py` `e03131838aec842ae8edde806b07df50b59cac4b8d788c80975b23a6f8a972a8`；`student_analysis.py` `e765d50d10c77ca77a4d462d81960c25170029e2dad0ede34239080861152b1f`。镜像后本地完整测试 148/148 通过。此操作未修改服务器源码；当前冻结任务仍在读取权重。
+
 The rank source currently places TRNAS Phi first (`all_setting_mean=0.7822227242461846`); E37 multiview max and RMS are sixth/seventh. Historical releases remain read-only.
