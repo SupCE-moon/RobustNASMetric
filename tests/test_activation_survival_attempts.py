@@ -109,3 +109,32 @@ def test_loader_failure_is_recorded_and_exact_key_retry_keeps_evidence(tmp_path)
     third = evaluate_keys([item], good_loader, samples, manifest, tmp_path / "attempts",
                           setting="darts_e0", source_sha256=SOURCE, compute=compute)
     assert third == {"written": 0, "failed": 0, "skipped": 1}
+
+
+def test_secondary_rb_artifact_change_is_recorded_as_failure(tmp_path):
+    first = tmp_path / "first.pt"
+    second = tmp_path / "second.pt"
+    first.write_bytes(b"first")
+    second.write_bytes(b"changed")
+    item = SimpleNamespace(
+        model_or_arch_id="arch-1", checkpoint_epoch=None,
+        checkpoint_path=first, target_value=0.5,
+    )
+    frozen = {
+        "setting": "rb40_mature", "model_or_arch_id": "arch-1",
+        "checkpoint_epoch": None, "target_value": 0.5,
+        "checkpoint_sha256": hashlib.sha256(b"first").hexdigest(),
+        "artifact_sha256": {str(first): hashlib.sha256(b"first").hexdigest(),
+                            str(second): hashlib.sha256(b"original").hexdigest()},
+    }
+    manifest = {"frozen_sha256": MANIFEST_HASH, "frozen_payload": {"objects": [frozen]}}
+    result = evaluate_keys([item], lambda _: object(),
+                           lambda: (torch.ones(1, 1), torch.zeros(1, dtype=torch.long)),
+                           manifest, tmp_path / "attempts", setting="rb40_mature",
+                           source_sha256=SOURCE,
+                           compute=lambda *_args, **_kwargs: {"metric_value": 1.0,
+                                                                 "sample_count": 1, "call_count": 1,
+                                                                 "diagnostics": {}})
+    assert result["failed"] == 1
+    row = json.loads(next((tmp_path / "attempts").glob("*.json")).read_text())
+    assert "artifact" in row["error"]

@@ -142,6 +142,13 @@ def evaluate_keys(
             if checkpoint_hash != frozen["checkpoint_sha256"]:
                 raise ValueError("checkpoint differs from frozen manifest")
             attempt["checkpoint_sha256"] = checkpoint_hash
+            artifact_hashes = {}
+            for artifact, expected_hash in frozen.get("artifact_sha256", {}).items():
+                actual_hash = sha256_file(Path(artifact))
+                if actual_hash != expected_hash:
+                    raise ValueError(f"artifact differs from frozen manifest: {artifact}")
+                artifact_hashes[artifact] = actual_hash
+            attempt["artifact_sha256"] = artifact_hashes
             if sample_value is None:
                 sample_value = samples()
             model = load_model(item)
