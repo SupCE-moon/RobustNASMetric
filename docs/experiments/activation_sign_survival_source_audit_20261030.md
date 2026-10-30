@@ -21,4 +21,6 @@ Strict tooling hashes observed in-container: `build_adv_excess_strict_release.py
 
 2026-10-30 16:11 UTC, 为新候选的严格发布入口补镜像四份服务器源码；SFTP 只读提取后，本地 SHA-256 与 `wangjiahao` 内逐份相同：`strict_ranking.py` `ab1cff50f13fcfc536258ca73717614ab2cf7e21c1715243dc0fabd4b83a04c1`；`release.py` `e71b51684bee6837b5b7f790efe797f07a8f387772b2c9bbf07f45cbe660d2eb`；`metric_eligibility.py` `e03131838aec842ae8edde806b07df50b59cac4b8d788c80975b23a6f8a972a8`；`student_analysis.py` `e765d50d10c77ca77a4d462d81960c25170029e2dad0ede34239080861152b1f`。镜像后本地完整测试 148/148 通过。此操作未修改服务器源码；当前冻结任务仍在读取权重。
 
+16:25 UTC 发现隔离副本原有 `metric_registry.py` 只列 46 项，与服务器 86 项严格发布不一致；从同一服务器项目只读镜像并核对 SHA-256 为 `1aab7d25894de7cc77c24effda8f9e669bfc8a61c373839a04ba7c316e6a63db`。服务器原文件没有改动。修复副本后，本地完整测试 153/153 通过。新发布入口在自己的进程内临时登记本候选，再调用服务器原有的严格排名和验证函数；不修改正在冻结的服务器 `src/`。
+
 The rank source currently places TRNAS Phi first (`all_setting_mean=0.7822227242461846`); E37 multiview max and RMS are sixth/seventh. Historical releases remain read-only.
