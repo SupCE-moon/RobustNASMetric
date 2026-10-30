@@ -55,6 +55,8 @@ def validate_holdout_package(package: dict) -> dict:
 
     seen_keys: set[tuple[str, str]] = set()
     per_setting: dict[str, dict[str, str]] = collections.defaultdict(dict)
+    rows_by_setting: dict[str, dict[str, dict]] = collections.defaultdict(dict)
+    targets: dict[tuple[str, str], tuple[float, str]] = {}
     for row in rows:
         setting = row["setting"]
         model_id = row.get("model_or_arch_id")
@@ -82,10 +84,13 @@ def validate_holdout_package(package: dict) -> dict:
         value = row.get("target_value")
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
             raise ValueError(f"{setting}: finite target required")
-        if space == "darts":
-            if row.get("target_checkpoint_sha256") != row["checkpoint_sha256"]:
-                raise ValueError(f"{setting}: target checkpoint mismatch")
+        target_key = (space, model_id)
+        target_definition = (float(value), source)
+        if target_key in targets and targets[target_key] != target_definition:
+            raise ValueError(f"{setting}: target differs across stages")
+        targets[target_key] = target_definition
         per_setting[setting][model_id] = signature
+        rows_by_setting[setting][model_id] = row
 
     nb_base = per_setting["nb201_e0"]
     for epoch in (5, 10, 25, 50):
@@ -93,6 +98,11 @@ def validate_holdout_package(package: dict) -> dict:
             raise ValueError("NB201 architectures/signatures differ across stages")
     if per_setting["darts_e100"] != per_setting["darts_e0"]:
         raise ValueError("DARTS architectures/signatures differ across stages")
+    for model_id, final_row in rows_by_setting["darts_e100"].items():
+        final_hash = final_row["checkpoint_sha256"]
+        for stage in ("darts_e0", "darts_e100"):
+            if rows_by_setting[stage][model_id].get("target_checkpoint_sha256") != final_hash:
+                raise ValueError(f"{stage}: target checkpoint mismatch")
     return package
 
 

@@ -17,8 +17,10 @@ def complete_package() -> dict:
         space = "rb40" if setting == "rb40_mature" else setting.split("_e")[0]
         epoch = None if space == "rb40" else int(setting.rsplit("e", 1)[1])
         for index in range(count):
-            checkpoint_hash = f"{index + 1:064x}"
-            target_checkpoint_hash = checkpoint_hash if space == "darts" else None
+            checkpoint_hash = f"{index + 1 + (epoch or 0) * 1000:064x}"
+            target_checkpoint_hash = (
+                f"{index + 1 + 100 * 1000:064x}" if space == "darts" else None
+            )
             objects.append({
                 "setting": setting, "model_or_arch_id": str(index),
                 "checkpoint_epoch": epoch, "signature": f"{space}_structure_{index}",
@@ -43,6 +45,8 @@ def test_complete_package_has_exact_counts_and_shared_architectures() -> None:
     ("duplicate", "duplicate"),
     ("nb_stage_alias", "NB201"),
     ("darts_target_weight", "target checkpoint"),
+    ("darts_e0_self_target", "target checkpoint"),
+    ("changed_target", "target differs"),
     ("no_weight_hash", "checkpoint SHA"),
     ("prior_overlap", "prior overlap"),
     ("nonfinite_target", "finite"),
@@ -58,6 +62,11 @@ def test_incomplete_or_contaminated_package_rejected(mutation: str, message: str
         next(row for row in rows if row["setting"] == "nb201_e50")["model_or_arch_id"] = "extra"
     elif mutation == "darts_target_weight":
         next(row for row in rows if row["setting"] == "darts_e100")["target_checkpoint_sha256"] = "a" * 64
+    elif mutation == "darts_e0_self_target":
+        row = next(row for row in rows if row["setting"] == "darts_e0")
+        row["target_checkpoint_sha256"] = row["checkpoint_sha256"]
+    elif mutation == "changed_target":
+        next(row for row in rows if row["setting"] == "nb201_e50")["target_value"] = 0.6
     elif mutation == "no_weight_hash":
         rows[0]["checkpoint_sha256"] = ""
     elif mutation == "prior_overlap":
