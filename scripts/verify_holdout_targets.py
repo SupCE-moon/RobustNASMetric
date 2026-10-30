@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 import re
+from pathlib import Path
 
 
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
@@ -64,3 +65,47 @@ def verify_target_item(item: dict) -> None:
         raise ValueError("PGD seed mismatch")
     if item.get("target_normalization") != _DARTS_NORMALIZATION:
         raise ValueError("DARTS normalization mismatch")
+
+
+def verify_target_file(item: dict, project_root: Path) -> float:
+    """Recompute a DARTS accuracy from immutable per-image attack evidence.
+
+    The root must be the permitted project. This checks file bytes and internal
+    consistency; it does not replace a separate code/weight execution audit.
+    """
+    verify_target_item(item)
+    root = Path(project_root).resolve()
+    relative = item.get("target_source_path")
+    if not isinstance(relative, str) or not relative or Path(relative).is_absolute():
+        raise ValueError("target source path must be project-relative")
+    path = (root / relative).resolve()
+    if not path.is_relative_to(root) or not path.is_file():
+        raise ValueError("target source file missing or outside project")
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != item["target_source_sha256"]:
+        raise ValueError("target source SHA mismatch")
+    try:
+        record = json.loads(raw)
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise ValueError("target source JSON invalid") from exc
+    if record.get("status") != "ok" or str(record.get("model_or_arch_id")) != item["model_or_arch_id"]:
+        raise ValueError("target evidence status or architecture mismatch")
+    if record.get("checkpoint_sha256") != item["final_checkpoint_sha256"]:
+        raise ValueError("target evidence checkpoint mismatch")
+    protocol_fields = (
+        "target_attack", "target_dataset", "target_epsilon", "target_step_size",
+        "target_steps", "target_restarts", "target_random_start", "target_batch_size",
+        "target_random_seed", "target_normalization",
+    )
+    if record.get("protocol") != {key: item[key] for key in protocol_fields}:
+        raise ValueError("target evidence protocol mismatch")
+    ids = record.get("sample_ids")
+    correct = record.get("correct")
+    if not isinstance(ids, list) or not isinstance(correct, list) or len(ids) != 10000 or len(correct) != 10000:
+        raise ValueError("target evidence requires 10,000 ordered images")
+    if ids != list(range(10000)) or not all(type(value) is bool for value in correct):
+        raise ValueError("target evidence sample IDs or correctness invalid")
+    accuracy = sum(correct) / 10000
+    if not math.isclose(accuracy, float(item["target_value"]), rel_tol=0, abs_tol=1e-12):
+        raise ValueError("target accuracy differs from per-image evidence")
+    return accuracy

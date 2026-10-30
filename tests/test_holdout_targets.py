@@ -8,7 +8,7 @@ import json
 
 import pytest
 
-from scripts.verify_holdout_targets import verify_target_item
+from scripts.verify_holdout_targets import verify_target_file, verify_target_item
 
 
 def darts_target() -> dict:
@@ -63,3 +63,49 @@ def test_wrong_darts_target_protocol_rejected(field: str, replacement: object, m
     item[field] = replacement
     with pytest.raises(ValueError, match=message):
         verify_target_item(item)
+
+
+def write_target_evidence(tmp_path, item: dict, *, correct=None, checkpoint=None) -> dict:
+    record = {
+        "status": "ok", "model_or_arch_id": item["model_or_arch_id"],
+        "checkpoint_sha256": checkpoint or item["final_checkpoint_sha256"],
+        "sample_ids": list(range(10000)),
+        "correct": correct if correct is not None else [True] * 4700 + [False] * 5300,
+        "protocol": {key: item[key] for key in (
+            "target_attack", "target_dataset", "target_epsilon", "target_step_size",
+            "target_steps", "target_restarts", "target_random_start", "target_batch_size",
+            "target_random_seed", "target_normalization",
+        )},
+    }
+    path = tmp_path / "darts_target.json"
+    path.write_text(json.dumps(record, sort_keys=True), encoding="utf-8")
+    item["target_source_path"] = path.name
+    item["target_source_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return item
+
+
+def test_darts_target_file_recomputes_full_accuracy(tmp_path) -> None:
+    item = write_target_evidence(tmp_path, darts_target())
+    assert verify_target_file(item, tmp_path) == 0.47
+
+
+@pytest.mark.parametrize("tamper, message", [
+    ("missing_image", "10,000"),
+    ("old_checkpoint", "checkpoint"),
+    ("wrong_accuracy", "accuracy"),
+    ("changed_file", "source SHA"),
+])
+def test_darts_target_file_rejects_incomplete_or_stale_evidence(tmp_path, tamper: str, message: str) -> None:
+    item = darts_target()
+    if tamper == "missing_image":
+        item = write_target_evidence(tmp_path, item, correct=[True] * 4700 + [False] * 5299)
+    elif tamper == "old_checkpoint":
+        item = write_target_evidence(tmp_path, item, checkpoint="9" * 64)
+    else:
+        item = write_target_evidence(tmp_path, item)
+        if tamper == "wrong_accuracy":
+            item["target_value"] = 0.48
+        else:
+            (tmp_path / item["target_source_path"]).write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError, match=message):
+        verify_target_file(item, tmp_path)
