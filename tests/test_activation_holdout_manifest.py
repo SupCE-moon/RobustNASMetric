@@ -351,7 +351,12 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
     prior_path = tmp_path / "prior_inventory.json"
     prior_path.write_text(json.dumps(prior_inventory), encoding="utf-8")
     package["prior_inventory_sha256"] = hashlib.sha256(prior_path.read_bytes()).hexdigest()
-    source_report = verify_holdout_provenance(package, tmp_path, prior_path)
+    prior_meta = tmp_path / "prior_meta.json"
+    prior_meta.write_text(json.dumps({"ids": {"9000": {"isomorph": 9000}}}), encoding="utf-8")
+    prior_meta_sha = hashlib.sha256(prior_meta.read_bytes()).hexdigest()
+    source_report = verify_holdout_provenance(
+        package, tmp_path, prior_path,
+        official_meta_path=prior_meta, official_meta_sha256=prior_meta_sha)
     source_report_path = tmp_path / "source_audit.json"
     source_report_path.write_text(json.dumps(source_report, sort_keys=True), encoding="utf-8")
     package["source_audit_sha256"] = hashlib.sha256(source_report_path.read_bytes()).hexdigest()
@@ -362,7 +367,9 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
         package, tmp_path / "sealed.json", verification_report_path=report_path,
         verification_context={"project_root": tmp_path, **kwargs},
         source_audit_report_path=source_report_path,
-        source_audit_context={"project_root": tmp_path, "inventory_path": prior_path},
+        source_audit_context={"project_root": tmp_path, "inventory_path": prior_path,
+                              "official_meta_path": prior_meta,
+                              "official_meta_sha256": prior_meta_sha},
     )
     assert sealed["sealed"] is True
     old.write_text("arch_id\n9001\n", encoding="utf-8")
@@ -371,7 +378,9 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
             package, tmp_path / "stale_history.json", verification_report_path=report_path,
             verification_context={"project_root": tmp_path, **kwargs},
             source_audit_report_path=source_report_path,
-            source_audit_context={"project_root": tmp_path, "inventory_path": prior_path},
+            source_audit_context={"project_root": tmp_path, "inventory_path": prior_path,
+                                  "official_meta_path": prior_meta,
+                                  "official_meta_sha256": prior_meta_sha},
         )
     assert not (tmp_path / "stale_history.json").exists()
     old.write_text("arch_id\n9000\n", encoding="utf-8")
@@ -383,7 +392,9 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
             package, tmp_path / "should_not_seal.json", verification_report_path=report_path,
             verification_context={"project_root": tmp_path, **kwargs},
             source_audit_report_path=source_report_path,
-            source_audit_context={"project_root": tmp_path, "inventory_path": prior_path},
+            source_audit_context={"project_root": tmp_path, "inventory_path": prior_path,
+                                  "official_meta_path": prior_meta,
+                                  "official_meta_sha256": prior_meta_sha},
         )
     assert not (tmp_path / "should_not_seal.json").exists()
 
@@ -401,14 +412,32 @@ def test_frozen_prior_inventory_blocks_overlap_and_id_only_sources(tmp_path) -> 
     path = tmp_path / "prior_inventory.json"
     path.write_text(json.dumps(inventory), encoding="utf-8")
     package["prior_inventory_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
-    report = verify_holdout_provenance(package, tmp_path, path)
+    meta_path = tmp_path / "meta.json"
+    meta_path.write_text(json.dumps({"ids": {"9000": {"isomorph": 9000},
+                                             "0": {"isomorph": 0}}}), encoding="utf-8")
+    meta_sha = hashlib.sha256(meta_path.read_bytes()).hexdigest()
+    context = {"official_meta_path": meta_path, "official_meta_sha256": meta_sha}
+    report = verify_holdout_provenance(package, tmp_path, path, **context)
     assert report["status"] == "PASS" and report["expected_rows"] == 371
     assert report["unresolved_prior_sources"] == 0
     inventory["nb201_canonical_ids"] = ["0"]
     path.write_text(json.dumps(inventory), encoding="utf-8")
     package["prior_inventory_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match="identity"):
+        verify_holdout_provenance(package, tmp_path, path, **context)
+    source.write_text("arch_id\n0\n", encoding="utf-8")
+    inventory["source_sha256"][relative] = hashlib.sha256(source.read_bytes()).hexdigest()
+    path.write_text(json.dumps(inventory), encoding="utf-8")
+    package["prior_inventory_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
     with pytest.raises(ValueError, match="overlap"):
-        verify_holdout_provenance(package, tmp_path, path)
+        verify_holdout_provenance(package, tmp_path, path, **context)
+    inventory["nb201_canonical_ids"] = []
+    path.write_text(json.dumps(inventory), encoding="utf-8")
+    package["prior_inventory_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match="identit"):
+        verify_holdout_provenance(package, tmp_path, path, **context)
+    source.write_text("arch_id\n9000\n", encoding="utf-8")
+    inventory["source_sha256"][relative] = hashlib.sha256(source.read_bytes()).hexdigest()
     id_only = tmp_path / "outputs" / "darts" / "e32.csv"
     id_only.parent.mkdir(parents=True)
     id_only.write_text("arch_id,metric\n0,0.7\n", encoding="utf-8")
@@ -418,4 +447,4 @@ def test_frozen_prior_inventory_blocks_overlap_and_id_only_sources(tmp_path) -> 
     path.write_text(json.dumps(inventory), encoding="utf-8")
     package["prior_inventory_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
     with pytest.raises(ValueError, match="unresolved"):
-        verify_holdout_provenance(package, tmp_path, path)
+        verify_holdout_provenance(package, tmp_path, path, **context)

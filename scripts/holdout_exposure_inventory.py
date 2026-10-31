@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from scripts.holdout_overlap_audit import canonical_darts_signature
 
@@ -35,7 +35,8 @@ def _dicts(value: object):
             stack.extend(v for v in item.values() if isinstance(v, (dict, list)))
 
 
-def collect_exposure(project_root: Path, official_meta: dict) -> dict:
+def collect_exposure(project_root: Path, official_meta: dict,
+                     *, source_paths: list[str] | None = None) -> dict:
     """Return source-hashed prior IDs/signatures and unresolved identity rows.
 
     CSV/JSON values outside identity fields are never used for selection.
@@ -49,10 +50,26 @@ def collect_exposure(project_root: Path, official_meta: dict) -> dict:
     source_sha: dict[str, str] = {}
     unresolved: list[dict[str, str]] = []
 
-    csv_paths = list((root / "outputs").rglob("*.csv"))
-    csv_paths += list((root / "shared_benchmarks").rglob("*.csv"))
-    json_paths = list((root / "outputs").rglob("*.json"))
-    for path in sorted([*csv_paths, *json_paths]):
+    if source_paths is None:
+        csv_paths = list((root / "outputs").rglob("*.csv"))
+        csv_paths += list((root / "shared_benchmarks").rglob("*.csv"))
+        json_paths = list((root / "outputs").rglob("*.json"))
+        paths = sorted([*csv_paths, *json_paths])
+    else:
+        if len(source_paths) != len(set(source_paths)):
+            raise ValueError("duplicate frozen source path")
+        paths = []
+        for relative in source_paths:
+            if (not isinstance(relative, str) or not relative
+                    or PurePosixPath(relative).is_absolute()
+                    or ".." in PurePosixPath(relative).parts
+                    or "\\" in relative):
+                raise ValueError("frozen source path must be project-relative")
+            path = (root / relative).resolve()
+            if not path.is_relative_to(root) or not path.is_file():
+                raise ValueError("frozen source missing or outside project")
+            paths.append(path)
+    for path in sorted(paths):
         rel = path.relative_to(root).as_posix()
         raw = path.read_bytes()
         if path.suffix == ".csv":

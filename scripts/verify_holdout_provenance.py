@@ -7,12 +7,15 @@ import json
 from pathlib import Path
 
 from scripts.build_activation_holdout_manifest import validate_holdout_package
+from scripts.holdout_exposure_inventory import collect_exposure
 from scripts.holdout_overlap_audit import canonical_darts_signature
 from scripts.resolve_darts_id_only_sources import resolve_id_only_sources
 
 
 def verify_holdout_provenance(package: dict, project_root: Path,
-                              inventory_path: Path) -> dict:
+                              inventory_path: Path, *,
+                              official_meta_path: Path,
+                              official_meta_sha256: str) -> dict:
     """Require source bytes, complete DARTS identity linkage and no overlap."""
     validate_holdout_package(package)
     root = Path(project_root).resolve()
@@ -44,6 +47,25 @@ def verify_holdout_provenance(package: dict, project_root: Path,
             or len(set(prior_nb)) != len(prior_nb)
             or len(set(prior_darts)) != len(prior_darts)):
         raise ValueError("prior inventory identities or sources invalid")
+    meta_path = Path(official_meta_path).resolve()
+    if not meta_path.is_relative_to(root) or not meta_path.is_file():
+        raise ValueError("official meta missing or outside project")
+    meta_raw = meta_path.read_bytes()
+    if hashlib.sha256(meta_raw).hexdigest() != official_meta_sha256:
+        raise ValueError("official meta SHA mismatch")
+    meta = json.loads(
+        meta_raw, object_pairs_hook=no_duplicate_fields,
+        parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)),
+    )
+    if not isinstance(meta, dict) or not isinstance(meta.get("ids"), dict):
+        raise ValueError("official meta schema invalid")
+    reproduced = collect_exposure(root, meta, source_paths=list(sources))
+    for field in ("source_sha256", "nb201_canonical_ids", "darts_canonical_signatures",
+                  "darts_id_only_sources", "unresolved"):
+        if reproduced[field] != inventory.get(field):
+            if field == "source_sha256":
+                raise ValueError("historical source SHA mismatch")
+            raise ValueError(f"frozen prior inventory identity/source mismatch: {field}")
     resolution = resolve_id_only_sources(root, inventory)
     if resolution["status"] != "PASS":
         raise ValueError("unresolved DARTS prior sources")
@@ -65,6 +87,7 @@ def verify_holdout_provenance(package: dict, project_root: Path,
             "status": "PASS", "expected_rows": 371,
             "objects_sha256": hashlib.sha256(objects_bytes).hexdigest(),
             "prior_inventory_sha256": digest,
+            "official_meta_sha256": official_meta_sha256,
             "verified_prior_sources": len(sources),
             "resolved_id_only_sources": len(resolution["resolved_sources"]),
             "unresolved_prior_sources": 0}

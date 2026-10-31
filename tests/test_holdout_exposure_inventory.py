@@ -50,3 +50,15 @@ def test_darts_signature_and_id_only_sources_are_separate(tmp_path):
     report = collect_exposure(tmp_path, {"ids": {}})
     assert len(report["darts_canonical_signatures"]) == 1
     assert report["darts_id_only_sources"] == ["outputs/darts/without.csv"]
+
+
+def test_frozen_source_paths_exclude_later_outputs(tmp_path):
+    old = tmp_path / "outputs" / "nb201" / "old.csv"
+    later = tmp_path / "outputs" / "nb201" / "later.csv"
+    write_csv(old, [{"arch_id": "1"}])
+    write_csv(later, [{"arch_id": "2"}])
+    meta = {"ids": {"1": {"isomorph": 1}, "2": {"isomorph": 2}}}
+    report = collect_exposure(
+        tmp_path, meta, source_paths=["outputs/nb201/old.csv"])
+    assert report["nb201_canonical_ids"] == ["1"]
+    assert list(report["source_sha256"]) == ["outputs/nb201/old.csv"]
