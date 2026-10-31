@@ -11,6 +11,8 @@ import re
 from pathlib import Path
 from pathlib import PurePosixPath
 
+from scripts.holdout_overlap_audit import canonical_darts_signature
+
 
 HOLDOUT_COUNTS = {
     "rb40_mature": 11,
@@ -84,6 +86,8 @@ def validate_holdout_package(package: dict) -> dict:
         value = row.get("target_value")
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
             raise ValueError(f"{setting}: finite target required")
+        if not 0 <= value <= 1:
+            raise ValueError(f"{setting}: target accuracy must be in [0,1]")
         target_key = (space, model_id)
         target_definition = (float(value), source)
         if target_key in targets and targets[target_key] != target_definition:
@@ -93,11 +97,16 @@ def validate_holdout_package(package: dict) -> dict:
         rows_by_setting[setting][model_id] = row
 
     nb_base = per_setting["nb201_e0"]
+    if len(set(nb_base.values())) != len(nb_base):
+        raise ValueError("duplicate NB201 structure")
     for epoch in (5, 10, 25, 50):
         if per_setting[f"nb201_e{epoch}"] != nb_base:
             raise ValueError("NB201 architectures/signatures differ across stages")
     if per_setting["darts_e100"] != per_setting["darts_e0"]:
         raise ValueError("DARTS architectures/signatures differ across stages")
+    darts_canonical = [canonical_darts_signature(value) for value in per_setting["darts_e0"].values()]
+    if len(set(darts_canonical)) != len(darts_canonical):
+        raise ValueError("duplicate DARTS structure")
     for model_id, final_row in rows_by_setting["darts_e100"].items():
         final_hash = final_row["checkpoint_sha256"]
         for stage in ("darts_e0", "darts_e100"):
@@ -106,12 +115,12 @@ def validate_holdout_package(package: dict) -> dict:
     return package
 
 
-def seal_holdout_package(package: dict, path: Path) -> dict:
+def seal_holdout_package(package: dict, path: Path, *,
+                         verification_report_path: Path | None = None) -> dict:
     """Write a canonical, content-hashed manifest once after target verification.
 
-    The target verifier supplies ``targets_verified`` and its report hash.
-    This function does not itself prove the files or protocol; callers must
-    inspect and hash the verifier report before invoking it.
+    Require a real, source-hashed verification report bound to these 371 rows.
+    The report still needs an independent file/protocol verifier as its writer.
     """
     validate_holdout_package(package)
     if package.get("targets_verified") is not True:
@@ -121,6 +130,31 @@ def seal_holdout_package(package: dict, path: Path) -> dict:
         "analysis_sha256", "code_sha256", "environment_sha256",
     ):
         _hash(package.get(field), field)
+    if verification_report_path is None or not Path(verification_report_path).is_file():
+        raise ValueError("target verification report required")
+    report_raw = Path(verification_report_path).read_bytes()
+    if hashlib.sha256(report_raw).hexdigest() != package["target_verification_sha256"]:
+        raise ValueError("target verification report SHA mismatch")
+    def no_duplicate_fields(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate verification report field: {key}")
+            result[key] = value
+        return result
+    try:
+        report = json.loads(report_raw, object_pairs_hook=no_duplicate_fields,
+                            parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("target verification report JSON invalid") from exc
+    if (not isinstance(report, dict) or report.get("status") != "PASS"
+            or report.get("expected_rows") != 371
+            or report.get("verified_counts") != HOLDOUT_COUNTS):
+        raise ValueError("target verification report incomplete")
+    objects_bytes = json.dumps(package["objects"], sort_keys=True, ensure_ascii=False,
+                               separators=(",", ":"), allow_nan=False).encode("utf-8")
+    if report.get("objects_sha256") != hashlib.sha256(objects_bytes).hexdigest():
+        raise ValueError("target verification report objects mismatch")
     payload = {key: value for key, value in package.items() if key not in ("sealed", "sha256")}
     payload_bytes = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8")
     sealed = {**payload, "sealed": True, "sha256": hashlib.sha256(payload_bytes).hexdigest()}
