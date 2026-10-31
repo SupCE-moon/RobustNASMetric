@@ -19,6 +19,65 @@ _CIFAR10_TEST_IDS_SHA256 = hashlib.sha256(
     json.dumps(list(range(10000)), separators=(",", ":")).encode("utf-8")
 ).hexdigest()
 _DARTS_NORMALIZATION = "cifar10_125.3_123.0_113.9__63.0_62.1_66.7"
+_NB201_SOURCE_ID = "official_nasrobbench201_cifar10_autoattack"
+
+
+def load_official_nb201_sources(benchmark_path: Path, meta_path: Path,
+                                benchmark_sha256: str, meta_sha256: str) -> tuple[dict, dict]:
+    """Load only the exact official source bytes frozen before holdout scoring."""
+    def load_one(path: Path, expected: str, name: str) -> dict:
+        raw = Path(path).read_bytes()
+        if hashlib.sha256(raw).hexdigest() != expected:
+            raise ValueError(f"{name} SHA mismatch")
+        def no_duplicate_fields(pairs):
+            result = {}
+            for key, value in pairs:
+                if key in result:
+                    raise ValueError(f"{name} duplicate JSON field: {key}")
+                result[key] = value
+            return result
+        value = json.loads(raw, object_pairs_hook=no_duplicate_fields,
+                           parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)))
+        if not isinstance(value, dict):
+            raise ValueError(f"{name} JSON object required")
+        return value
+    benchmark = load_one(benchmark_path, benchmark_sha256, "official results")
+    meta = load_one(meta_path, meta_sha256, "official meta")
+    if not isinstance(benchmark.get("cifar10"), dict) or not isinstance(meta.get("ids"), dict):
+        raise ValueError("official NB201 source schema invalid")
+    return benchmark, meta
+
+
+def verify_nb201_target_item(item: dict, benchmark: dict, meta: dict,
+                              benchmark_sha256: str) -> float:
+    """Recompute a single NB201 target from its official canonical record."""
+    if item.get("setting") not in {f"nb201_e{x}" for x in (0, 5, 10, 25, 50)}:
+        raise ValueError("NB201 setting invalid")
+    identifier = item.get("model_or_arch_id")
+    if not isinstance(identifier, str) or not identifier.isdecimal():
+        raise ValueError("NB201 architecture ID invalid")
+    metadata = meta["ids"].get(identifier)
+    record = benchmark["cifar10"].get(identifier)
+    if not isinstance(metadata, dict) or not isinstance(record, dict):
+        raise ValueError("official NB201 architecture missing")
+    if str(metadata.get("isomorph")) != identifier:
+        raise ValueError("NB201 architecture is noncanonical")
+    if item.get("signature") != metadata.get("nb201-string"):
+        raise ValueError("NB201 structure differs from official meta")
+    if item.get("target_source_id") != _NB201_SOURCE_ID:
+        raise ValueError("NB201 official target source ID mismatch")
+    if item.get("target_source_sha256") != benchmark_sha256:
+        raise ValueError("NB201 official source SHA mismatch")
+    actual = record.get("autoattack")
+    expected = item.get("target_value")
+    if (isinstance(actual, bool) or not isinstance(actual, (int, float))
+            or not math.isfinite(actual) or not 0 <= actual <= 1):
+        raise ValueError("NB201 official accuracy invalid")
+    if (isinstance(expected, bool) or not isinstance(expected, (int, float))
+            or not math.isfinite(expected)
+            or not math.isclose(float(expected), float(actual), rel_tol=0, abs_tol=1e-12)):
+        raise ValueError("NB201 target differs from official accuracy")
+    return float(actual)
 
 
 def verify_target_item(item: dict) -> None:

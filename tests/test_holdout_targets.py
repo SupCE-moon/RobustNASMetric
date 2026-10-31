@@ -8,7 +8,12 @@ import json
 
 import pytest
 
-from scripts.verify_holdout_targets import verify_target_file, verify_target_item
+from scripts.verify_holdout_targets import (
+    load_official_nb201_sources,
+    verify_nb201_target_item,
+    verify_target_file,
+    verify_target_item,
+)
 
 
 def darts_target() -> dict:
@@ -109,3 +114,39 @@ def test_darts_target_file_rejects_incomplete_or_stale_evidence(tmp_path, tamper
             (tmp_path / item["target_source_path"]).write_text("{}", encoding="utf-8")
     with pytest.raises(ValueError, match=message):
         verify_target_file(item, tmp_path)
+
+
+def test_nb201_target_matches_official_canonical_record_only() -> None:
+    benchmark = {"cifar10": {"7": {"autoattack": 0.37}}}
+    meta = {"ids": {"7": {"isomorph": 7, "nb201-string": "arch-seven"}}}
+    item = {"setting": "nb201_e5", "model_or_arch_id": "7",
+            "signature": "arch-seven", "target_value": 0.37,
+            "target_source_id": "official_nasrobbench201_cifar10_autoattack",
+            "target_source_sha256": "a" * 64}
+    assert verify_nb201_target_item(item, benchmark, meta, "a" * 64) == 0.37
+    for field, replacement, message in (
+        ("target_value", 0.38, "official"),
+        ("signature", "wrong", "structure"),
+        ("target_source_sha256", "b" * 64, "source SHA"),
+    ):
+        bad = {**item, field: replacement}
+        with pytest.raises(ValueError, match=message):
+            verify_nb201_target_item(bad, benchmark, meta, "a" * 64)
+    meta["ids"]["7"]["isomorph"] = 3
+    with pytest.raises(ValueError, match="canonical"):
+        verify_nb201_target_item(item, benchmark, meta, "a" * 64)
+
+
+def test_official_nb201_source_loader_checks_file_hashes(tmp_path) -> None:
+    benchmark_path = tmp_path / "official.json"
+    meta_path = tmp_path / "meta.json"
+    benchmark_path.write_text(json.dumps({"cifar10": {"7": {"autoattack": 0.37}}}))
+    meta_path.write_text(json.dumps({"ids": {"7": {"isomorph": 7,
+                                                      "nb201-string": "arch-seven"}}}))
+    benchmark_sha = hashlib.sha256(benchmark_path.read_bytes()).hexdigest()
+    meta_sha = hashlib.sha256(meta_path.read_bytes()).hexdigest()
+    benchmark, meta = load_official_nb201_sources(benchmark_path, meta_path,
+                                                   benchmark_sha, meta_sha)
+    assert "7" in benchmark["cifar10"] and "7" in meta["ids"]
+    with pytest.raises(ValueError, match="official results SHA"):
+        load_official_nb201_sources(benchmark_path, meta_path, "0" * 64, meta_sha)
