@@ -20,6 +20,7 @@ from scripts.verify_holdout_targets import (
     verify_target_item,
     verify_darts_target_rows,
     verify_checkpoint_files,
+    verify_rb11_weight_hash_list,
 )
 
 
@@ -245,6 +246,27 @@ def test_rb11_targets_match_frozen_manifest_and_replacement_overlay(tmp_path) ->
     recovery["replacement_weight"]["sha256"] = "d" * 64
     with pytest.raises(ValueError, match="replacement"):
         verify_rb11_target_rows(rows, manifest, digest, recovery)
+
+
+def test_rb11_other_ten_hashes_match_frozen_list(tmp_path) -> None:
+    original = [f"{index + 1:064x}" for index in range(11)]
+    path = tmp_path / "old.sha256"
+    path.write_text("".join(f"{digest}  model_{i}.pt\n"
+                            for i, digest in enumerate(original)), encoding="ascii")
+    list_sha = hashlib.sha256(path.read_bytes()).hexdigest()
+    recovery = {"frozen_overlay": {"base_weight_hash_list_sha256": list_sha,
+                                    "all_original_weight_hashes_still_match_old_hash_list": True},
+                "old_damaged_weight": {"sha256": original[-1]},
+                "model_name": "replaced"}
+    rows = [{"model_or_arch_id": f"model_{i}", "checkpoint_sha256": original[i]}
+            for i in range(10)] + [{"model_or_arch_id": "replaced",
+                                     "checkpoint_sha256": "f" * 64}]
+    report = verify_rb11_weight_hash_list(rows, recovery, path, list_sha)
+    assert report["status"] == "PASS" and report["verified_rows"] == 11
+    changed = [dict(row) for row in rows]
+    changed[0]["checkpoint_sha256"] = "e" * 64
+    with pytest.raises(ValueError, match="frozen"):
+        verify_rb11_weight_hash_list(changed, recovery, path, list_sha)
 
 
 def test_darts_all_40_stage_keys_share_20_fulltest_targets(tmp_path) -> None:

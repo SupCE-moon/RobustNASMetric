@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import csv
 import hashlib
 import json
 
@@ -11,6 +12,7 @@ import pytest
 from scripts.build_activation_holdout_manifest import (
     HOLDOUT_COUNTS, seal_holdout_package, validate_holdout_package,
 )
+from scripts.verify_holdout_targets import verify_holdout_package_targets
 
 
 def complete_package() -> dict:
@@ -166,3 +168,135 @@ def test_mismatched_target_report_cannot_seal(tmp_path) -> None:
     package["target_verification_sha256"] = "b" * 64
     with pytest.raises(ValueError, match="report SHA"):
         seal_holdout_package(package, tmp_path / "sealed.json", verification_report_path=report)
+
+
+def test_target_verification_report_binds_all_371_objects(tmp_path, monkeypatch) -> None:
+    package = complete_package()
+    expected = {"rb40_mature": 11, **{f"nb201_e{x}": 64 for x in (0, 5, 10, 25, 50)},
+                "darts_e0": 20, "darts_e100": 20}
+    import scripts.verify_holdout_targets as verifier
+    monkeypatch.setattr(verifier, "verify_checkpoint_files", lambda rows, root:
+                        {"status": "PASS", "verified_rows": len(rows), "verified_files": len(rows)})
+    monkeypatch.setattr(verifier, "load_frozen_rb11_manifest", lambda *args: {str(i): {} for i in range(11)})
+    monkeypatch.setattr(verifier, "load_rb11_recovery_report", lambda *args: {})
+    monkeypatch.setattr(verifier, "load_official_nb201_sources", lambda *args: ({}, {}))
+    monkeypatch.setattr(verifier, "verify_rb11_target_rows", lambda rows, *args:
+                        {"status": "PASS", "verified_rows": len(rows)})
+    monkeypatch.setattr(verifier, "verify_rb11_weight_hash_list", lambda rows, *args:
+                        {"status": "PASS", "verified_rows": len(rows)})
+    monkeypatch.setattr(verifier, "verify_nb201_target_rows", lambda rows, *args:
+                        {"status": "PASS", "verified_rows": len(rows)})
+    monkeypatch.setattr(verifier, "verify_darts_target_rows", lambda rows, root:
+                        {"status": "PASS", "verified_rows": len(rows)})
+    report = verify_holdout_package_targets(
+        package, tmp_path, rb_manifest_path=tmp_path / "rb.csv", rb_manifest_sha256="a" * 64,
+        rb_recovery_path=tmp_path / "recovery.json", rb_recovery_sha256="b" * 64,
+        rb_weight_hash_list_path=tmp_path / "old.sha256", rb_weight_hash_list_sha256="e" * 64,
+        nb_result_path=tmp_path / "official.json", nb_result_sha256="c" * 64,
+        nb_meta_path=tmp_path / "meta.json", nb_meta_sha256="d" * 64,
+    )
+    assert report["status"] == "PASS" and report["expected_rows"] == 371
+    assert report["verified_counts"] == expected
+    assert report["objects_sha256"] == hashlib.sha256(json.dumps(
+        package["objects"], sort_keys=True, separators=(",", ":"),
+        ensure_ascii=False, allow_nan=False,
+    ).encode("utf-8")).hexdigest()
+    assert "target_value" not in json.dumps(report)
+    package["objects"].pop()
+    with pytest.raises(ValueError, match="darts_e100"):
+        verify_holdout_package_targets(
+            package, tmp_path, rb_manifest_path=tmp_path / "rb.csv", rb_manifest_sha256="a" * 64,
+            rb_recovery_path=tmp_path / "recovery.json", rb_recovery_sha256="b" * 64,
+            rb_weight_hash_list_path=tmp_path / "old.sha256", rb_weight_hash_list_sha256="e" * 64,
+            nb_result_path=tmp_path / "official.json", nb_result_sha256="c" * 64,
+            nb_meta_path=tmp_path / "meta.json", nb_meta_sha256="d" * 64,
+        )
+
+
+def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) -> None:
+    package = complete_package()
+    weight = tmp_path / "weight.pt"
+    weight.write_bytes(b"fixture checkpoint")
+    weight_sha = hashlib.sha256(weight.read_bytes()).hexdigest()
+    rb_path = tmp_path / "rb.csv"
+    with rb_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["model_name", "robust_accuracy"])
+        writer.writeheader()
+        writer.writerows({"model_name": str(i), "robust_accuracy": "0.5"}
+                         for i in range(11))
+    rb_sha = hashlib.sha256(rb_path.read_bytes()).hexdigest()
+    frozen_hashes_path = tmp_path / "old.sha256"
+    frozen_hashes_path.write_text("".join(
+        f"{weight_sha}  old_model_{i}.pt\n" for i in range(11)
+    ), encoding="ascii")
+    frozen_hashes_sha = hashlib.sha256(frozen_hashes_path.read_bytes()).hexdigest()
+    recovery = {"frozen_overlay": {"base_manifest_sha256": rb_sha,
+                                    "expected_unique_models": 11,
+                                    "base_weight_hash_list_sha256": frozen_hashes_sha,
+                                    "all_original_weight_hashes_still_match_old_hash_list": True},
+                "fresh_container_load_audit": {"status": "PASS", "loadable_unique_models": 11},
+                "model_name": "0", "replacement_weight": {"sha256": weight_sha},
+                "old_damaged_weight": {"sha256": weight_sha}}
+    recovery_path = tmp_path / "recovery.json"
+    recovery_path.write_text(json.dumps(recovery), encoding="utf-8")
+    recovery_sha = hashlib.sha256(recovery_path.read_bytes()).hexdigest()
+    official_path = tmp_path / "official.json"
+    official_path.write_text(json.dumps({"cifar10": {
+        str(i): {"autoattack": 0.5} for i in range(64)
+    }}), encoding="utf-8")
+    official_sha = hashlib.sha256(official_path.read_bytes()).hexdigest()
+    meta_path = tmp_path / "meta.json"
+    meta_path.write_text(json.dumps({"ids": {
+        str(i): {"isomorph": i, "nb201-string": f"nb201_structure_{i}"}
+        for i in range(64)
+    }}), encoding="utf-8")
+    meta_sha = hashlib.sha256(meta_path.read_bytes()).hexdigest()
+    protocol = {
+        "target_attack": "pgd20", "target_dataset": "cifar10_test",
+        "target_epsilon": 8 / 255, "target_step_size": 2 / 255,
+        "target_steps": 20, "target_restarts": 1, "target_random_start": True,
+        "target_batch_size": 128, "target_random_seed": 400000,
+        "target_normalization": "cifar10_125.3_123.0_113.9__63.0_62.1_66.7",
+    }
+    darts_evidence = {}
+    for i in range(20):
+        path = tmp_path / f"darts_{i}.json"
+        path.write_text(json.dumps({
+            "status": "ok", "model_or_arch_id": str(i),
+            "checkpoint_sha256": weight_sha, "protocol": protocol,
+            "sample_ids": list(range(10000)),
+            "correct": [True] * 5000 + [False] * 5000,
+        }), encoding="utf-8")
+        darts_evidence[str(i)] = (path.name, hashlib.sha256(path.read_bytes()).hexdigest())
+    ids_sha = hashlib.sha256(json.dumps(list(range(10000)), separators=(",", ":")).encode()).hexdigest()
+    for row in package["objects"]:
+        row["checkpoint_path"] = weight.name
+        row["checkpoint_sha256"] = weight_sha
+        space = row["setting"].split("_")[0]
+        if space == "rb40":
+            row.update(target_source_id="frozen_rb11_manifest_20260922",
+                       target_source_sha256=rb_sha)
+        elif space == "nb201":
+            row.update(target_source_id="official_nasrobbench201_cifar10_autoattack",
+                       target_source_sha256=official_sha)
+        else:
+            path, digest = darts_evidence[row["model_or_arch_id"]]
+            row.update(protocol)
+            row.update(target_source_id="new_darts_full_test_pgd20",
+                       target_source_path=path, target_source_sha256=digest,
+                       target_sample_count=10000, target_sample_ids_sha256=ids_sha,
+                       target_checkpoint_sha256=weight_sha,
+                       final_checkpoint_sha256=weight_sha)
+    kwargs = dict(rb_manifest_path=rb_path, rb_manifest_sha256=rb_sha,
+                  rb_recovery_path=recovery_path, rb_recovery_sha256=recovery_sha,
+                  rb_weight_hash_list_path=frozen_hashes_path,
+                  rb_weight_hash_list_sha256=frozen_hashes_sha,
+                  nb_result_path=official_path, nb_result_sha256=official_sha,
+                  nb_meta_path=meta_path, nb_meta_sha256=meta_sha)
+    report = verify_holdout_package_targets(package, tmp_path, **kwargs)
+    assert report["status"] == "PASS"
+    assert report["checkpoint_verification"]["verified_files"] == 1
+    assert report["darts_target_verification"]["verified_architectures"] == 20
+    weight.write_bytes(b"tampered")
+    with pytest.raises(ValueError, match="checkpoint SHA"):
+        verify_holdout_package_targets(package, tmp_path, **kwargs)

@@ -14,6 +14,8 @@ import json
 import math
 import re
 from pathlib import PurePosixPath
+
+from scripts.build_activation_holdout_manifest import HOLDOUT_COUNTS, validate_holdout_package
 from collections import Counter
 from pathlib import Path
 
@@ -67,6 +69,88 @@ def verify_checkpoint_files(rows: list[dict], project_root: Path) -> dict:
             raise ValueError(f"checkpoint SHA mismatch: {path.relative_to(root)}")
     return {"kind": "holdout_checkpoint_file_verification", "status": "PASS",
             "verified_rows": len(rows), "verified_files": len(paths)}
+
+
+def verify_rb11_weight_hash_list(rows: list[dict], recovery: dict,
+                                  path: Path, expected_sha256: str) -> dict:
+    """Require the ten retained RB weights plus the old damaged hash in the frozen list."""
+    raw = Path(path).read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected_sha256:
+        raise ValueError("frozen RB11 weight list SHA mismatch")
+    overlay = recovery.get("frozen_overlay", {})
+    if (overlay.get("base_weight_hash_list_sha256") != expected_sha256
+            or overlay.get("all_original_weight_hashes_still_match_old_hash_list") is not True):
+        raise ValueError("frozen RB11 weight list not bound to recovery")
+    lines = raw.decode("utf-8-sig").splitlines()
+    if len(lines) != 11:
+        raise ValueError("frozen RB11 weight list requires 11 hashes")
+    original = []
+    for line in lines:
+        match = re.fullmatch(r"([0-9a-f]{64}) [ *](.+)", line)
+        if match is None or not match.group(2).strip():
+            raise ValueError("frozen RB11 weight list format invalid")
+        original.append(match.group(1))
+    if len(rows) != 11 or not all(isinstance(row, dict) for row in rows):
+        raise ValueError("RB11 weight rows require 11 objects")
+    replacement = recovery.get("model_name")
+    retained = [row.get("checkpoint_sha256") for row in rows
+                if row.get("model_or_arch_id") != replacement]
+    damaged = recovery.get("old_damaged_weight", {}).get("sha256")
+    if (len(retained) != 10 or not isinstance(damaged, str)
+            or Counter(retained + [damaged]) != Counter(original)):
+        raise ValueError("RB11 retained weights differ from frozen hash list")
+    return {"kind": "rb11_frozen_weight_hash_verification", "status": "PASS",
+            "verified_rows": 11, "frozen_weight_hash_list_sha256": expected_sha256}
+
+
+def verify_holdout_package_targets(
+    package: dict, project_root: Path, *,
+    rb_manifest_path: Path, rb_manifest_sha256: str,
+    rb_recovery_path: Path, rb_recovery_sha256: str,
+    rb_weight_hash_list_path: Path, rb_weight_hash_list_sha256: str,
+    nb_result_path: Path, nb_result_sha256: str,
+    nb_meta_path: Path, nb_meta_sha256: str,
+) -> dict:
+    """Audit all 371 weight files and labels before writing a seal report."""
+    validate_holdout_package(package)
+    rows = package["objects"]
+    groups = {setting: [row for row in rows if row["setting"] == setting]
+              for setting in HOLDOUT_COUNTS}
+    weights = verify_checkpoint_files(rows, project_root)
+    frozen_rb = load_frozen_rb11_manifest(rb_manifest_path, rb_manifest_sha256)
+    recovery = load_rb11_recovery_report(rb_recovery_path, rb_recovery_sha256)
+    rb = verify_rb11_target_rows(groups["rb40_mature"], frozen_rb,
+                                 rb_manifest_sha256, recovery)
+    rb_weights = verify_rb11_weight_hash_list(
+        groups["rb40_mature"], recovery,
+        rb_weight_hash_list_path, rb_weight_hash_list_sha256)
+    official, meta = load_official_nb201_sources(
+        nb_result_path, nb_meta_path, nb_result_sha256, nb_meta_sha256)
+    nb_rows = [row for setting in HOLDOUT_COUNTS if setting.startswith("nb201_")
+               for row in groups[setting]]
+    nb = verify_nb201_target_rows(nb_rows, official, meta, nb_result_sha256)
+    darts_rows = [row for setting in ("darts_e0", "darts_e100")
+                  for row in groups[setting]]
+    darts = verify_darts_target_rows(darts_rows, project_root)
+    expected = ((weights, 371), (rb, 11), (rb_weights, 11), (nb, 320), (darts, 40))
+    if any(report.get("status") != "PASS" or report.get("verified_rows") != count
+           for report, count in expected):
+        raise ValueError("target verification subreport incomplete")
+    objects_bytes = json.dumps(rows, sort_keys=True, ensure_ascii=False,
+                               separators=(",", ":"), allow_nan=False).encode("utf-8")
+    return {
+        "kind": "activation_holdout_target_verification",
+        "status": "PASS", "expected_rows": 371,
+        "objects_sha256": hashlib.sha256(objects_bytes).hexdigest(),
+        "verified_counts": HOLDOUT_COUNTS,
+        "checkpoint_verification": weights,
+        "rb11_target_verification": rb,
+        "rb11_weight_hash_verification": rb_weights,
+        "nb201_target_verification": nb,
+        "darts_target_verification": darts,
+        "rb11_recovery_sha256": rb_recovery_sha256,
+        "nb201_meta_sha256": nb_meta_sha256,
+    }
 
 
 def load_rb11_recovery_report(path: Path, expected_sha256: str) -> dict:
