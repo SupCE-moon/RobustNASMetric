@@ -29,4 +29,15 @@
 
 ## 官方 NB201 来源复核（2026-10-31）
 
-本项目历史 E23 命令指定 `data/nasrobbench201/NAS-RobBench-201_all.json` 和 `data/nasrobbench201/meta.json`，读取 `cifar10` 下的 `autoattack` 数值；`choose_architectures` 仅从可追溯 canonical ID 中等概率抽样。已在允许的服务器项目内核对，这两份 JSON **当前不存在**。NAS-RobBench-201 作者的 [官方代码与下载入口](https://github.com/TT2408/nasrobbench201#download-our-benchmark-dataset) 提供数据文件；目前只定位到来源，没有下载、导入或从历史主网格 CSV 反推新留出目标。新包选择前须核验官方文件的字节哈希、数据字段和全部历史 ID/结构排除集。
+本项目历史 E23 命令指定 `data/nasrobbench201/NAS-RobBench-201_all.json` 和 `data/nasrobbench201/meta.json`，读取 `cifar10` 下的 `autoattack` 数值；`choose_architectures` 仅从可追溯 canonical ID 中等概率抽样。首次核对时，这两份 JSON 在允许的服务器项目内不存在。NAS-RobBench-201 作者的 [官方代码与下载入口](https://github.com/TT2408/nasrobbench201#download-our-benchmark-dataset) 提供数据文件。新包选择前须核验官方文件的字节哈希、数据字段和全部历史 ID/结构排除集。
+
+### 官方源文件补齐（2026-10-31，覆盖上一段缺失状态）
+
+通过作者公开 Drive 文件夹只读取得原始文件，并直接传至唯一允许的 `wangjiahao:/workspace/robust_metric_lab_nas/data/official_nasrobbench201_source_20261031/`。本地指定项目内亦保留同字节副本 `data/official_nasrobbench201_source/`。本地与服务器逐文件 SHA-256 一致：
+
+| 文件 | 字节 | SHA-256 |
+|---|---:|---|
+| `NAS-RobBench-201_all.json` | 15,622,110 | `b670b9ce5a7e6cd29735c07806efa493ba0f7023cc46940b856e214a70b3a308` |
+| `meta.json` | 2,112,697 | `54b6d2c2780cfb63de98e9d67e72db9cb0c02be426191d429dbe02c898d4577e` |
+
+服务器端解析确认 `cifar10` 有 6,466 条架构记录，6,466 条均存在 `autoattack` 字段；`meta.json` 有 15,625 个 ID。作者代码另克隆到项目内 `data/official_nasrobbench201_repo_f933a51/`，固定提交 `f933a51be7026985a6b5fbf9ab82956acb14e3d4`。这些文件**只是目标来源**；尚未完成全历史排除、选取独立 64 架构、训练五阶段权重或留出成绩计算，不能据此声称独立验证完成。
