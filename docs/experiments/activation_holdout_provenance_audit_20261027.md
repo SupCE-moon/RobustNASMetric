@@ -81,3 +81,5 @@ DARTS 在主网格和历史结果中发现 8 份带签名的 CSV，合计 **120 
 新增 `scripts/select_activation_holdout_darts.py`，只读 120 个已知历史规范化结构签名，以 `seed=20261027` 从项目原有 DARTS 离散空间的固定随机流中按顺序取前 20 个不重叠结构，分配新的编号 `1000..1019`；不接收任何目标或指标值。选择脚本本地/服务器 SHA-256 均为 `2778206ea8b8d2200e35f37713d23cc8e8f31e8ac273bf3bd36573461b466aae`，空间生成源码两端 SHA-256 均为 `3904d99614bae0d8218603ddf966a07e572a54d32d5a0d33b9518aa2ee0bb572`。选择代码的 2 项针对性测试先失败后通过。
 
 服务器独占写入 `outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/darts_selection_unsealed.json`（SHA-256 `f3e272c91dbe0ed2746f7d40ebc8cbc7f497519bf9d5286d1c48bdde81231e86`），固定种子、候选流、20 个 ID/结构、40 个预期阶段键、相关来源哈希和 `unresolved_id_only_source_count=453`。读回核对 20 个规范化结构唯一且与已知 120 个不重叠，无目标字段。**状态为 `unsealed_prior_id_only_sources`，不是独立性证明**；在 E32 等缺失出处补齐前，不对这 20 个结构作正式留出比较或宣布跨空间外部验证完成。
+
+用户随后说明 E32 当时似乎由 AI 执行，当前不知道原始运行命令、日志或逐结构映射。该回忆不能代替可核验的来源证据；E32 继续记为 `unresolved`，不通过删除该历史表、仅凭编号相同或对照指标数值相近来解除排除风险。DARTS 留出架构仍只是一份未封存的预选清单。
