@@ -63,3 +63,11 @@ DARTS 在主网格和历史结果中发现 8 份带签名的 CSV，合计 **120 
 官方 6,466 个 CIFAR-10 架构键扣除 1,301 个已用 canonical ID 后剩 5,165 个可候选。官方仓库中的 `meta-node-4.pth`（SHA-256 `275f76034ee3a4df01c39176101c036642520380d771c61a287b8f75daad02e0`）含 15,625 个结构，与官方 `meta.json` 对全部 6,466 个 canonical 架构的结构字符串逐一一致；选中第一个架构 `2936` 已在 CPU 上成功构造 615,386 参数模型（只验证加载，不计算 metric）。
 
 服务器独占写入 `outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/nb201_selection_unsealed.json`，10,099 字节，SHA-256 `07eeafcc8dbc245ffab169173678b9bf53f7382b41a73c4690783a694ef012a1`。文件固定了选择种子、算法、64 个 ID/结构、e0/e5/e10/e25/e50 的预期 320 键，以及官方数据、元数据、模型结构、排除清单和选择代码的来源哈希。独立读回确认 64 个 ID 与结构唯一、与排除集无交集、文件不含目标值字段。状态仍为 `unsealed_weights_and_targets_missing`：这只是架构选择，不是 320 份权重、正式目标验证或任何留出结论。
+
+## NB201 留出权重训练计划（2026-10-31）
+
+只读检查主网格现有 `arch_5998_epoch_50_seed_0.pt` 的 `metadata.run_config`，核对其训练配置为 CIFAR-10 全量 50,000 张、C=16/N=5、50 epoch、PGD-7（ε=8/255、步长 2/255、随机起点）、batch 256、SGD momentum 0.9 / weight decay 5e-4、OneCycle 最大 lr 0.1、seed 0；该检查点 SHA-256 为 `e19cc651ea1fd709f899ea10e77b4b5bd47c9583fa20aaf22e86afa23c437f69`。新留出训练沿用这些参数，不运行指标计算，也不读取官方目标值。
+
+新增 `scripts/train_activation_holdout_nb201.py`，本地/服务器 SHA-256 均为 `9e9cf3cda7b45550131b805d01158fdd0a8207a158c35dd91bd42b18bf97ad60`。它锁定选择清单、旧训练函数源码 `452c9d84e011d589f7dc1c4b23b482aec4f54e18a20620904dfbcdbabadb22be`、服务器攻击函数源码 `65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13`、官方 `meta-node-4.pth`、官方仓库提交及项目内 CIFAR-10 训练文件哈希。每个架构使用新建的独立尝试目录；仅在五份检查点哈希收齐后写完成收据，失败尝试原样保留。重启时只跳过完成收据和五份实物均匹配的架构；损坏收据会报错，不会静默重训或覆盖。4 项针对性测试先失败后通过；本地完整 **205 项通过**。
+
+服务器仅执行 `--plan-only`，在新目录 `outputs/student_metrics/wangjiahao/activation_holdout_nb201_weights_20261031/training_plan.json` 独占创建训练计划（SHA-256 `ff6e8af15fbe50e19c34d40aa5cfd2289a8b3f2521b6db83ad9fc979f46d43b0`）。读回确认 64 架构、320 预期权重键、6 个 CIFAR-10 训练文件哈希、无目标字段。**未启动 GPU 训练，未产出留出权重或成绩。** 先等待当前 560 键主实验流程使用 GPU，之后再按冻结计划训练；若主实验结果未达到预定主榜门槛，仍保留此未查看分数的留出包供下一轮候选使用。
