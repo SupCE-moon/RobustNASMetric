@@ -126,6 +126,11 @@ def verify_holdout_package_targets(
     nb_meta_path: Path, nb_meta_sha256: str,
 ) -> dict:
     """Audit all 371 weight files and labels before writing a seal report."""
+    root = Path(project_root).resolve()
+    for source_path in (rb_manifest_path, rb_recovery_path,
+                        rb_weight_hash_list_path, nb_result_path, nb_meta_path):
+        if not Path(source_path).resolve().is_relative_to(root):
+            raise ValueError("holdout source path outside project")
     validate_holdout_package(package)
     rows = package["objects"]
     groups = {setting: [row for row in rows if row["setting"] == setting]

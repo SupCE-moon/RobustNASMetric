@@ -122,7 +122,7 @@ def test_darts_edge_order_alias_is_duplicate_structure() -> None:
         validate_holdout_package(package)
 
 
-def test_sealed_package_is_canonical_and_write_once(tmp_path) -> None:
+def test_sealed_package_is_canonical_and_write_once(tmp_path, monkeypatch) -> None:
     package = complete_package()
     package["source_audit_sha256"] = "a" * 64
     package["protocol_sha256"] = "c" * 64
@@ -143,12 +143,24 @@ def test_sealed_package_is_canonical_and_write_once(tmp_path) -> None:
     path = tmp_path / "sealed.json"
     with pytest.raises(ValueError, match="verification report"):
         seal_holdout_package(package, path)
-    sealed = seal_holdout_package(package, path, verification_report_path=report)
+    with pytest.raises(ValueError, match="live target verification"):
+        seal_holdout_package(package, path, verification_report_path=report)
+    import scripts.verify_holdout_targets as verifier
+    monkeypatch.setattr(verifier, "verify_holdout_package_targets",
+                        lambda objects, **context: {**json.loads(report.read_text()), "status": "FAIL"})
+    with pytest.raises(ValueError, match="differs from live"):
+        seal_holdout_package(package, path, verification_report_path=report,
+                             verification_context={"project_root": tmp_path})
+    monkeypatch.setattr(verifier, "verify_holdout_package_targets",
+                        lambda objects, **context: json.loads(report.read_text()))
+    sealed = seal_holdout_package(package, path, verification_report_path=report,
+                                  verification_context={"project_root": tmp_path})
     assert sealed["sealed"] is True
     assert path.read_text(encoding="utf-8").endswith("\n")
     assert len(sealed["sha256"]) == 64
     with pytest.raises(FileExistsError):
-        seal_holdout_package(package, path, verification_report_path=report)
+        seal_holdout_package(package, path, verification_report_path=report,
+                             verification_context={"project_root": tmp_path})
 
 
 def test_mismatched_target_report_cannot_seal(tmp_path) -> None:
@@ -302,6 +314,30 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
     assert report["status"] == "PASS"
     assert report["checkpoint_verification"]["verified_files"] == 12
     assert report["darts_target_verification"]["verified_architectures"] == 20
+    outside = tmp_path.parent / "outside_rb_manifest.csv"
+    outside.write_bytes(rb_path.read_bytes())
+    with pytest.raises(ValueError, match="outside project"):
+        verify_holdout_package_targets(
+            package, tmp_path, **{**kwargs, "rb_manifest_path": outside})
+    package.update({field: "a" * 64 for field in (
+        "source_audit_sha256", "protocol_sha256", "analysis_sha256",
+        "code_sha256", "environment_sha256",
+    )})
+    package["targets_verified"] = True
+    report_path = tmp_path / "target_report.json"
+    report_path.write_text(json.dumps(report, sort_keys=True), encoding="utf-8")
+    package["target_verification_sha256"] = hashlib.sha256(report_path.read_bytes()).hexdigest()
+    sealed = seal_holdout_package(
+        package, tmp_path / "sealed.json", verification_report_path=report_path,
+        verification_context={"project_root": tmp_path, **kwargs},
+    )
+    assert sealed["sealed"] is True
     weight.write_bytes(b"tampered")
     with pytest.raises(ValueError, match="checkpoint SHA"):
         verify_holdout_package_targets(package, tmp_path, **kwargs)
+    with pytest.raises(ValueError, match="checkpoint SHA"):
+        seal_holdout_package(
+            package, tmp_path / "should_not_seal.json", verification_report_path=report_path,
+            verification_context={"project_root": tmp_path, **kwargs},
+        )
+    assert not (tmp_path / "should_not_seal.json").exists()

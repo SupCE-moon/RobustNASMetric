@@ -116,7 +116,8 @@ def validate_holdout_package(package: dict) -> dict:
 
 
 def seal_holdout_package(package: dict, path: Path, *,
-                         verification_report_path: Path | None = None) -> dict:
+                         verification_report_path: Path | None = None,
+                         verification_context: dict | None = None) -> dict:
     """Write a canonical, content-hashed manifest once after target verification.
 
     Require a real, source-hashed verification report bound to these 371 rows.
@@ -155,6 +156,12 @@ def seal_holdout_package(package: dict, path: Path, *,
                                separators=(",", ":"), allow_nan=False).encode("utf-8")
     if report.get("objects_sha256") != hashlib.sha256(objects_bytes).hexdigest():
         raise ValueError("target verification report objects mismatch")
+    if not isinstance(verification_context, dict) or not verification_context:
+        raise ValueError("live target verification context required before sealing")
+    from scripts.verify_holdout_targets import verify_holdout_package_targets
+    actual_report = verify_holdout_package_targets(package, **verification_context)
+    if report != actual_report:
+        raise ValueError("target verification report differs from live file audit")
     payload = {key: value for key, value in package.items() if key not in ("sealed", "sha256")}
     payload_bytes = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8")
     sealed = {**payload, "sealed": True, "sha256": hashlib.sha256(payload_bytes).hexdigest()}
