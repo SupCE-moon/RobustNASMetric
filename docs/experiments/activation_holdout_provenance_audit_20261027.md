@@ -83,3 +83,9 @@ DARTS 在主网格和历史结果中发现 8 份带签名的 CSV，合计 **120 
 服务器独占写入 `outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/darts_selection_unsealed.json`（SHA-256 `f3e272c91dbe0ed2746f7d40ebc8cbc7f497519bf9d5286d1c48bdde81231e86`），固定种子、候选流、20 个 ID/结构、40 个预期阶段键、相关来源哈希和 `unresolved_id_only_source_count=453`。读回核对 20 个规范化结构唯一且与已知 120 个不重叠，无目标字段。**状态为 `unsealed_prior_id_only_sources`，不是独立性证明**；在 E32 等缺失出处补齐前，不对这 20 个结构作正式留出比较或宣布跨空间外部验证完成。
 
 用户随后说明 E32 当时似乎由 AI 执行，当前不知道原始运行命令、日志或逐结构映射。该回忆不能代替可核验的来源证据；E32 继续记为 `unresolved`，不通过删除该历史表、仅凭编号相同或对照指标数值相近来解除排除风险。DARTS 留出架构仍只是一份未封存的预选清单。
+
+## DARTS 留出目标逐图证据准备（2026-10-31）
+
+只读核对主网格 `darts100` e100 检查点元数据和既有 `scripts/run_darts_metric_trajectory.py` / `scripts/evaluate_darts_checkpoints.py`：主网格为 C=16、8 cells、全量 CIFAR-10、TRADES PGD-10 β=6、100 epoch、SGD momentum 0.9 / weight decay 2e-4、cosine、batch 128、seed 0。旧完整测试目标在 e100 权重上用 PGD-20、ε=8/255、步长 2/255、随机起点、seed 400000、10,000 图；上述两份服务器源码 SHA-256 分别为 `033c160a8bfe4021e825b7e85a40b21a4ee186c932876118b27221c6227498b2` 和 `08409844ca21c65d244e14b1477457433353af19967db99d06983f6885537b9c`。旧评估器只给准确率汇总，没有逐图证据。
+
+在本地隔离工作区新增 `scripts/evaluate_activation_holdout_darts_targets.py`（SHA-256 `9c2f1387b805338892419bdcfa4c73718be2b2da1fd289eec9b19e6dcb228ced`），把原 PGD 批次循环的逐图布尔结果保存为独占写入的 10,000 图 JSON，并生成与 `scripts/verify_holdout_targets.py` 匹配的目标条目。测试确认逐图平均值与原 `pgd_accuracy` 在相同随机种子下完全一致、10,000 图文件可由现有验证器复算且不能覆盖、缺图与非布尔值拒绝。3 项针对性测试和本地完整 **210 项通过**。当前代码**仅在本地准备，未在服务器部署或运行**；未解 DARTS 出处、20 份 e100 权重及正式目标材料仍未补齐。
