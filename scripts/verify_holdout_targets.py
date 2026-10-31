@@ -85,11 +85,16 @@ def verify_rb11_weight_hash_list(rows: list[dict], recovery: dict,
     if len(lines) != 11:
         raise ValueError("frozen RB11 weight list requires 11 hashes")
     original = []
+    by_basename = {}
     for line in lines:
         match = re.fullmatch(r"([0-9a-f]{64}) [ *](.+)", line)
         if match is None or not match.group(2).strip():
             raise ValueError("frozen RB11 weight list format invalid")
         original.append(match.group(1))
+        basename = PurePosixPath(match.group(2).replace("\\", "/")).name
+        if basename in by_basename:
+            raise ValueError("duplicate frozen RB11 weight filename")
+        by_basename[basename] = match.group(1)
     if len(rows) != 11 or not all(isinstance(row, dict) for row in rows):
         raise ValueError("RB11 weight rows require 11 objects")
     replacement = recovery.get("model_name")
@@ -99,6 +104,15 @@ def verify_rb11_weight_hash_list(rows: list[dict], recovery: dict,
     if (len(retained) != 10 or not isinstance(damaged, str)
             or Counter(retained + [damaged]) != Counter(original)):
         raise ValueError("RB11 retained weights differ from frozen hash list")
+    for row in rows:
+        if row.get("model_or_arch_id") == replacement:
+            continue
+        path_value = row.get("checkpoint_path")
+        if not isinstance(path_value, str):
+            raise ValueError("RB11 model checkpoint path missing")
+        basename = PurePosixPath(path_value).name
+        if by_basename.get(basename) != row["checkpoint_sha256"]:
+            raise ValueError("RB11 model checkpoint path/hash differs from frozen list")
     return {"kind": "rb11_frozen_weight_hash_verification", "status": "PASS",
             "verified_rows": 11, "frozen_weight_hash_list_sha256": expected_sha256}
 

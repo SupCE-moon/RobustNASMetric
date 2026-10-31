@@ -258,8 +258,11 @@ def test_rb11_other_ten_hashes_match_frozen_list(tmp_path) -> None:
                                     "all_original_weight_hashes_still_match_old_hash_list": True},
                 "old_damaged_weight": {"sha256": original[-1]},
                 "model_name": "replaced"}
-    rows = [{"model_or_arch_id": f"model_{i}", "checkpoint_sha256": original[i]}
+    rows = [{"model_or_arch_id": f"model_{i}",
+             "checkpoint_path": f"weights/model_{i}.pt",
+             "checkpoint_sha256": original[i]}
             for i in range(10)] + [{"model_or_arch_id": "replaced",
+                                     "checkpoint_path": "replacement.pt",
                                      "checkpoint_sha256": "f" * 64}]
     report = verify_rb11_weight_hash_list(rows, recovery, path, list_sha)
     assert report["status"] == "PASS" and report["verified_rows"] == 11
@@ -267,6 +270,11 @@ def test_rb11_other_ten_hashes_match_frozen_list(tmp_path) -> None:
     changed[0]["checkpoint_sha256"] = "e" * 64
     with pytest.raises(ValueError, match="frozen"):
         verify_rb11_weight_hash_list(changed, recovery, path, list_sha)
+    swapped = [dict(row) for row in rows]
+    swapped[0]["checkpoint_sha256"], swapped[1]["checkpoint_sha256"] = (
+        swapped[1]["checkpoint_sha256"], swapped[0]["checkpoint_sha256"])
+    with pytest.raises(ValueError, match="model|path"):
+        verify_rb11_weight_hash_list(swapped, recovery, path, list_sha)
 
 
 def test_darts_all_40_stage_keys_share_20_fulltest_targets(tmp_path) -> None:

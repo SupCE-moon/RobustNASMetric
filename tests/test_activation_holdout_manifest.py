@@ -230,6 +230,9 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
         f"{weight_sha}  old_model_{i}.pt\n" for i in range(11)
     ), encoding="ascii")
     frozen_hashes_sha = hashlib.sha256(frozen_hashes_path.read_bytes()).hexdigest()
+    for i in range(11):
+        (tmp_path / f"old_model_{i}.pt").write_bytes(weight.read_bytes())
+    (tmp_path / "replacement.pt").write_bytes(weight.read_bytes())
     recovery = {"frozen_overlay": {"base_manifest_sha256": rb_sha,
                                     "expected_unique_models": 11,
                                     "base_weight_hash_list_sha256": frozen_hashes_sha,
@@ -274,6 +277,8 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
         row["checkpoint_sha256"] = weight_sha
         space = row["setting"].split("_")[0]
         if space == "rb40":
+            row["checkpoint_path"] = ("replacement.pt" if row["model_or_arch_id"] == "0"
+                                      else f"old_model_{row['model_or_arch_id']}.pt")
             row.update(target_source_id="frozen_rb11_manifest_20260922",
                        target_source_sha256=rb_sha)
         elif space == "nb201":
@@ -295,7 +300,7 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
                   nb_meta_path=meta_path, nb_meta_sha256=meta_sha)
     report = verify_holdout_package_targets(package, tmp_path, **kwargs)
     assert report["status"] == "PASS"
-    assert report["checkpoint_verification"]["verified_files"] == 1
+    assert report["checkpoint_verification"]["verified_files"] == 12
     assert report["darts_target_verification"]["verified_architectures"] == 20
     weight.write_bytes(b"tampered")
     with pytest.raises(ValueError, match="checkpoint SHA"):
