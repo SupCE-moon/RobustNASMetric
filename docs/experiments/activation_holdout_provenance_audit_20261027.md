@@ -73,3 +73,11 @@ DARTS 在主网格和历史结果中发现 8 份带签名的 CSV，合计 **120 
 第一版服务器脚本 `scripts/train_activation_holdout_nb201.py` SHA-256 `9e9cf3cda7b45550131b805d01158fdd0a8207a158c35dd91bd42b18bf97ad60`，曾仅执行 `--plan-only`，在 `outputs/student_metrics/wangjiahao/activation_holdout_nb201_weights_20261031/training_plan.json` 留下 SHA-256 `ff6e8af15fbe50e19c34d40aa5cfd2289a8b3f2521b6db83ad9fc979f46d43b0`。发现计划未锁定执行脚本自身后，在运行任何训练前将该版标记为**仅供审计、不得执行训练**，不覆盖其文件。
 
 修订版本地 `scripts/train_activation_holdout_nb201.py` 与服务器新文件 `scripts/train_activation_holdout_nb201_v2.py` 字节 SHA-256 均为 `99bd26c2b8fd4849641ec407e0fb892151adc6fc6205667ec2251e5140537081`，调用时必须提供匹配的 `--expected-runner-sha`。服务器仅执行 `--plan-only`，独占生成 `outputs/student_metrics/wangjiahao/activation_holdout_nb201_weights_20261031_v2/training_plan.json`，SHA-256 `26fb65655fc60c98272ca2df751aba2d1c0a676dc37b7ce49176f67ab1430bd2b`。该版才是后续训练依据；读回确认 64 架构、320 预期权重键、6 个 CIFAR-10 训练文件哈希、无目标字段。**未启动 GPU 训练，未产出留出权重或成绩。** 先等待当前 560 键主实验流程使用 GPU，之后再按冻结计划训练；若主实验结果未达到预定主榜门槛，仍保留此未查看分数的留出包供下一轮候选使用。
+
+## DARTS 留出结构预选，尚未封存（2026-10-31）
+
+补查 `wangjiahao` 项目内 E32 记录 `docs/experiments/e32_signed_capacity_falsified.md`（SHA-256 `e961c7bb1bc9133c6fc8dff1bc98b316cc6f3e3e4757c1f40a253f1d2b00158e`）：文档称 E32 复用既有材料并对 20 个 DARTS 架构作零成本重跑，列出 `outputs/e32_darts_e0_zerocost.csv`；其分析脚本 SHA-256 为 `823a8027b1f71e3b3c35878c15210731e672f5a042c4c48d0f5ce69534778cfc`。这些材料仍未给出新列所用的逐结构签名、检查点映射或原始运行命令，因此 **E32 未解状态不撤销**。历史身份清单中 453 份 DARTS 只有编号的来源仍按未解保留。
+
+新增 `scripts/select_activation_holdout_darts.py`，只读 120 个已知历史规范化结构签名，以 `seed=20261027` 从项目原有 DARTS 离散空间的固定随机流中按顺序取前 20 个不重叠结构，分配新的编号 `1000..1019`；不接收任何目标或指标值。选择脚本本地/服务器 SHA-256 均为 `2778206ea8b8d2200e35f37713d23cc8e8f31e8ac273bf3bd36573461b466aae`，空间生成源码两端 SHA-256 均为 `3904d99614bae0d8218603ddf966a07e572a54d32d5a0d33b9518aa2ee0bb572`。选择代码的 2 项针对性测试先失败后通过。
+
+服务器独占写入 `outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/darts_selection_unsealed.json`（SHA-256 `f3e272c91dbe0ed2746f7d40ebc8cbc7f497519bf9d5286d1c48bdde81231e86`），固定种子、候选流、20 个 ID/结构、40 个预期阶段键、相关来源哈希和 `unresolved_id_only_source_count=453`。读回核对 20 个规范化结构唯一且与已知 120 个不重叠，无目标字段。**状态为 `unsealed_prior_id_only_sources`，不是独立性证明**；在 E32 等缺失出处补齐前，不对这 20 个结构作正式留出比较或宣布跨空间外部验证完成。
