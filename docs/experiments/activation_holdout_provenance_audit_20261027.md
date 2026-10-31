@@ -49,3 +49,9 @@
 DARTS 在主网格和历史结果中发现 8 份带签名的 CSV，合计 **120 个不同原始结构签名**（主网格 100、E23/E24 20）；另有 10 份只有 `arch_id`、没有签名的历史表，包括 E27/E32 与 E23/E24 汇总。E27 的评估脚本默认输入 E23 的 20 架构表，但 E32 的逐结构出处还须用原始命令或检查点映射进一步核实。编号 `0..19` 不能独自证明跨实验是同一结构；在出处不清时把它们保留为 unresolved，不封存 DARTS 新留出包。
 
 对 E27/E32 追加来源核对：`scripts/evaluate_darts_e27_zerocost.py`（SHA-256 `594a623f04f206dedda706c68ab9f75eb5facc04a0db1176878a5ad08e9c2bd4`）默认直接读取 E23 DARTS20 的含签名 CSV，并逐行解析其签名构造 e0 模型。E32 与 E27 v3 的 20 个编号全部相同，57 个共同旧指标列中有 **53 列在 20/20 行逐值完全相等**；E32 文件 SHA-256 为 `a6824c4c5ccceeeda3b8f47f32779b8a5c0185214dcce8a492e49b8f1552e707`，E27 v3 为 `9284712578205e8d205a2155087ab1194e3fc5f6b2df4baf2352232fdc90a52f`。这强烈支持 E32 表承接 E27/E23 的 20 架构旧行，但 E32 新增列的原始运行命令/权重映射未见，故仍保留 unresolved，而不把相同编号当成充分证明。
+
+## 可重跑的排除清单（2026-10-31）
+
+新增 `scripts/holdout_exposure_inventory.py`，从项目内历史 CSV 与 JSON 只提取身份字段；官方 `meta.json` 负责 NB201 同构归并，DARTS 签名按每节点两边顺序无关规范化；对每份身份来源记录字节 SHA-256。3 项针对性测试先失败再通过，本地完整测试 **198 项通过**。本地/服务器脚本 SHA-256 均为 `d62eefc82d63e955afb13b3e1fd571ed7e7418a4f656bb2665e0962e8bcad9e5`，其依赖的结构审计脚本两端哈希均为 `23ce9a67631ef7faeecb69c1fff824ed63d69ffdd437dc4c870b83ab8cf48da2`。
+
+服务器新建、独占写入 `outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/prior_exposure_inventory.json`，288,440 字节，SHA-256 `5d920fa1546fda39462f4ba71ad52e330ae5a00bef8647fd48005a7b5392cdc94`。内容含 **1,301 个 NB201 canonical ID、120 个 DARTS 规范化签名、859 份来源文件哈希**。扫描全部 `outputs` JSON 后，NB201 只见已在 CSV 排除集中的 64 个主网格 ID，未增加新 ID；一份无法解析的 E37 代码哈希 JSON 不含任何架构字段。清单还保留 **453 份只有 DARTS 编号的来源**（多数为主网格逐键诊断与原始尝试），状态明确标为 `unresolved_darts_id_only`。这不是已通过的独立性证明；须把每类编号追溯到冻结签名后才可封存 DARTS 留出。
