@@ -105,3 +105,9 @@ DARTS 在主网格和历史结果中发现 8 份带签名的 CSV，合计 **120 
 此函数尚未形成 320 键的真实目标验证报告，也没有补齐 RB11 来源核对或 DARTS 逐图文件。服务器早先传输的旧版 `verify_holdout_targets.py` 状态仍待独立核哈希；本次本地新版不得视为服务器已同步或正式封存证明。
 
 继续在本地新增 `verify_nb201_target_rows`，要求五个阶段各 64 条、总计精确 320 个唯一 `(setting, canonical_id)` 键、同一 64 ID 集合、e0 结构唯一，并逐键复核官方 AutoAttack 目标。只输出 PASS、计数、键集哈希和官方源哈希，不输出各架构目标值。测试先失败后通过，覆盖 319 键、重复键、错官方目标与非字符串 ID；本地完整 **218 项通过**。当前本地验证器 SHA-256 更新为 `bda61022f4e90d65086cf703d8a3f925e595e98abb214aabc31aba23005d9367`，上一段哈希仅记录当时版本；服务器未同步此更新，未对真实 64 架构运行批量验证。
+
+## RB11 冻结目标与恢复映射核对准备（2026-10-31）
+
+指定本地项目的 `docs/experiments/RB40留出权重恢复验证_20261027.md` 与 `outputs/student_metrics/wangjiahao/holdout_checkpoint_recovery_20261027/recovery_verification.json` 只读复核：原冻结 RB11 manifest 预期 SHA-256 `b529fc7b722f1314a4cac9c6bf9ee383043d489e374d87e2119d8cce88fce372`，原 11 权重哈希清单预期 SHA-256 `9ddf7faca73ccdfa7be0a8eb7a73f5ac337aaab80406bf1e8b6de2b8069fd7e4`；仅 `Rebuffi2021Fixing_70_16_cutmix_ddpm` 改用替换权重 SHA-256 `0769d395cbf77dc49caeab7e4c48fec5299e694937bd0b598293410a0e39a9bb`。恢复 JSON 的本地 SHA-256 为 `263c0eea26bdf8c324ecb851f5b1f3440f872c30a0963789b1a57512414a2f90`，按该哈希只读解析得到加载检查 `PASS, 11/11`。用户确认替换文件来自 RobustBench 登记链接，但没有独立发布的官方文件哈希，故不把这一来源声明写成字节级官方认证。
+
+本地验证器新增冻结 RB11 清单的哈希/11 模型/目标范围检查，以及 11 条目标与该清单逐项一致、恢复记录与单文件替换哈希一致的纯函数。合成测试覆盖 10/11、改目标、改替换哈希与恢复 JSON 错哈希；本地完整 **219 项通过**。当前 `scripts/verify_holdout_targets.py` SHA-256 为 `f4c9b017450e09d3b1c470646d0278b8d7012c620f6f4a8b64cb6374d1c6fa9f`。**原 RB11 目标 manifest 和权重哈希清单不在本地隔离工作区，真实 11 条目标尚未运行本验证器核对**；该逻辑也尚未在服务器同步。恢复记录只证明权重可加载，不证明任何 Ours/Φ 留出结果。

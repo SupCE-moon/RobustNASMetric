@@ -8,6 +8,8 @@ The DARTS protocol matches the project's full-test PGD-20 implementation:
 from __future__ import annotations
 
 import hashlib
+import csv
+import io
 import json
 import math
 import re
@@ -21,6 +23,100 @@ _CIFAR10_TEST_IDS_SHA256 = hashlib.sha256(
 ).hexdigest()
 _DARTS_NORMALIZATION = "cifar10_125.3_123.0_113.9__63.0_62.1_66.7"
 _NB201_SOURCE_ID = "official_nasrobbench201_cifar10_autoattack"
+_RB11_SOURCE_ID = "frozen_rb11_manifest_20260922"
+
+
+def load_rb11_recovery_report(path: Path, expected_sha256: str) -> dict:
+    """Bind the one-file RB11 repair claim to its recorded JSON bytes."""
+    raw = Path(path).read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected_sha256:
+        raise ValueError("RB11 recovery SHA mismatch")
+    def no_duplicate_fields(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate RB11 recovery field: {key}")
+            result[key] = value
+        return result
+    value = json.loads(raw, object_pairs_hook=no_duplicate_fields,
+                       parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)))
+    if not isinstance(value, dict):
+        raise ValueError("RB11 recovery report object required")
+    return value
+
+
+def load_frozen_rb11_manifest(path: Path, expected_sha256: str) -> dict[str, dict]:
+    """Read the frozen 11-model target list only after its bytes match."""
+    raw = Path(path).read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected_sha256:
+        raise ValueError("frozen RB11 manifest SHA mismatch")
+    with io.StringIO(raw.decode("utf-8-sig"), newline="") as stream:
+        reader = csv.DictReader(stream)
+        if not {"model_name", "robust_accuracy"} <= set(reader.fieldnames or []):
+            raise ValueError("frozen RB11 manifest columns missing")
+        rows = list(reader)
+    if len(rows) != 11:
+        raise ValueError("frozen RB11 manifest requires 11 models")
+    names = [row["model_name"] for row in rows]
+    if any(not name or name != name.strip() for name in names) or len(set(names)) != 11:
+        raise ValueError("frozen RB11 model names invalid or duplicate")
+    result = {}
+    for row in rows:
+        try:
+            value = float(row["robust_accuracy"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError("frozen RB11 target accuracy invalid") from exc
+        if not math.isfinite(value) or not 0 <= value <= 1:
+            raise ValueError("frozen RB11 target accuracy invalid")
+        result[row["model_name"]] = {**row, "robust_accuracy": value}
+    return result
+
+
+def verify_rb11_target_rows(rows: list[dict], manifest: dict[str, dict],
+                             manifest_sha256: str, recovery: dict) -> dict:
+    """Check all 11 target labels against the frozen overlay's base manifest."""
+    if len(rows) != 11 or len(manifest) != 11:
+        raise ValueError("RB11 holdout requires exactly 11 target rows")
+    if not all(isinstance(row, dict) for row in rows):
+        raise ValueError("RB11 holdout row invalid")
+    names = [row.get("model_or_arch_id") for row in rows]
+    if not all(isinstance(name, str) for name in names) or len(set(names)) != 11:
+        raise ValueError("RB11 holdout duplicate or invalid model ID")
+    if set(names) != set(manifest):
+        raise ValueError("RB11 holdout differs from frozen model list")
+    overlay = recovery.get("frozen_overlay", {})
+    load_audit = recovery.get("fresh_container_load_audit", {})
+    if (overlay.get("base_manifest_sha256") != manifest_sha256
+            or overlay.get("expected_unique_models") != 11
+            or load_audit.get("status") != "PASS"
+            or load_audit.get("loadable_unique_models") != 11):
+        raise ValueError("RB11 recovery does not match frozen 11-model manifest")
+    replacement = recovery.get("model_name")
+    replacement_sha = recovery.get("replacement_weight", {}).get("sha256")
+    if replacement not in manifest or not isinstance(replacement_sha, str) or not _SHA256.fullmatch(replacement_sha):
+        raise ValueError("RB11 replacement mapping invalid")
+    for row in rows:
+        name = row["model_or_arch_id"]
+        if row.get("setting") != "rb40_mature":
+            raise ValueError("RB11 holdout setting invalid")
+        if (row.get("target_source_id") != _RB11_SOURCE_ID
+                or row.get("target_source_sha256") != manifest_sha256):
+            raise ValueError("RB11 frozen target source mismatch")
+        value = row.get("target_value")
+        if (isinstance(value, bool) or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                or not math.isclose(float(value), manifest[name]["robust_accuracy"], rel_tol=0, abs_tol=1e-12)):
+            raise ValueError("RB11 target differs from frozen manifest")
+        digest = row.get("checkpoint_sha256")
+        if not isinstance(digest, str) or not _SHA256.fullmatch(digest):
+            raise ValueError("RB11 checkpoint SHA invalid")
+        if name == replacement and digest != replacement_sha:
+            raise ValueError("RB11 replacement checkpoint SHA mismatch")
+    key_bytes = json.dumps(sorted(names), separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return {"kind": "rb11_frozen_target_verification", "status": "PASS",
+            "verified_rows": 11, "verified_keys_sha256": hashlib.sha256(key_bytes).hexdigest(),
+            "frozen_manifest_sha256": manifest_sha256,
+            "replacement_checkpoint_sha256": replacement_sha}
 
 
 def load_official_nb201_sources(benchmark_path: Path, meta_path: Path,

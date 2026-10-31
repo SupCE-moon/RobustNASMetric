@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import csv
 import hashlib
 import json
 
@@ -10,6 +11,9 @@ import pytest
 
 from scripts.verify_holdout_targets import (
     load_official_nb201_sources,
+    load_frozen_rb11_manifest,
+    load_rb11_recovery_report,
+    verify_rb11_target_rows,
     verify_nb201_target_item,
     verify_nb201_target_rows,
     verify_target_file,
@@ -188,3 +192,44 @@ def test_nb201_all_320_targets_required_without_exposing_values() -> None:
     malformed[-1]["model_or_arch_id"] = ["63"]
     with pytest.raises(ValueError, match="architecture ID"):
         verify_nb201_target_rows(malformed, benchmark, meta, "a" * 64)
+
+
+def test_rb11_targets_match_frozen_manifest_and_replacement_overlay(tmp_path) -> None:
+    path = tmp_path / "rb40_models.csv"
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["model_name", "robust_accuracy"])
+        writer.writeheader()
+        writer.writerows({"model_name": f"model_{i}", "robust_accuracy": "0.4"}
+                         for i in range(10))
+        writer.writerow({"model_name": "Rebuffi2021Fixing_70_16_cutmix_ddpm",
+                         "robust_accuracy": "0.6"})
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    manifest = load_frozen_rb11_manifest(path, digest)
+    rows = [{"setting": "rb40_mature", "model_or_arch_id": name,
+             "target_value": record["robust_accuracy"],
+             "target_source_id": "frozen_rb11_manifest_20260922",
+             "target_source_sha256": digest,
+             "checkpoint_sha256": ("b" * 64 if name.startswith("Rebuffi") else "c" * 64)}
+            for name, record in manifest.items()]
+    recovery = {"frozen_overlay": {"base_manifest_sha256": digest,
+                                    "expected_unique_models": 11},
+                "fresh_container_load_audit": {"status": "PASS", "loadable_unique_models": 11},
+                "model_name": "Rebuffi2021Fixing_70_16_cutmix_ddpm",
+                "replacement_weight": {"sha256": "b" * 64}}
+    recovery_path = tmp_path / "recovery.json"
+    recovery_path.write_text(json.dumps(recovery), encoding="utf-8")
+    recovery_sha = hashlib.sha256(recovery_path.read_bytes()).hexdigest()
+    assert load_rb11_recovery_report(recovery_path, recovery_sha) == recovery
+    with pytest.raises(ValueError, match="recovery SHA"):
+        load_rb11_recovery_report(recovery_path, "0" * 64)
+    report = verify_rb11_target_rows(rows, manifest, digest, recovery)
+    assert report["status"] == "PASS" and report["verified_rows"] == 11
+    with pytest.raises(ValueError, match="11"):
+        verify_rb11_target_rows(rows[:-1], manifest, digest, recovery)
+    wrong = [dict(row) for row in rows]
+    wrong[-1]["target_value"] = 0.7
+    with pytest.raises(ValueError, match="frozen"):
+        verify_rb11_target_rows(wrong, manifest, digest, recovery)
+    recovery["replacement_weight"]["sha256"] = "d" * 64
+    with pytest.raises(ValueError, match="replacement"):
+        verify_rb11_target_rows(rows, manifest, digest, recovery)
