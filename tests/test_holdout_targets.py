@@ -11,6 +11,7 @@ import pytest
 from scripts.verify_holdout_targets import (
     load_official_nb201_sources,
     verify_nb201_target_item,
+    verify_nb201_target_rows,
     verify_target_file,
     verify_target_item,
 )
@@ -150,3 +151,40 @@ def test_official_nb201_source_loader_checks_file_hashes(tmp_path) -> None:
     assert "7" in benchmark["cifar10"] and "7" in meta["ids"]
     with pytest.raises(ValueError, match="official results SHA"):
         load_official_nb201_sources(benchmark_path, meta_path, "0" * 64, meta_sha)
+
+
+def _nb201_grid():
+    benchmark = {"cifar10": {str(i): {"autoattack": 0.2 + i / 1000} for i in range(64)}}
+    meta = {"ids": {str(i): {"isomorph": i, "nb201-string": f"arch-{i}"}
+                    for i in range(64)}}
+    rows = [
+        {"setting": f"nb201_e{epoch}", "model_or_arch_id": str(i),
+         "signature": f"arch-{i}", "target_value": 0.2 + i / 1000,
+         "target_source_id": "official_nasrobbench201_cifar10_autoattack",
+         "target_source_sha256": "a" * 64}
+        for epoch in (0, 5, 10, 25, 50) for i in range(64)
+    ]
+    return rows, benchmark, meta
+
+
+def test_nb201_all_320_targets_required_without_exposing_values() -> None:
+    rows, benchmark, meta = _nb201_grid()
+    report = verify_nb201_target_rows(rows, benchmark, meta, "a" * 64)
+    assert report["status"] == "PASS"
+    assert report["verified_rows"] == 320
+    assert report["verified_architectures"] == 64
+    assert "target_value" not in json.dumps(report)
+
+    with pytest.raises(ValueError, match="320"):
+        verify_nb201_target_rows(rows[:-1], benchmark, meta, "a" * 64)
+    duplicate = rows[:-1] + [rows[0]]
+    with pytest.raises(ValueError, match="duplicate"):
+        verify_nb201_target_rows(duplicate, benchmark, meta, "a" * 64)
+    changed = [dict(row) for row in rows]
+    changed[-1]["target_value"] = 0.99
+    with pytest.raises(ValueError, match="official"):
+        verify_nb201_target_rows(changed, benchmark, meta, "a" * 64)
+    malformed = [dict(row) for row in rows]
+    malformed[-1]["model_or_arch_id"] = ["63"]
+    with pytest.raises(ValueError, match="architecture ID"):
+        verify_nb201_target_rows(malformed, benchmark, meta, "a" * 64)

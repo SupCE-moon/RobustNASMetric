@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 import re
+from collections import Counter
 from pathlib import Path
 
 
@@ -78,6 +79,49 @@ def verify_nb201_target_item(item: dict, benchmark: dict, meta: dict,
             or not math.isclose(float(expected), float(actual), rel_tol=0, abs_tol=1e-12)):
         raise ValueError("NB201 target differs from official accuracy")
     return float(actual)
+
+
+def verify_nb201_target_rows(rows: list[dict], benchmark: dict, meta: dict,
+                              benchmark_sha256: str) -> dict:
+    """Verify the exact 64-architecture × five-stage official target grid."""
+    epochs = (0, 5, 10, 25, 50)
+    settings = {f"nb201_e{epoch}" for epoch in epochs}
+    if len(rows) != 320:
+        raise ValueError("NB201 holdout requires exactly 320 target rows")
+    if not all(isinstance(row, dict) for row in rows):
+        raise ValueError("NB201 holdout target row must be an object")
+    if not all(isinstance(row.get("model_or_arch_id"), str)
+               and row["model_or_arch_id"].isdecimal() for row in rows):
+        raise ValueError("NB201 architecture ID invalid")
+    keys = [(row.get("setting"), row.get("model_or_arch_id")) for row in rows]
+    if len(set(keys)) != 320:
+        raise ValueError("duplicate NB201 holdout target key")
+    counts = Counter(row.get("setting") for row in rows if isinstance(row, dict))
+    if set(counts) != settings or any(counts[setting] != 64 for setting in settings):
+        raise ValueError("NB201 holdout requires 64 targets in each of five stages")
+    ids_by_setting = {
+        setting: {identifier for row_setting, identifier in keys if row_setting == setting}
+        for setting in settings
+    }
+    base_ids = ids_by_setting["nb201_e0"]
+    if any(ids != base_ids for ids in ids_by_setting.values()):
+        raise ValueError("NB201 architecture IDs differ across stages")
+    signatures = {row["model_or_arch_id"]: row.get("signature")
+                  for row in rows if row["setting"] == "nb201_e0"}
+    if len(set(signatures.values())) != 64:
+        raise ValueError("duplicate NB201 holdout structure")
+    for row in rows:
+        verify_nb201_target_item(row, benchmark, meta, benchmark_sha256)
+    key_bytes = json.dumps(sorted(keys), separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return {
+        "kind": "nb201_official_target_verification",
+        "status": "PASS",
+        "verified_rows": 320,
+        "verified_architectures": 64,
+        "verified_counts": {setting: 64 for setting in sorted(settings)},
+        "verified_keys_sha256": hashlib.sha256(key_bytes).hexdigest(),
+        "official_source_sha256": benchmark_sha256,
+    }
 
 
 def verify_target_item(item: dict) -> None:
