@@ -59,9 +59,11 @@ def test_selection_rejects_wrong_hash_and_duplicate_or_target(tmp_path):
 
 def test_training_plan_pins_old_checkpoint_protocol_without_targets():
     plan = expected_training_plan(_selection(), selection_sha="a" * 64,
+                                  runner_sha="e" * 64,
                                   trainer_sha="b" * 64, attack_sha="c" * 64,
                                   meta_node_sha="d" * 64)
     assert plan["expected_checkpoint_keys"] == 320
+    assert plan["runner_source_sha256"] == "e" * 64
     assert plan["training"]["seed"] == 0
     assert plan["training"]["train_pgd_steps"] == 7
     assert plan["training"]["train_samples"] == 50000
@@ -72,6 +74,7 @@ def test_training_plan_pins_old_checkpoint_protocol_without_targets():
 
 def test_plan_is_exclusive_and_rejects_changed_run(tmp_path):
     plan = expected_training_plan(_selection(), selection_sha="a" * 64,
+                                  runner_sha="e" * 64,
                                   trainer_sha="b" * 64, attack_sha="c" * 64,
                                   meta_node_sha="d" * 64)
     path = tmp_path / "plan.json"

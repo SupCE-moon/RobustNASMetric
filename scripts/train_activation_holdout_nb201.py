@@ -90,13 +90,14 @@ def load_frozen_selection(path: Path, expected_sha: str = SELECTION_SHA256) -> d
     return selection
 
 
-def expected_training_plan(selection: dict, *, selection_sha: str, trainer_sha: str,
+def expected_training_plan(selection: dict, *, selection_sha: str, runner_sha: str, trainer_sha: str,
                            attack_sha: str, meta_node_sha: str,
                            cifar10_hashes: dict[str, str] | None = None) -> dict:
     """Construct the immutable, score-free training plan."""
     return {
         "kind": "activation_holdout_nb201_weight_training",
         "selection_sha256": selection_sha,
+        "runner_source_sha256": runner_sha,
         "training_source_sha256": trainer_sha,
         "attack_source_sha256": attack_sha,
         "meta_node_sha256": meta_node_sha,
@@ -214,12 +215,16 @@ def _train_one_architecture(row: dict, out: Path, plan_sha: str, repo: Path,
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--selection", type=Path, required=True)
+    parser.add_argument("--expected-runner-sha", required=True)
     parser.add_argument("--repo", type=Path, required=True)
     parser.add_argument("--data-root", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--plan-only", action="store_true")
     args = parser.parse_args()
     selection_path = _project_path(args.selection)
+    actual_runner_sha = sha256(Path(__file__))
+    if actual_runner_sha != args.expected_runner_sha:
+        raise ValueError("holdout weight runner source hash changed")
     repo = _project_path(args.repo)
     data_root = _project_path(args.data_root)
     out = _project_path(args.output_dir)
@@ -235,6 +240,7 @@ def main() -> None:
     if commit != OFFICIAL_REPO_COMMIT:
         raise ValueError("official architecture repository commit changed")
     plan = expected_training_plan(selection, selection_sha=SELECTION_SHA256,
+                                  runner_sha=actual_runner_sha,
                                   trainer_sha=TRAINER_SHA256, attack_sha=ATTACK_SHA256,
                                   meta_node_sha=META_NODE_SHA256,
                                   cifar10_hashes=_data_hashes(data_root))
