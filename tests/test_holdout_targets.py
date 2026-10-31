@@ -18,6 +18,7 @@ from scripts.verify_holdout_targets import (
     verify_nb201_target_rows,
     verify_target_file,
     verify_target_item,
+    verify_darts_target_rows,
 )
 
 
@@ -97,6 +98,16 @@ def write_target_evidence(tmp_path, item: dict, *, correct=None, checkpoint=None
 def test_darts_target_file_recomputes_full_accuracy(tmp_path) -> None:
     item = write_target_evidence(tmp_path, darts_target())
     assert verify_target_file(item, tmp_path) == 0.47
+
+
+def test_darts_target_file_rejects_duplicate_json_field(tmp_path) -> None:
+    item = write_target_evidence(tmp_path, darts_target())
+    path = tmp_path / item["target_source_path"]
+    raw = path.read_text()
+    path.write_text(raw.replace('"status": "ok"', '"status": "ok", "status": "ok"', 1))
+    item["target_source_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match="duplicate"):
+        verify_target_file(item, tmp_path)
 
 
 @pytest.mark.parametrize("tamper, message", [
@@ -233,3 +244,39 @@ def test_rb11_targets_match_frozen_manifest_and_replacement_overlay(tmp_path) ->
     recovery["replacement_weight"]["sha256"] = "d" * 64
     with pytest.raises(ValueError, match="replacement"):
         verify_rb11_target_rows(rows, manifest, digest, recovery)
+
+
+def test_darts_all_40_stage_keys_share_20_fulltest_targets(tmp_path) -> None:
+    rows = []
+    for index in range(20):
+        item = darts_target()
+        item["model_or_arch_id"] = str(1000 + index)
+        item["checkpoint_sha256"] = f"{index + 1:064x}"
+        item["final_checkpoint_sha256"] = f"{index + 101:064x}"
+        item["target_checkpoint_sha256"] = item["final_checkpoint_sha256"]
+        record = {
+            "status": "ok", "model_or_arch_id": item["model_or_arch_id"],
+            "checkpoint_sha256": item["final_checkpoint_sha256"],
+            "sample_ids": list(range(10000)),
+            "correct": [True] * 4700 + [False] * 5300,
+            "protocol": {key: item[key] for key in (
+                "target_attack", "target_dataset", "target_epsilon", "target_step_size",
+                "target_steps", "target_restarts", "target_random_start", "target_batch_size",
+                "target_random_seed", "target_normalization",
+            )},
+        }
+        path = tmp_path / f"darts_{index}.json"
+        path.write_text(json.dumps(record, sort_keys=True), encoding="utf-8")
+        item["target_source_path"] = path.name
+        item["target_source_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        final = {**item, "setting": "darts_e100",
+                 "checkpoint_sha256": item["final_checkpoint_sha256"]}
+        rows.extend((item, final))
+    report = verify_darts_target_rows(rows, tmp_path)
+    assert report["status"] == "PASS" and report["verified_rows"] == 40
+    with pytest.raises(ValueError, match="40"):
+        verify_darts_target_rows(rows[:-1], tmp_path)
+    wrong = [dict(row) for row in rows]
+    wrong[1]["target_source_sha256"] = "9" * 64
+    with pytest.raises(ValueError, match="stage|source SHA"):
+        verify_darts_target_rows(wrong, tmp_path)

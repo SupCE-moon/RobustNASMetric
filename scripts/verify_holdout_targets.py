@@ -283,10 +283,23 @@ def verify_target_file(item: dict, project_root: Path) -> float:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != item["target_source_sha256"]:
         raise ValueError("target source SHA mismatch")
+    def no_duplicate_fields(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f"duplicate target source JSON field: {key}")
+            result[key] = value
+        return result
     try:
-        record = json.loads(raw)
+        record = json.loads(
+            raw,
+            object_pairs_hook=no_duplicate_fields,
+            parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)),
+        )
     except (ValueError, UnicodeDecodeError) as exc:
-        raise ValueError("target source JSON invalid") from exc
+        raise ValueError(f"target source JSON invalid: {exc}") from exc
+    if not isinstance(record, dict):
+        raise ValueError("target source JSON object required")
     if record.get("status") != "ok" or str(record.get("model_or_arch_id")) != item["model_or_arch_id"]:
         raise ValueError("target evidence status or architecture mismatch")
     if record.get("checkpoint_sha256") != item["final_checkpoint_sha256"]:
@@ -308,3 +321,40 @@ def verify_target_file(item: dict, project_root: Path) -> float:
     if not math.isclose(accuracy, float(item["target_value"]), rel_tol=0, abs_tol=1e-12):
         raise ValueError("target accuracy differs from per-image evidence")
     return accuracy
+
+
+def verify_darts_target_rows(rows: list[dict], project_root: Path) -> dict:
+    """Verify 20 final-weight targets shared across both DARTS stages."""
+    if len(rows) != 40:
+        raise ValueError("DARTS holdout requires exactly 40 target rows")
+    if not all(isinstance(row, dict) and isinstance(row.get("model_or_arch_id"), str)
+               for row in rows):
+        raise ValueError("DARTS target row or architecture ID invalid")
+    keys = [(row.get("setting"), row["model_or_arch_id"]) for row in rows]
+    if len(set(keys)) != 40:
+        raise ValueError("duplicate DARTS target key")
+    counts = Counter(setting for setting, _ in keys)
+    if counts != {"darts_e0": 20, "darts_e100": 20}:
+        raise ValueError("DARTS holdout requires 20 targets at each stage")
+    by_key = {(row["setting"], row["model_or_arch_id"]): row for row in rows}
+    first_ids = {identifier for setting, identifier in keys if setting == "darts_e0"}
+    final_ids = {identifier for setting, identifier in keys if setting == "darts_e100"}
+    if first_ids != final_ids:
+        raise ValueError("DARTS architecture IDs differ across stages")
+    source_hashes = []
+    for identifier in sorted(first_ids):
+        early = by_key[("darts_e0", identifier)]
+        final = by_key[("darts_e100", identifier)]
+        verify_target_item(early)
+        for field in ("target_value", "target_source_id", "target_source_path",
+                      "target_source_sha256", "target_checkpoint_sha256",
+                      "final_checkpoint_sha256"):
+            if early.get(field) != final.get(field):
+                raise ValueError(f"DARTS stage target {field} mismatch: {identifier}")
+        verify_target_file(final, project_root)
+        source_hashes.append(final["target_source_sha256"])
+    hash_bytes = json.dumps(source_hashes, separators=(",", ":")).encode("utf-8")
+    return {"kind": "darts_fulltest_target_verification", "status": "PASS",
+            "verified_rows": 40, "verified_architectures": 20,
+            "verified_counts": {"darts_e0": 20, "darts_e100": 20},
+            "target_files_sha256": hashlib.sha256(hash_bytes).hexdigest()}

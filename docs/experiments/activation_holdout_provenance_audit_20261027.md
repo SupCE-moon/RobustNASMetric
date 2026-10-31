@@ -111,3 +111,7 @@ DARTS 在主网格和历史结果中发现 8 份带签名的 CSV，合计 **120 
 指定本地项目的 `docs/experiments/RB40留出权重恢复验证_20261027.md` 与 `outputs/student_metrics/wangjiahao/holdout_checkpoint_recovery_20261027/recovery_verification.json` 只读复核：原冻结 RB11 manifest 预期 SHA-256 `b529fc7b722f1314a4cac9c6bf9ee383043d489e374d87e2119d8cce88fce372`，原 11 权重哈希清单预期 SHA-256 `9ddf7faca73ccdfa7be0a8eb7a73f5ac337aaab80406bf1e8b6de2b8069fd7e4`；仅 `Rebuffi2021Fixing_70_16_cutmix_ddpm` 改用替换权重 SHA-256 `0769d395cbf77dc49caeab7e4c48fec5299e694937bd0b598293410a0e39a9bb`。恢复 JSON 的本地 SHA-256 为 `263c0eea26bdf8c324ecb851f5b1f3440f872c30a0963789b1a57512414a2f90`，按该哈希只读解析得到加载检查 `PASS, 11/11`。用户确认替换文件来自 RobustBench 登记链接，但没有独立发布的官方文件哈希，故不把这一来源声明写成字节级官方认证。
 
 本地验证器新增冻结 RB11 清单的哈希/11 模型/目标范围检查，以及 11 条目标与该清单逐项一致、恢复记录与单文件替换哈希一致的纯函数。合成测试覆盖 10/11、改目标、改替换哈希与恢复 JSON 错哈希；本地完整 **219 项通过**。当前 `scripts/verify_holdout_targets.py` SHA-256 为 `f4c9b017450e09d3b1c470646d0278b8d7012c620f6f4a8b64cb6374d1c6fa9f`。**原 RB11 目标 manifest 和权重哈希清单不在本地隔离工作区，真实 11 条目标尚未运行本验证器核对**；该逻辑也尚未在服务器同步。恢复记录只证明权重可加载，不证明任何 Ours/Φ 留出结果。
+
+## DARTS 目标批量核对准备（2026-10-31）
+
+本地验证器新增 `verify_darts_target_rows`：要求 DARTS e0/e100 各 20 条、合计 40 个唯一键，两个阶段使用同一 20 个架构编号和同一最终权重目标；逐个读取 e100 的 10,000 图 PGD-20 正误文件、验证文件哈希并复算准确率。逐图 JSON 现在拒绝重复字段和非有限 JSON 常量，避免解析器覆盖前一字段。合成测试覆盖错阶段数量、两阶段目标错配、重复字段等；本地完整 **221 项通过**。当前 `scripts/verify_holdout_targets.py` SHA-256 为 `4539ac8b459e4239d046644f023c97cb4f1bdf8e178b7796c72fe07571bf65ee`。这些是验证代码及合成测试，**真实 20 个 DARTS 目标文件尚不存在，40 键未验证，留出集未封存**。服务器同步仍受此前审批额度限制，不能声称服务器已有此版本。
