@@ -55,3 +55,11 @@ DARTS 在主网格和历史结果中发现 8 份带签名的 CSV，合计 **120 
 新增 `scripts/holdout_exposure_inventory.py`，从项目内历史 CSV 与 JSON 只提取身份字段；官方 `meta.json` 负责 NB201 同构归并，DARTS 签名按每节点两边顺序无关规范化；对每份身份来源记录字节 SHA-256。3 项针对性测试先失败再通过，本地完整测试 **198 项通过**。本地/服务器脚本 SHA-256 均为 `d62eefc82d63e955afb13b3e1fd571ed7e7418a4f656bb2665e0962e8bcad9e5`，其依赖的结构审计脚本两端哈希均为 `23ce9a67631ef7faeecb69c1fff824ed63d69ffdd437dc4c870b83ab8cf48da2`。
 
 服务器新建、独占写入 `outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/prior_exposure_inventory.json`，288,440 字节，SHA-256 `5d920fa1546fda39462f4ba71ad52e330ae5a00bef8647fd48005a7b5392cdc94`。内容含 **1,301 个 NB201 canonical ID、120 个 DARTS 规范化签名、859 份来源文件哈希**。扫描全部 `outputs` JSON 后，NB201 只见已在 CSV 排除集中的 64 个主网格 ID，未增加新 ID；一份无法解析的 E37 代码哈希 JSON 不含任何架构字段。清单还保留 **453 份只有 DARTS 编号的来源**（多数为主网格逐键诊断与原始尝试），状态明确标为 `unresolved_darts_id_only`。这不是已通过的独立性证明；须把每类编号追溯到冻结签名后才可封存 DARTS 留出。
+
+## NB201 留出架构预选冻结（2026-10-31）
+
+新增 `scripts/select_activation_holdout_nb201.py`，只接收官方 `cifar10` 架构 **键**、官方元数据和已用 canonical ID；以数字序排序后由 `random.Random(20261027).sample(...,64)` 等概率抽样，**不接收或读取目标值**。3 项针对性测试、完整 201 项本地测试通过。脚本在本地/服务器 SHA-256 均为 `50b164f7e3ebcd1a09f7f0b82417ef1f63546faa122e81499fc0abda46d846c1`。
+
+官方 6,466 个 CIFAR-10 架构键扣除 1,301 个已用 canonical ID 后剩 5,165 个可候选。官方仓库中的 `meta-node-4.pth`（SHA-256 `275f76034ee3a4df01c39176101c036642520380d771c61a287b8f75daad02e0`）含 15,625 个结构，与官方 `meta.json` 对全部 6,466 个 canonical 架构的结构字符串逐一一致；选中第一个架构 `2936` 已在 CPU 上成功构造 615,386 参数模型（只验证加载，不计算 metric）。
+
+服务器独占写入 `outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/nb201_selection_unsealed.json`，10,099 字节，SHA-256 `07eeafcc8dbc245ffab169173678b9bf53f7382b41a73c4690783a694ef012a1`。文件固定了选择种子、算法、64 个 ID/结构、e0/e5/e10/e25/e50 的预期 320 键，以及官方数据、元数据、模型结构、排除清单和选择代码的来源哈希。独立读回确认 64 个 ID 与结构唯一、与排除集无交集、文件不含目标值字段。状态仍为 `unsealed_weights_and_targets_missing`：这只是架构选择，不是 320 份权重、正式目标验证或任何留出结论。
