@@ -117,7 +117,9 @@ def validate_holdout_package(package: dict) -> dict:
 
 def seal_holdout_package(package: dict, path: Path, *,
                          verification_report_path: Path | None = None,
-                         verification_context: dict | None = None) -> dict:
+                         verification_context: dict | None = None,
+                         source_audit_report_path: Path | None = None,
+                         source_audit_context: dict | None = None) -> dict:
     """Write a canonical, content-hashed manifest once after target verification.
 
     Require a real, source-hashed verification report bound to these 371 rows.
@@ -162,6 +164,26 @@ def seal_holdout_package(package: dict, path: Path, *,
     actual_report = verify_holdout_package_targets(package, **verification_context)
     if report != actual_report:
         raise ValueError("target verification report differs from live file audit")
+    if source_audit_report_path is None or not Path(source_audit_report_path).is_file():
+        raise ValueError("source audit report required before sealing")
+    source_raw = Path(source_audit_report_path).read_bytes()
+    if hashlib.sha256(source_raw).hexdigest() != package["source_audit_sha256"]:
+        raise ValueError("source audit report SHA mismatch")
+    source_report = json.loads(
+        source_raw, object_pairs_hook=no_duplicate_fields,
+        parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)),
+    )
+    if (not isinstance(source_report, dict) or source_report.get("status") != "PASS"
+            or source_report.get("expected_rows") != 371
+            or source_report.get("objects_sha256") != hashlib.sha256(objects_bytes).hexdigest()
+            or source_report.get("unresolved_prior_sources") != 0):
+        raise ValueError("source audit report incomplete")
+    if not isinstance(source_audit_context, dict) or not source_audit_context:
+        raise ValueError("live source audit context required before sealing")
+    from scripts.verify_holdout_provenance import verify_holdout_provenance
+    live_source_report = verify_holdout_provenance(package, **source_audit_context)
+    if source_report != live_source_report:
+        raise ValueError("source audit report differs from live provenance audit")
     payload = {key: value for key, value in package.items() if key not in ("sealed", "sha256")}
     payload_bytes = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8")
     sealed = {**payload, "sealed": True, "sha256": hashlib.sha256(payload_bytes).hexdigest()}

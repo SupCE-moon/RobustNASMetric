@@ -13,6 +13,7 @@ from scripts.build_activation_holdout_manifest import (
     HOLDOUT_COUNTS, seal_holdout_package, validate_holdout_package,
 )
 from scripts.verify_holdout_targets import verify_holdout_package_targets
+from scripts.verify_holdout_provenance import verify_holdout_provenance
 
 
 def complete_package() -> dict:
@@ -153,14 +154,30 @@ def test_sealed_package_is_canonical_and_write_once(tmp_path, monkeypatch) -> No
                              verification_context={"project_root": tmp_path})
     monkeypatch.setattr(verifier, "verify_holdout_package_targets",
                         lambda objects, **context: json.loads(report.read_text()))
+    with pytest.raises(ValueError, match="source audit report"):
+        seal_holdout_package(package, path, verification_report_path=report,
+                             verification_context={"project_root": tmp_path})
+    provenance = tmp_path / "source_audit.json"
+    source_report = {"status": "PASS", "expected_rows": 371,
+                     "objects_sha256": json.loads(report.read_text())["objects_sha256"],
+                     "unresolved_prior_sources": 0}
+    provenance.write_text(json.dumps(source_report), encoding="utf-8")
+    package["source_audit_sha256"] = hashlib.sha256(provenance.read_bytes()).hexdigest()
+    import scripts.verify_holdout_provenance as provenance_verifier
+    monkeypatch.setattr(provenance_verifier, "verify_holdout_provenance",
+                        lambda objects, **context: source_report)
     sealed = seal_holdout_package(package, path, verification_report_path=report,
-                                  verification_context={"project_root": tmp_path})
+                                  verification_context={"project_root": tmp_path},
+                                  source_audit_report_path=provenance,
+                                  source_audit_context={"project_root": tmp_path})
     assert sealed["sealed"] is True
     assert path.read_text(encoding="utf-8").endswith("\n")
     assert len(sealed["sha256"]) == 64
     with pytest.raises(FileExistsError):
         seal_holdout_package(package, path, verification_report_path=report,
-                             verification_context={"project_root": tmp_path})
+                             verification_context={"project_root": tmp_path},
+                             source_audit_report_path=provenance,
+                             source_audit_context={"project_root": tmp_path})
 
 
 def test_mismatched_target_report_cannot_seal(tmp_path) -> None:
@@ -320,18 +337,44 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
         verify_holdout_package_targets(
             package, tmp_path, **{**kwargs, "rb_manifest_path": outside})
     package.update({field: "a" * 64 for field in (
-        "source_audit_sha256", "protocol_sha256", "analysis_sha256",
+        "protocol_sha256", "analysis_sha256",
         "code_sha256", "environment_sha256",
     )})
     package["targets_verified"] = True
+    old = tmp_path / "outputs" / "nb201" / "old.csv"
+    old.parent.mkdir(parents=True)
+    old.write_text("arch_id\n9000\n", encoding="utf-8")
+    prior_inventory = {"nb201_canonical_ids": ["9000"],
+                       "darts_canonical_signatures": [], "darts_id_only_sources": [],
+                       "unresolved": [], "source_sha256": {
+                           "outputs/nb201/old.csv": hashlib.sha256(old.read_bytes()).hexdigest()}}
+    prior_path = tmp_path / "prior_inventory.json"
+    prior_path.write_text(json.dumps(prior_inventory), encoding="utf-8")
+    package["prior_inventory_sha256"] = hashlib.sha256(prior_path.read_bytes()).hexdigest()
+    source_report = verify_holdout_provenance(package, tmp_path, prior_path)
+    source_report_path = tmp_path / "source_audit.json"
+    source_report_path.write_text(json.dumps(source_report, sort_keys=True), encoding="utf-8")
+    package["source_audit_sha256"] = hashlib.sha256(source_report_path.read_bytes()).hexdigest()
     report_path = tmp_path / "target_report.json"
     report_path.write_text(json.dumps(report, sort_keys=True), encoding="utf-8")
     package["target_verification_sha256"] = hashlib.sha256(report_path.read_bytes()).hexdigest()
     sealed = seal_holdout_package(
         package, tmp_path / "sealed.json", verification_report_path=report_path,
         verification_context={"project_root": tmp_path, **kwargs},
+        source_audit_report_path=source_report_path,
+        source_audit_context={"project_root": tmp_path, "inventory_path": prior_path},
     )
     assert sealed["sealed"] is True
+    old.write_text("arch_id\n9001\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="historical source SHA"):
+        seal_holdout_package(
+            package, tmp_path / "stale_history.json", verification_report_path=report_path,
+            verification_context={"project_root": tmp_path, **kwargs},
+            source_audit_report_path=source_report_path,
+            source_audit_context={"project_root": tmp_path, "inventory_path": prior_path},
+        )
+    assert not (tmp_path / "stale_history.json").exists()
+    old.write_text("arch_id\n9000\n", encoding="utf-8")
     weight.write_bytes(b"tampered")
     with pytest.raises(ValueError, match="checkpoint SHA"):
         verify_holdout_package_targets(package, tmp_path, **kwargs)
@@ -339,5 +382,40 @@ def test_full_371_target_verification_reads_source_and_weight_bytes(tmp_path) ->
         seal_holdout_package(
             package, tmp_path / "should_not_seal.json", verification_report_path=report_path,
             verification_context={"project_root": tmp_path, **kwargs},
+            source_audit_report_path=source_report_path,
+            source_audit_context={"project_root": tmp_path, "inventory_path": prior_path},
         )
     assert not (tmp_path / "should_not_seal.json").exists()
+
+
+def test_frozen_prior_inventory_blocks_overlap_and_id_only_sources(tmp_path) -> None:
+    package = complete_package()
+    source = tmp_path / "outputs" / "nb201" / "old.csv"
+    source.parent.mkdir(parents=True)
+    source.write_text("arch_id\n9000\n", encoding="utf-8")
+    relative = "outputs/nb201/old.csv"
+    inventory = {"nb201_canonical_ids": ["9000"],
+                 "darts_canonical_signatures": [], "darts_id_only_sources": [],
+                 "unresolved": [],
+                 "source_sha256": {relative: hashlib.sha256(source.read_bytes()).hexdigest()}}
+    path = tmp_path / "prior_inventory.json"
+    path.write_text(json.dumps(inventory), encoding="utf-8")
+    package["prior_inventory_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    report = verify_holdout_provenance(package, tmp_path, path)
+    assert report["status"] == "PASS" and report["expected_rows"] == 371
+    assert report["unresolved_prior_sources"] == 0
+    inventory["nb201_canonical_ids"] = ["0"]
+    path.write_text(json.dumps(inventory), encoding="utf-8")
+    package["prior_inventory_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match="overlap"):
+        verify_holdout_provenance(package, tmp_path, path)
+    id_only = tmp_path / "outputs" / "darts" / "e32.csv"
+    id_only.parent.mkdir(parents=True)
+    id_only.write_text("arch_id,metric\n0,0.7\n", encoding="utf-8")
+    inventory["nb201_canonical_ids"] = ["9000"]
+    inventory["darts_id_only_sources"] = ["outputs/darts/e32.csv"]
+    inventory["source_sha256"]["outputs/darts/e32.csv"] = hashlib.sha256(id_only.read_bytes()).hexdigest()
+    path.write_text(json.dumps(inventory), encoding="utf-8")
+    package["prior_inventory_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match="unresolved"):
+        verify_holdout_provenance(package, tmp_path, path)
