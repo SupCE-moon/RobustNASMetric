@@ -13,6 +13,7 @@ import io
 import json
 import math
 import re
+from pathlib import PurePosixPath
 from collections import Counter
 from pathlib import Path
 
@@ -24,6 +25,48 @@ _CIFAR10_TEST_IDS_SHA256 = hashlib.sha256(
 _DARTS_NORMALIZATION = "cifar10_125.3_123.0_113.9__63.0_62.1_66.7"
 _NB201_SOURCE_ID = "official_nasrobbench201_cifar10_autoattack"
 _RB11_SOURCE_ID = "frozen_rb11_manifest_20260922"
+
+
+def verify_checkpoint_files(rows: list[dict], project_root: Path) -> dict:
+    """Read each referenced checkpoint under the permitted project and hash its bytes."""
+    root = Path(project_root).resolve()
+    if not root.is_dir():
+        raise ValueError("checkpoint project root missing")
+    seen_keys = set()
+    paths = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("checkpoint row invalid")
+        key = (row.get("setting"), row.get("model_or_arch_id"))
+        if not all(isinstance(part, str) and part for part in key):
+            raise ValueError("checkpoint key invalid")
+        if key in seen_keys:
+            raise ValueError("duplicate checkpoint key")
+        seen_keys.add(key)
+        relative = row.get("checkpoint_path")
+        if (not isinstance(relative, str) or not relative
+                or PurePosixPath(relative).is_absolute()
+                or ".." in PurePosixPath(relative).parts
+                or "\\" in relative):
+            raise ValueError("checkpoint path must be project-relative")
+        path = (root / relative).resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            raise ValueError("checkpoint file missing or outside project")
+        digest = row.get("checkpoint_sha256")
+        if not isinstance(digest, str) or not _SHA256.fullmatch(digest):
+            raise ValueError("checkpoint SHA invalid")
+        if path in paths and paths[path] != digest:
+            raise ValueError("checkpoint path assigned conflicting SHA")
+        paths[path] = digest
+    for path, expected in paths.items():
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        if digest.hexdigest() != expected:
+            raise ValueError(f"checkpoint SHA mismatch: {path.relative_to(root)}")
+    return {"kind": "holdout_checkpoint_file_verification", "status": "PASS",
+            "verified_rows": len(rows), "verified_files": len(paths)}
 
 
 def load_rb11_recovery_report(path: Path, expected_sha256: str) -> dict:

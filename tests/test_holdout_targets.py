@@ -19,6 +19,7 @@ from scripts.verify_holdout_targets import (
     verify_target_file,
     verify_target_item,
     verify_darts_target_rows,
+    verify_checkpoint_files,
 )
 
 
@@ -280,3 +281,20 @@ def test_darts_all_40_stage_keys_share_20_fulltest_targets(tmp_path) -> None:
     wrong[1]["target_source_sha256"] = "9" * 64
     with pytest.raises(ValueError, match="stage|source SHA"):
         verify_darts_target_rows(wrong, tmp_path)
+
+
+def test_checkpoint_files_bound_to_project_and_sha(tmp_path) -> None:
+    checkpoint = tmp_path / "weights.pt"
+    checkpoint.write_bytes(b"verified checkpoint bytes")
+    digest = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+    rows = [{"setting": "darts_e0", "model_or_arch_id": "1000",
+             "checkpoint_path": checkpoint.name, "checkpoint_sha256": digest}]
+    report = verify_checkpoint_files(rows, tmp_path)
+    assert report["status"] == "PASS" and report["verified_files"] == 1
+    assert report["verified_rows"] == 1
+    with pytest.raises(ValueError, match="SHA"):
+        verify_checkpoint_files([{**rows[0], "checkpoint_sha256": "0" * 64}], tmp_path)
+    with pytest.raises(ValueError, match="outside|relative"):
+        verify_checkpoint_files([{**rows[0], "checkpoint_path": "../weights.pt"}], tmp_path)
+    with pytest.raises(ValueError, match="duplicate"):
+        verify_checkpoint_files(rows + rows, tmp_path)
