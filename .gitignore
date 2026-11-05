@@ -120,3 +120,6 @@ runs/
 
 # Local isolated development worktrees
 /.worktrees/
+
+# Local execution ledgers and review packages
+/.superpowers/
