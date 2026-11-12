@@ -308,3 +308,18 @@ suite 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时会自动传这
 
 生成前请读 `docs/HANDOFF.md` §26：不要加 `.eval()`（会让结果与发布表不可比），
 `--output-dir` 必须显式给，只改分析时用 `--reuse`。
+## RQ2 的结论是否只来自稳得住的指标（2026-11-12）
+
+`rq2-stable-subset-20261112.{json,md}`，由 `scripts/audit_rq2_stable_subset.py` 生成（纯 CPU、秒级）。
+
+把 `e0-weight-seed-20261112` 的稳定性按指标名 join 到 400 架构的偏相关上，分四组：
+
+| 组 | 指标数 | 最强 \|ρ\| |
+| --- | --- | --- |
+| 值与信号都稳定 | 49 | +0.400（`feature_measure_robust_delta`） |
+| 只有值稳定 | 4 | +0.132 |
+| 只有信号稳定 | 6 | +0.397 |
+| 都不稳定 | 10 | +0.274 |
+
+前十名里没有"都不稳定"组的指标，所以 RQ2 的正面结论站得住。前五里有两个只保证信号稳定
+（`local_delta`、`struct_delta`），用它们要多次采样。

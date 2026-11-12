@@ -486,3 +486,27 @@ python scripts\audit_e0_weight_seed.py `
 
 **不要做的事**：不要用这个结论去否定榜单里 `adversarial_loss` 的名次。榜单评的是**已训练模型**，
 那里的输出层不是随机投影；这里评的是**未训练网络**。两个结论各自成立，不能互相引用。
+## 27. 报 RQ2 的相关时必须带"值稳定"一列（2026-11-12）
+
+**一句话**：一个 +0.4 的偏相关，如果对应指标换个权重种子就翻号，它不能当结论。
+
+**跑一次**（纯 CPU、秒级，读两张已经存在的表）：
+
+```powershell
+python scripts\audit_rq2_stable_subset.py `
+  --wide <主工作树>\outputs\e28_capacity_family\nb201_e0_n400_20261112.csv `
+  --seed-report results\audits\e0-weight-seed-20261112.json `
+  --json results\audits\rq2-stable-subset-20261112.json `
+  --report results\audits\rq2-stable-subset-20261112.md
+```
+
+**判据**：看 `verdict` 与"前十（按 |偏相关|）"表里的"组"列。若前十出现"都不稳定"，
+这一段结论要打折。当前结果是前十全部可复现。
+
+**注意**：
+
+1. 先有 `e0-weight-seed-20261112.json`（要 GPU 11 分钟），否则 `--seed-report` 读不到。
+2. 稳定性只在 100 个架构上测过；给 400 架构分组是成立的（稳定性是指标的性质），
+   但要在报告里写明这个跨度。
+3. 阈值 0.8 附近的指标（`local_delta` 0.791、`struct_delta` 0.763）要标"边界"，
+   不要让读者以为它们是"确定不稳"。

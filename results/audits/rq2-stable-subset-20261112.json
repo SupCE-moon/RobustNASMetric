@@ -1,0 +1,573 @@
+{
+  "schema_version": 1,
+  "wide": {
+    "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\e28_capacity_family\\nb201_e0_n400_20261112.csv",
+    "sha256": "b618ecf32fede27655386ba7fc81c87c9f76e45bc5429d221dfa25e779a9014c",
+    "n": 400
+  },
+  "seed_report": {
+    "path": "results\\audits\\e0-weight-seed-20261112.json",
+    "sha256": "c46546034a4e15311bd3b93ad62067f2df07f55acabdbe20864baa0572d41fe0"
+  },
+  "value_threshold": 0.8,
+  "controls": [
+    "clean",
+    "params"
+  ],
+  "verdict": "前十全部可复现，但前五里有指标只是信号稳定（值需多次采样）",
+  "groups": {
+    "stable_both": {
+      "count": 49,
+      "measured": 49,
+      "strongest": "feature_measure_robust_delta",
+      "strongest_rho": 0.3999609564212103,
+      "median_abs_rho": 0.24975499568630424,
+      "above_0_30": 12
+    },
+    "stable_value_only": {
+      "count": 4,
+      "measured": 4,
+      "strongest": "feature_measure_spatial_gram_rel_delta",
+      "strongest_rho": 0.13192728986392105,
+      "median_abs_rho": 0.12663682290414188,
+      "above_0_30": 0
+    },
+    "stable_signal_only": {
+      "count": 6,
+      "measured": 6,
+      "strongest": "feature_measure_local_delta",
+      "strongest_rho": 0.39682647702410917,
+      "median_abs_rho": 0.2776028763299354,
+      "above_0_30": 3
+    },
+    "unstable_both": {
+      "count": 10,
+      "measured": 10,
+      "strongest": "perturbation_capacity_layerprofile_delta",
+      "strongest_rho": 0.27414201253311216,
+      "median_abs_rho": 0.14265161141432336,
+      "above_0_30": 0
+    },
+    "unmeasured": {
+      "count": 4,
+      "measured": 3,
+      "strongest": "clean_acc",
+      "strongest_rho": -0.08022779229701946,
+      "median_abs_rho": 0.08022779229701946,
+      "above_0_30": 0
+    }
+  },
+  "metrics": [
+    {
+      "metric": "feature_measure_robust_delta",
+      "partial_rho": 0.3999609564212103,
+      "value_rho": 0.8854125412541253,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_weighted_delta",
+      "partial_rho": 0.3973584267861169,
+      "value_rho": 0.8317471747174716,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_local_delta",
+      "partial_rho": 0.39682647702410917,
+      "value_rho": 0.7913711371137113,
+      "signal_verdict": "stable_signal",
+      "group": "stable_signal_only"
+    },
+    {
+      "metric": "feature_measure_struct_delta",
+      "partial_rho": 0.37421564912798316,
+      "value_rho": 0.7630363036303628,
+      "signal_verdict": "stable_signal",
+      "group": "stable_signal_only"
+    },
+    {
+      "metric": "feature_measure_robust_hybrid_delta",
+      "partial_rho": 0.36792216371622977,
+      "value_rho": 0.8872487248724871,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "input_grad_l2",
+      "partial_rho": 0.3666228630799154,
+      "value_rho": 0.974113411341134,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_robust_rel_delta",
+      "partial_rho": 0.3623116837513255,
+      "value_rho": 0.90991899189919,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "jacobian_spectral_norm",
+      "partial_rho": 0.3614292164512678,
+      "value_rho": 0.9726172617261725,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_robust_hybrid_rel_delta",
+      "partial_rho": 0.35209531992345305,
+      "value_rho": 0.9064746474647464,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_robust_spatial_delta",
+      "partial_rho": 0.33845743964617664,
+      "value_rho": 0.8881488148814881,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_robust_spatial_rel_delta",
+      "partial_rho": 0.33391933317344025,
+      "value_rho": 0.8853765376537653,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_spectral_participation_ratio_static",
+      "partial_rho": 0.32773832316614104,
+      "value_rho": 0.8354465573350774,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_spectral_erank_static",
+      "partial_rho": 0.31480702673167377,
+      "value_rho": 0.84772785915307,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "perturbation_capacity_topk_delta",
+      "partial_rho": 0.3058415722460086,
+      "value_rho": 0.8826682668266826,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_struct01_delta",
+      "partial_rho": 0.3031961649674808,
+      "value_rho": 0.7048064806480646,
+      "signal_verdict": "stable_signal",
+      "group": "stable_signal_only"
+    },
+    {
+      "metric": "perturbation_capacity_flow_rel_delta",
+      "partial_rho": 0.2792513253380071,
+      "value_rho": 0.9253108877762167,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_mmd",
+      "partial_rho": 0.2790007038804598,
+      "value_rho": 0.8937413741374137,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_channel_gram_centered_rel_delta",
+      "partial_rho": 0.27874179136078137,
+      "value_rho": 0.9257285728572856,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "perturbation_capacity_channelwise_delta",
+      "partial_rho": 0.27861949656289153,
+      "value_rho": 0.883028302830283,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "perturbation_capacity_profile_delta",
+      "partial_rho": 0.27759942170180224,
+      "value_rho": 0.9179717971797178,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "perturbation_capacity_gini_delta",
+      "partial_rho": 0.275571006000796,
+      "value_rho": 0.854173417341734,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "perturbation_capacity_layerprofile_delta",
+      "partial_rho": 0.27414201253311216,
+      "value_rho": 0.7939581595649138,
+      "signal_verdict": "signal_spread",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "perturbation_capacity_relu_active_delta",
+      "partial_rho": 0.2736906252712481,
+      "value_rho": 0.8115291529152914,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "local_logit_lipschitz",
+      "partial_rho": 0.2733773185037318,
+      "value_rho": 0.9471707170717071,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_swd",
+      "partial_rho": 0.2726276557533939,
+      "value_rho": 0.9470467046704668,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_cov_delta",
+      "partial_rho": 0.26118229647372626,
+      "value_rho": 0.9334733473347333,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "fsp_delta",
+      "partial_rho": 0.25700257086620315,
+      "value_rho": 0.7035143514351434,
+      "signal_verdict": "signal_spread",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "perturbation_capacity_above_mean_delta",
+      "partial_rho": 0.2552797730532066,
+      "value_rho": 0.8967616761676167,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_flow_rel_delta",
+      "partial_rho": 0.2536789264498366,
+      "value_rho": 0.9667684774586105,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_moment_delta",
+      "partial_rho": 0.2533111402616441,
+      "value_rho": 0.7402140214021401,
+      "signal_verdict": "signal_spread",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "margin_input_grad_ratio",
+      "partial_rho": 0.25200958769238996,
+      "value_rho": 0.7062906290629062,
+      "signal_verdict": "stable_signal",
+      "group": "stable_signal_only"
+    },
+    {
+      "metric": "perturbation_capacity_delta",
+      "partial_rho": 0.24975499568630424,
+      "value_rho": 0.8806880688068807,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_flow_rel_multiscale_delta",
+      "partial_rho": 0.24946816052739515,
+      "value_rho": 0.9669324948444533,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_relu_active_hybrid_rel_delta",
+      "partial_rho": 0.2482601146771694,
+      "value_rho": 0.9628842884288428,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_relu_active_delta",
+      "partial_rho": 0.24793895159367577,
+      "value_rho": 0.9557195719571956,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_flow_delta",
+      "partial_rho": 0.2409382820712484,
+      "value_rho": 0.9402976715531844,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_relu_active_hybrid_delta",
+      "partial_rho": 0.2385966964492935,
+      "value_rho": 0.9601720172017201,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "perturbation_capacity_iqr_active_delta",
+      "partial_rho": 0.23633913736799375,
+      "value_rho": 0.7743174317431741,
+      "signal_verdict": "stable_signal",
+      "group": "stable_signal_only"
+    },
+    {
+      "metric": "perturbation_capacity_iqr_delta",
+      "partial_rho": 0.2314432289494693,
+      "value_rho": 0.822074207420742,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_flow_corr_rel_delta",
+      "partial_rho": 0.22426049054790825,
+      "value_rho": 0.8566142064244672,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_quantile_hausdorff_delta",
+      "partial_rho": 0.22414104470662613,
+      "value_rho": 0.9635283528352835,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_flow_corr_symmetric_rel_delta",
+      "partial_rho": 0.2240168526314059,
+      "value_rho": 0.8571665198521363,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "jacobian_effective_rank",
+      "partial_rho": 0.22156956797860275,
+      "value_rho": 0.8979657965796578,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_hausdorff_delta",
+      "partial_rho": 0.2195212410176628,
+      "value_rho": 0.9627642764276426,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "fsp_strict_delta",
+      "partial_rho": 0.20340443765121505,
+      "value_rho": 0.9459662724248771,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_fsp_rel_multiscale_delta",
+      "partial_rho": 0.19974032364922917,
+      "value_rho": 0.826190619061906,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_flow_corr_angular_delta",
+      "partial_rho": 0.19750465434539097,
+      "value_rho": 0.8060058980059882,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_flow_rel_allpairs_delta",
+      "partial_rho": 0.1971183248361093,
+      "value_rho": 0.9727052705270527,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "perturbation_capacity_multiscale_delta",
+      "partial_rho": 0.19678353942140023,
+      "value_rho": 0.951079107910791,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "jacobian_spectral_decay",
+      "partial_rho": 0.19609599551374263,
+      "value_rho": 0.9334533453345334,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_spectrum_hellinger_delta",
+      "partial_rho": 0.18680493792489117,
+      "value_rho": 0.9603000300030001,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "perturbation_capacity_signed_delta",
+      "partial_rho": 0.1853340404388828,
+      "value_rho": 0.4219181918191819,
+      "signal_verdict": "stable_signal",
+      "group": "stable_signal_only"
+    },
+    {
+      "metric": "feature_graph_fundamental_rank_delta",
+      "partial_rho": 0.18076824590686863,
+      "value_rho": 0.9587598759875986,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_spectrum_emd_delta",
+      "partial_rho": 0.1761866493433596,
+      "value_rho": 0.9257885788578856,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "perturbation_capacity_relu_active_multiscale_delta",
+      "partial_rho": 0.1692420011481218,
+      "value_rho": 0.9426582658265824,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_box_dimension_delta",
+      "partial_rho": 0.15776038886974203,
+      "value_rho": 0.6129052905290528,
+      "signal_verdict": "signal_spread",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "feature_delta",
+      "partial_rho": 0.14510591088667918,
+      "value_rho": 0.9673567356735672,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "adversarial_loss",
+      "partial_rho": -0.14266986848061558,
+      "value_rho": 0.0937973797379738,
+      "signal_verdict": "signal_flips",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "natural_loss",
+      "partial_rho": -0.14263335434803118,
+      "value_rho": 0.0937973797379738,
+      "signal_verdict": "signal_flips",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "feature_measure_channel_gram_cosine_delta",
+      "partial_rho": 0.13736736695602414,
+      "value_rho": 0.7199759975997598,
+      "signal_verdict": "signal_flips",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "feature_measure_spatial_gram_rel_delta",
+      "partial_rho": 0.13192728986392105,
+      "value_rho": 0.929080908090809,
+      "signal_verdict": "signal_flips",
+      "group": "stable_value_only"
+    },
+    {
+      "metric": "feature_measure_spatial_gram_delta",
+      "partial_rho": 0.13020222588403635,
+      "value_rho": 0.9352295229522952,
+      "signal_verdict": "signal_flips",
+      "group": "stable_value_only"
+    },
+    {
+      "metric": "feature_measure_relu_active_spatial_delta",
+      "partial_rho": 0.12307141992424742,
+      "value_rho": 0.9387538753875386,
+      "signal_verdict": "signal_flips",
+      "group": "stable_value_only"
+    },
+    {
+      "metric": "feature_measure_relu_active_spatial_rel_delta",
+      "partial_rho": 0.12282192448525672,
+      "value_rho": 0.933141314131413,
+      "signal_verdict": "signal_flips",
+      "group": "stable_value_only"
+    },
+    {
+      "metric": "feature_measure_spectrum_js_delta",
+      "partial_rho": 0.09978989281375268,
+      "value_rho": 0.9556555655565555,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "clean_acc",
+      "partial_rho": -0.08022779229701946,
+      "value_rho": null,
+      "signal_verdict": "",
+      "group": ""
+    },
+    {
+      "metric": "adv_acc",
+      "partial_rho": -0.08022779229701946,
+      "value_rho": null,
+      "signal_verdict": "",
+      "group": ""
+    },
+    {
+      "metric": "input_loss_delta",
+      "partial_rho": 0.03966943873159481,
+      "value_rho": 0.03503422785154638,
+      "signal_verdict": "signal_flips",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "feature_spectral_decay_exponent_static",
+      "partial_rho": -0.028914638087963795,
+      "value_rho": 0.9240959541711421,
+      "signal_verdict": "stable_signal",
+      "group": "stable_both"
+    },
+    {
+      "metric": "feature_measure_spatial_gram_cosine_delta",
+      "partial_rho": -0.020919014394125104,
+      "value_rho": 0.6738353835383538,
+      "signal_verdict": "signal_flips",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "num_candidate_layers",
+      "partial_rho": -0.019513840209775393,
+      "value_rho": null,
+      "signal_verdict": "",
+      "group": ""
+    },
+    {
+      "metric": "logit_kl",
+      "partial_rho": -0.006528177567126853,
+      "value_rho": 0.16576931537662218,
+      "signal_verdict": "signal_flips",
+      "group": "unstable_both"
+    },
+    {
+      "metric": "num_layers",
+      "partial_rho": null,
+      "value_rho": null,
+      "signal_verdict": "",
+      "group": ""
+    }
+  ]
+}
