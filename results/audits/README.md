@@ -62,3 +62,24 @@ python scripts/analyze_metric_redundancy.py ``
 - 覆盖不足的指标在表里带 `⚠n/8`：`racl_fixed_network_log_upper_proxy` 只有 1/8 个设置、
   `racl_arch_lipschitz_log_upper` 只有 7/8。**它们是"缺设置"，不是"数值低"。**
 - 这是描述性分析：只说明谁和谁重复，不说明谁正确；相关在"模型排序"上算，只对排序用途有效。
+
+## 文档声称 vs 发布表（2026-11-12）
+
+回答"文档里写的数字，和 CSV 对得上吗"。脚本：
+
+```powershell
+python tools/verify_doc_claims.py ``
+  --table outputs\strict_adv_excess_release_20261024T110422Z\RobustMetric_严格全部指标总表_86项_三位小数.csv ``
+  --json results\audits\doc-claims-20261112.json ``
+  --report results\audits\doc-claims-20261112.md
+```
+
+**结果**：33 条声称全部通过，最大偏差 0.0002（三位/四位小数舍入）；四条结构不变量全过。
+
+**怎么加新条目**：在 `tools/verify_doc_claims.py` 的 `claims()` 里加一条
+`field(...)` 或 `diff(...)`，写清 `doc`（文档路径）、`where`（小节）、`metric`、`field`、
+`expected`。**不要把不在榜单上的数字加进来**（阶段稳定性、耗时、作废版本的值），
+它们的出处不是这张表，放进来只会制造假警报。
+
+**边界**：只证明"文档与表一致"，不证明表正确。表正确性见同目录的
+`strict-ranking-recompute-20261112.md`。

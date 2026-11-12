@@ -140,3 +140,16 @@ Push-Location $env:TEMP\rm_clone; pytest tests -q; Pop-Location
 （哈希记录了但文件不入库）就能回答"84 项里有几个独立信号"。当有人质疑"84 项是不是同一件事数了 84 遍"时，
 先跑这个脚本：`results/audits/metric-redundancy-20261112.md` 里给了 ρ ≥ 0.40/0.50/0.60 三档的簇结构。
 注意报告里带 `⚠n/8` 的指标只覆盖部分设置，它们的相关系数不能和其他指标直接比。
+
+## 11. 改了文档里的数字之后
+
+如果你（或未来的我）在文档里改动了一个**榜单上的数**（分数、名次、两个指标之差），
+不要只改文字。跑一遍：
+
+```powershell
+python tools/verify_doc_claims.py --table <86 项总表> --json <临时 json> --report <临时 md>
+```
+
+退出码 0 = 33 条声称仍然对得上；非 0 会直接打印 `MISMATCH <metric>.<field>: doc=... table=...`。
+如果确实要改一个数（例如发布了新版榜单），先改 `tools/verify_doc_claims.py` 里的 `expected`，
+再改文档——顺序反了就会永远红灯。
