@@ -374,3 +374,27 @@ python scripts/wide_e0_to_rows.py --wide <上面的 csv> --output <repo>\outputs
 **当前结论**（改之前先读 D-029）：64 与 400 架构下最高偏相关都是 +0.357，扩大样本买到的是更窄的区间
 （[+0.014,+0.566] → [+0.260,+0.437]），不是更强的信号。发布表的历史 e0 给出 +0.575，
 与当前代码不是同一口径（`feature_delta` 差约 20 倍），**不要混用**。
+## 22. RQ2 的两个混杂都要控（2026-11-12）
+
+**重跑**：
+
+```powershell
+$env:PYTHONPATH = "<worktree>\src"
+python scripts/audit_rq2_confounders.py `
+  --wide <repo>\outputs\e28_capacity_family\nb201_e0_n400_20261112.csv `
+  --json results\audits\rq2-confounders-20261112.json `
+  --report results\audits\rq2-confounders-20261112.md
+```
+
+约 6 分钟（2000 次 bootstrap × 70 个指标 × 两个控制变量）；调试时用 `--resamples 200`。
+
+**判据**（改之前先读 D-030）：`rho_clean` 已 < 0.30 → `weak_before_capacity`（本来就不强，不算被解释）；
+否则 `rho_clean_params` < 0.30 → `explained_by_capacity`；比 `rho_clean` 低 0.10 以上 → `shrinks`；
+符号反了 → `flips`；其余 → `survives`。**改了任何一条都要同步改测试与报告模板。**
+
+**别误读「控制后反而升高」**：参数量是抑制变量，去掉它让剩余变异与 target 的关系更清楚，
+这不等于证据变强。写报告时按 `results/audits/rq2-confounders-20261112.md` 的措辞。
+
+**参数量怎么来的**：`Nb201TinyNetwork(ops)` 的实际 `numel()` 之和（91,226–2,699,770），
+不是论文里的估计值；C=16 下它实际上是 op 组合的代理。`parse_nb201_arch` 要求恰好 6 个 op，
+测试里手写的 arch string 数错一个就会静默返回 None——`parameter_counts` 会跳过而不是抛错。

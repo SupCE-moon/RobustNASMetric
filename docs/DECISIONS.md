@@ -733,3 +733,28 @@ audit 的 `load_rows` 必须把 arch_id 强制转字符串，否则 CSV 往返�
 `results/audits/early-vs-robbench-{n400,same64}-20261112.{json,md}`、
 `tests/test_expand_nb201_e0_coverage.py`（14 个）、`tests/test_wide_e0_to_rows.py`（11 个）、
 `docs/PROJECT_STATUS.md` §3 第 18 条与 §4/§6。
+## D-030 —— 把参数量作为 RQ2 的第二个混杂控制进去（2026-11-12）
+
+**背景**：D-028/D-029 只控制了训练后 clean 准确率。参数量是更明显的候选：更大的架构可能既漂移得多、
+又训练得准。RobBench 的 `meta.json` 没有参数量，但 C=16/N=5 的 tiny 网络参数量可由 op 组合直接算出来。
+
+**决定**：用 `Nb201TinyNetwork(ops)` 的实际参数个数（不是估计值）作第二控制变量，做三方偏秩相关
+（秩化后对「截距 + clean + params」回归取残差），并按架构 bootstrap 2000 次给区间。
+
+**结果与解读**：参数量确实与 target（+0.710）、clean（+0.692）强相关，但**控制它之后信号没有消失、
+反而略升**（最强的 `feature_delta` 从 +0.371 到 +0.422）。判定分布
+survives 12 / shrinks 7 / explained_by_capacity 5 / weak_before_capacity 45。
+
+**为什么"反而升高"不能当成好消息**：这通常意味着控制变量是**抑制变量**（与 clean 同向、与指标不同向），
+去掉它等于去掉了指标里与 target 无关的那部分变异。所以这不是"更强的证据"，而是"更干净的对照"。
+报告里写死了这句解释属于推断，不是机制。
+
+**判定桶为什么多一个 `weak_before_capacity`**：`rho_clean` 本来就 < 0.30 的指标，谈不上"被参数量解释"。
+初版把它们算进 `explained_by_capacity`，导致 47 个指标被误标——真正的「被解释」只有 5 个。
+这个桶是测试 `test_classify_separates_weak_from_explained` 逼出来的。
+
+**代价**：每个指标要跑 2000 次两控制偏相关（400 架构），单次全量约 6 分钟；可以用 `--resamples` 降。
+
+**后果**：`scripts/audit_rq2_confounders.py`、`tests/test_audit_rq2_confounders.py`（12 个测试）、
+`results/audits/rq2-confounders-20261112.{json,md}`、`docs/PROJECT_STATUS.md` §3 第 19 条与 §4/§6 第 9 条。
+RQ2 的幅度表述从「约 +0.35」更新为「约 +0.35~+0.42，两个混杂都控过」。

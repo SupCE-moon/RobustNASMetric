@@ -259,3 +259,13 @@ suite 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时会自动传这
 **不要做的事**：这份 400 表只有 70 个 zero-cost 指标，**不含 TRNAS Φ/R/Ψ**（需要训练轨迹），
 不要用它去重估第 3 节第 17 条里 Φ 的 +0.170；也不要把它与发布表的 e0 数字放进同一张比较表
 （`feature_delta` 差约 20 倍，见 `PROJECT_STATUS` §6 第 10 条）。
+## RQ2 的第二个混杂：参数量（2026-11-12）
+
+`scripts/audit_rq2_confounders.py` 在控制 clean 之外再控制参数量（由 `Nb201TinyNetwork(ops)` 实算），
+报告三方偏相关与 2000 次按架构 bootstrap 区间。产物 `results/audits/rq2-confounders-20261112.md`。
+
+要点：ρ(target,params)=+0.710、ρ(clean,params)=+0.692，但控制后信号**不降反升**
+（最强 `feature_delta` +0.371 → +0.422）——参数量在这批架构里是抑制变量，不是解释变量。
+判定分布 survives 12 / shrinks 7 / explained_by_capacity 5 / weak_before_capacity 45。
+
+**别把 `weak_before_capacity` 读成 `explained_by_capacity`**：前者的 `rho_clean` 本来就 < 0.30。
