@@ -133,3 +133,10 @@ Push-Location $env:TEMP\rm_clone; pytest tests -q; Pop-Location
 
 配套的本地大产物清单在 `results/manifests/local/`（422 文件 / 1,107.2 MiB 全量哈希），
 它告诉你"报告里的数字对应哪个具体文件"，但文件本体不入库。
+
+## 10. 还可用的一条独立验证：指标冗余度
+
+`scripts/analyze_metric_redundancy.py` 不训练模型、不读服务器，只用已入库的 13.94 MiB 原始行
+（哈希记录了但文件不入库）就能回答"84 项里有几个独立信号"。当有人质疑"84 项是不是同一件事数了 84 遍"时，
+先跑这个脚本：`results/audits/metric-redundancy-20261112.md` 里给了 ρ ≥ 0.40/0.50/0.60 三档的簇结构。
+注意报告里带 `⚠n/8` 的指标只覆盖部分设置，它们的相关系数不能和其他指标直接比。

@@ -39,3 +39,26 @@ python tools/verify_strict_ranking.py `
 `tools/repository_policy.py` 的规则不入 Git（数据类大文件）。它在本机主工作树的
 `outputs/` 下，哈希已记在 `results/manifests/local/outputs-inventory.json`。
 仓库里保留的是**它的产物**（总表、排名表、发布验证 JSON）和这份复算报告。
+
+## 指标冗余度（2026-11-12）
+
+回答"84 项榜到底有几个独立信号"。脚本：
+
+```powershell
+python scripts/analyze_metric_redundancy.py ``
+  --rows <主工作树>\outputs\strict_all_metrics_table_20261024_trnas_repaired\sources\metric_values_original_strict.csv ``
+  --json results\audits\metric-redundancy-20261112.json ``
+  --report results\audits\metric-redundancy-20261112.md
+```
+
+**结果**：85 个指标、8 个设置；ρ ≥ 0.5 → 21 簇，最大簇 35 个（`feature_measure_*` 漂移变体），
+`perturbation_capacity_*` 9 个一簇，协方差/谱距离 9 个一簇，TRNAS Φ/R/Ψ 3 个自成一簇，
+输入敏感性 6 个一簇（`local_logit_lipschitz`、`jacobian_spectral_norm`、`logit_kl`、
+`input_loss_delta`、`input_grad_l2`、`racl_input_gradient_lower`），
+`jacobian_effective_rank` 与 `jacobian_spectral_decay` 与主流**负相关**（-0.190 / -0.149）。
+
+**读法**：
+- 平均相关越高（最高 `feature_measure_robust_hybrid_rel_delta` +0.447），说明该指标越没有新信息。
+- 覆盖不足的指标在表里带 `⚠n/8`：`racl_fixed_network_log_upper_proxy` 只有 1/8 个设置、
+  `racl_arch_lipschitz_log_upper` 只有 7/8。**它们是"缺设置"，不是"数值低"。**
+- 这是描述性分析：只说明谁和谁重复，不说明谁正确；相关在"模型排序"上算，只对排序用途有效。

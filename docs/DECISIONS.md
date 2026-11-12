@@ -259,3 +259,32 @@ adversarial-excess feature drift", "Ours")`）。
 **后果**：83 项逐值最大绝对误差 `0.000e+00`、名次顺序完全一致；
 第 84 项 `feature_adv_excess_centered_unit_l2` 的原始行只在服务器，明确记为"离线不可复算"，
 不假装覆盖。
+
+## D-014 用"指标两两相关矩阵"衡量榜单的冗余度，而不是逐项看名次
+
+**背景**：严格榜上有 84 项，报告里逐项列了名次。但"84 项"这个数字本身会制造一种错觉，
+好像有 84 份独立证据。实际上很多指标是同一种测量的变体（例如
+`feature_measure_robust_hybrid_delta` 与 `feature_measure_robust_hybrid_rel_delta`）。
+如果榜单其实由五六个信号支撑，那么"84 项"就是同一个结论被数了 84 遍。
+
+**选择**：新增 `scripts/analyze_metric_redundancy.py`，在**模型之间的排序**上衡量指标两两的
+Spearman 相关，八个设置平均后用平均连接聚类，并在报告里同时给出 ρ ≥ 0.40 / 0.50 / 0.60
+三档的簇数。
+
+**理由**：
+1. 直接回答"有几个独立信号"，比再列一遍名次更有信息量，也是审稿人会问的第一个问题。
+2. 相关算在"排序"上，而不是原始数值上：榜单的用途就是排序，Spearman 与结论的用途对齐。
+3. 给三档阈值而不是一档，因为"簇数"依赖切树高度；写下单一数字等于把一个人为选择伪装成事实。
+
+**实现上的两个坑**：
+1. `np.fill_diagonal(avg.values, 1.0)` 改的是副本，对角线仍是 NaN，`linkage()` 直接报
+   "condensed distance matrix must contain only finite values"。改成 `np.fill_diagonal(mean, 1.0)`
+   作用在 `np.nanmean` 的返回值上才对。
+2. 覆盖不足的指标（`racl_fixed_network_log_upper_proxy` 只有 1/8 个设置、
+   `racl_arch_lipschitz_log_upper` 只有 7/8）不能被当成"相关系数很低"。
+   它们在报告里单独列一节并在表里加 `⚠n/8` 标记：只有 40 或 100 个模型支撑的相关系数，
+   与 560 个模型的指标不可直接比较。**"没有数据"和"数值低"必须分开写。**
+
+**后果**：ρ ≥ 0.5 时 21 簇，最大簇 35 个（全是特征漂移变体），TRNAS 三项自成一簇，
+`jacobian_effective_rank` 与主流负相关。这条只作为"描述性事实"记入 PROJECT_STATUS，
+不写成"Φ 更好是因为它独立"——那需要增量检验，是待验证假设。
