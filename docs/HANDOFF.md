@@ -298,3 +298,40 @@ python tools/run_audit_suite.py
 
 **不要**把这 11 条命令再手抄进别的文档。要改参数就改 `tools/run_audit_suite.py`，
 否则两份参数迟早不一致。
+
+
+## 20. RQ2 的零成本检验：RobBench 在哪里、怎么重跑（2026-11-12）
+
+**数据位置**（不在仓库里，按策略不入库，必须用绝对路径）：
+
+```
+<主工作树或 activation-survival worktree>/data/official_nasrobbench201_source/
+  NAS-RobBench-201_all.json   15.6 MiB，cifar10 下有 6466 个架构的训练后结果
+  meta.json                    2.1 MiB，只有 id → nb201-string / isomorph
+```
+
+**重跑一条**：
+
+```
+python scripts/audit_early_metrics_vs_robbench.py `
+  --rows <主工作树>\outputs\strict_all_metrics_table_20261024_trnas_repaired\sources\metric_values_original_strict.csv `
+  --robbench <上面那个 json> `
+  --json results/audits/early-vs-robbench-20261112.json `
+  --report results/audits/early-vs-robbench-20261112.md
+```
+
+走 suite 更省事：`python tools/run_audit_suite.py --only early_vs_robbench`。
+`resolve_robbench()` 会依次找 `--robbench`、`ROBUST_METRIC_ROBBENCH` 环境变量、
+当前 worktree 与 `git worktree list` 里每个 worktree 的
+`data/official_nasrobbench201_source/NAS-RobBench-201_all.json`。找不到时这一步标 `skipped`，
+**不会**拿别的文件顶替。
+
+**这个检验的判据**（改之前先读 D-028）：
+
+- 只看**偏相关**（控制训练后 clean 准确率），不看原始相关。原始相关在这份数据里几乎必然很高，
+  因为 clean 与 AutoAttack 的秩相关是 +0.982。
+- 判定阈值写死在 `DIRECT_RHO=0.30` / `VIA_CLEAN_RHO=0.10`，改阈值等于改结论，必须走决策记录。
+- 结论措辞只能是「相关/排序」，不能写「因果」或「训练早期就能预测」（跨协议）。
+
+**下一步不是训练**：RobBench 有 6466 个架构，目前只有 64 个有 e0 指标。先把 e0 指标扩到
+数百个架构（每个约 4 秒），比训练 16 个架构便宜得多，且能把 ±0.25 的区间压窄。

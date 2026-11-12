@@ -46,6 +46,7 @@ class Inputs:
     repair: Path
     ranking: Path
     redundancy: Path
+    robbench: Path | None = None
 
     def missing_for(self, needs: tuple[str, ...]) -> list[str]:
         missing = []
@@ -71,12 +72,13 @@ def _p(value: str) -> str:
 
 
 def build_steps(inputs: Inputs) -> list[Step]:
-    table, rows, repair, ranking, redundancy = (
+    table, rows, repair, ranking, redundancy, robbench = (
         inputs.table,
         inputs.rows,
         inputs.repair,
         inputs.ranking,
         inputs.redundancy,
+        inputs.robbench,
     )
     return [
         Step(
@@ -211,6 +213,18 @@ def build_steps(inputs: Inputs) -> list[Step]:
             why="有符号与绝对 capacity 漂移是不是同一个指标",
             expect_exit=(0, 1),
         ),
+        Step(
+            name="early_vs_robbench",
+            script="scripts/audit_early_metrics_vs_robbench.py",
+            argv=(
+                "--rows", _p(rows),
+                "--robbench", _p(robbench) if robbench else "",
+                "--json", _p(OUT / "early-vs-robbench-20261112.json"),
+                "--report", _p(OUT / "early-vs-robbench-20261112.md"),
+            ),
+            needs=("rows", "robbench"),
+            why="早期指标预测的是鲁棒性，还是只预测了 clean 准确率",
+        ),
     ]
 
 
@@ -296,10 +310,43 @@ def render_markdown(results: list[Result], inputs: Inputs) -> str:
         "  结论只能引用上次在完整数据上的运行结果，不能当成刚跑过。",
         "- `signed_capacity` 的退出码 1 是**结论**（两者不是同一指标），不是崩溃，",
         "  因此它的期望退出码是 0 或 1；其他步骤只接受 0。",
-        "- 这个汇总不重算任何数字，它只负责把十个审计的**参数接线**固定下来并跑一遍。",
+        "- `early_vs_robbench` 需要 NAS-RobBench-201 的 `NAS-RobBench-201_all.json`"
+        "（16 MB，按策略不入库）。找不到时这一步会被跳过，而不是用别的文件顶替。",
+        "- 这个汇总不重算任何数字，它只负责把十二个审计的**参数接线**固定下来并跑一遍。",
         "",
     ]
     return "\n".join(lines)
+
+
+def resolve_robbench(explicit: str | None) -> Path | None:
+    """Find NAS-RobBench-201_all.json without assuming which worktree holds it."""
+    import os
+
+    if explicit:
+        return Path(explicit)
+    from_env = os.environ.get("ROBUST_METRIC_ROBBENCH")
+    if from_env:
+        return Path(from_env)
+    relative = Path("data") / "official_nasrobbench201_source" / "NAS-RobBench-201_all.json"
+    candidates = [ROOT / relative]
+    try:
+        listing = subprocess.run(
+            ["git", "worktree", "list", "--porcelain"],
+            cwd=str(ROOT),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        ).stdout
+        for line in listing.splitlines():
+            if line.startswith("worktree "):
+                candidates.append(Path(line[len("worktree ") :].strip()) / relative)
+    except OSError:
+        pass
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return None
 
 
 def resolve_rows_root(explicit: str | None) -> Path:
@@ -333,6 +380,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--rows-root", help="directory holding the large outputs tree")
     parser.add_argument("--table", type=Path, default=None)
+    parser.add_argument("--robbench", help="path to NAS-RobBench-201_all.json")
     parser.add_argument("--only", help="comma separated step names")
     parser.add_argument("--json", type=Path, default=OUT / "audit-suite.json")
     parser.add_argument("--report", type=Path, default=OUT / "audit-suite.md")
@@ -350,6 +398,7 @@ def main(argv: list[str] | None = None) -> int:
         repair=rows_root / "strict_all_metrics_table_20261024_trnas_repaired" / "sources" / "repair_rows.csv",
         ranking=ROOT / "outputs" / release / "strict_ranking.csv",
         redundancy=OUT / "metric-redundancy-20261112.json",
+        robbench=resolve_robbench(args.robbench),
     )
 
     steps = build_steps(inputs)

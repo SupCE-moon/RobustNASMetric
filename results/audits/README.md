@@ -223,3 +223,17 @@ python tools/audit_metric_invariants.py --json results/audits/metric-invariants.
 `failed` 必须为 0；`skipped` 表示这台机器缺大输入，不等于通过。
 
 本次：11 通过 / 0 失败 / 0 跳过（`implementation`、`signed_capacity` 的退出码 1 是结论）。
+
+## 早期指标 vs 训练后鲁棒性（2026-11-12）
+
+`scripts/audit_early_metrics_vs_robbench.py` → `early-vs-robbench-20261112.{json,md}`。
+
+用 NAS-RobBench-201 现成的训练后结果（6466 个架构，其中 64 个有本仓库的 e0 指标）
+检验 RQ2。关键不在「相关系数多大」，而在**控制 clean 准确率之后还剩多少**：
+这份数据里 clean 与 AutoAttack 的秩相关是 +0.982。
+
+结果：84 个指标里 `direct` 28 / `via_clean` 17 / `suppressed` 9 / `weak` 30 / `uncovered` 1。
+Φ 的原始相关 +0.849、偏相关 +0.170（区间跨 0）；站得住的是输入敏感性族与 `feature_measure_swd`。
+
+重跑：`python tools/run_audit_suite.py --only early_vs_robbench`（需要 `--robbench` 或环境变量
+`ROBUST_METRIC_ROBBENCH`，文件 15.6 MiB 不入库）。判据与局限见 D-028。

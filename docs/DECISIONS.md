@@ -643,3 +643,44 @@ Kendall τ 也配上区间。阈值 `REPRODUCTION_TOLERANCE = 5.5e-4`：发布�
 
 **后果**：`tools/run_audit_suite.py`、`tests/test_run_audit_suite.py`（9 个测试）、
 `results/audits/audit-suite.{json,md}`、§3 第 16 条、`docs/HANDOFF.md` §19。
+
+## D-028 —— 用现成的 RobBench 数据做 RQ2 的第一次检验（2026-11-12）
+
+**决定**：RQ2 的第一步不训练模型，而是用官方 NAS-RobBench-201 发布里已有的
+「训练后鲁棒准确率」，与仓库里已有的 64 个架构 e0 指标做相关分析。
+
+**为什么**：ROADMAP 原先排的是「16 架构 × 3 seed 训练 6–10 天」。但 RobBench 已经给出
+6466 个架构在固定协议下的 `val_acc` / `val_pgd_8.0_acc` / `autoattack`，且已有的 64 个 e0
+架构 64/64 全部能对上。在花训练算力之前先问「有没有任何信号」，是更便宜的验证顺序；
+而且这份数据是别人发布的，不受我这边训练噪声影响，不会出现「自己训练自己评估」的循环。
+
+**为什么必须控制 clean 准确率**：在这份数据里训练后 clean 与 AutoAttack 的秩相关是
+**+0.982**。这意味着「能预测 clean 准确率」几乎等价于「看起来能预测鲁棒性」。
+不控制它，任何测「这个架构好不好训」的指标都会被误读成鲁棒性预测器。所以每个指标都报
+三列（原始相关、与 clean 的相关、控制 clean 后的偏相关），并以**偏相关**作为判定依据。
+
+**为什么判定分五级**而不是一刀切：
+
+- `direct`（偏相关 ≥ 0.30）：控制后仍站得住，这是 RQ2 想要的证据。
+- `via_clean`（原始 ≥ 0.30 但偏相关 < 0.10）：它预测鲁棒性的方式是预测 clean 准确率。
+  这不是「没用」，但用来谈抗攻击能力就是错的。
+- `suppressed`：控制后符号翻转，说明原始相关是被 clean 反向混杂压出来的（例如
+  `jacobian_effective_rank` 原始 −0.487、偏相关 +0.565）。这类指标最容易被误读成「越差越鲁棒」。
+- `weak` / `uncovered`：两边都弱，或可用样本不足。
+  分级本身是判断，所以阈值（0.30 / 0.10）写在代码常量里并由测试固定，事后不改。
+
+**为什么按架构 bootstrap**：n=64 是 64 个架构，不是 560 行；按行重采样会把区间算窄。
+
+**为什么不说因果、也不说「可以替代训练」**：
+
+1. 早期指标来自本仓库的 e0 前向，target 来自 RobBench 的另一套训练协议——这是**跨协议**比较，
+   只能说「架构层面的早期指标与训练后结果相关」，不能说「训练早期就能预测」。
+2. 只有一次初始化，初始化噪声完全没估计。
+3. 只有 64 个架构，Spearman 的 95% 区间约 ±0.25。
+4. 控制 clean 只排除了一条混杂路径；参数量、可训练性、RobBench 自身协议差异都还在。
+
+**后果**：`scripts/audit_early_metrics_vs_robbench.py`、
+`tests/test_audit_early_metrics_vs_robbench.py`（14 个测试）、
+`results/audits/early-vs-robbench-20261112.{json,md}`、`run_audit_suite` 第 12 步、
+`docs/PROJECT_STATUS.md` §3 第 17 条与 §4、`docs/ROADMAP.md` §3.4 与 M1.5/M2。
+下一步据此从「训练 16 个架构」改为「先给更多架构算 e0 指标」——同样的钱能买到更窄的区间。

@@ -3,7 +3,7 @@
   "rows_root": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs",
   "table": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\mainline-consolidation\\outputs\\strict_adv_excess_release_20261024T110422Z\\RobustMetric_严格全部指标总表_86项_三位小数.csv",
   "counts": {
-    "ok": 11,
+    "ok": 12,
     "failed": 0,
     "skipped": 0
   },
@@ -21,16 +21,16 @@
       "name": "doc_links",
       "status": "ok",
       "exit_code": 0,
-      "seconds": 0.24,
+      "seconds": 0.17,
       "missing": [],
-      "tail": "docs=96 checked=463 missing_required=0 planned=25 external=1 explained=3 optional=13",
+      "tail": "docs=97 checked=469 missing_required=0 planned=25 external=1 explained=3 optional=13",
       "why": "文档里引用的每个路径都存在"
     },
     {
       "name": "metric_index",
       "status": "ok",
       "exit_code": 0,
-      "seconds": 0.73,
+      "seconds": 0.72,
       "missing": [],
       "tail": "metrics=86 problems=0",
       "why": "86 个指标的注册、资格、名次、覆盖能拼成一张表"
@@ -39,7 +39,7 @@
       "name": "setting_weights",
       "status": "ok",
       "exit_code": 0,
-      "seconds": 1.3,
+      "seconds": 1.29,
       "missing": [],
       "tail": "metrics=84 tau(all,nb201)=0.9258 tau(all,rb40)=-0.127 weights={'rb40': 0.125, 'nb201': 0.625, 'darts': 0.25}",
       "why": "八设置平均里每个设置各占多少分量"
@@ -48,7 +48,7 @@
       "name": "implementation",
       "status": "ok",
       "exit_code": 1,
-      "seconds": 0.36,
+      "seconds": 0.35,
       "missing": [],
       "tail": "registered=86 bundle=70 other=15 registry_only=1 missing=0",
       "why": "每个注册指标都有代码真的把它算出来"
@@ -57,7 +57,7 @@
       "name": "invariants",
       "status": "ok",
       "exit_code": 0,
-      "seconds": 3.87,
+      "seconds": 3.78,
       "missing": [],
       "tail": "decreasing       perturbation_capacity_signed_delta",
       "why": "零扰动为 0、处处有限、随扰动单调"
@@ -66,7 +66,7 @@
       "name": "strict_ranking",
       "status": "ok",
       "exit_code": 0,
-      "seconds": 2.56,
+      "seconds": 2.7,
       "missing": [],
       "tail": "rejected: {\"racl_arch_lipschitz_log_upper\": \"missing or degenerate settings: rb40_mature (0/40 ok rows)\", \"racl_fixed_network_log_upper_proxy\": \"missing or degenerate settings: nb201_e0 (0/64 ok rows), nb201_e5 (0/64 ok rows), nb201_e10 (0/64 ok rows), nb201_e25 (0/64 ok rows), nb201_e50 (0/64 ok rows), darts_e0 (0/100 ok rows), darts_e100 (0/100 ok rows)\"}",
       "why": "83 个名次能从原始行离线复算出来，误差为零"
@@ -75,7 +75,7 @@
       "name": "redundancy",
       "status": "ok",
       "exit_code": 0,
-      "seconds": 1.3,
+      "seconds": 1.23,
       "missing": [],
       "tail": "rho>=0.40: 15 clusters",
       "why": "85 个指标实际上聚成几个独立信号"
@@ -84,7 +84,7 @@
       "name": "bootstrap_rb40",
       "status": "ok",
       "exit_code": 0,
-      "seconds": 3.97,
+      "seconds": 3.91,
       "missing": [],
       "tail": "  adversarial_loss: rho=+0.743 [+0.487,+0.903] rank=2 (1-14) positive (whole interval above zero)",
       "why": "RB40 上每个指标的相关性有没有 95% 区间"
@@ -93,7 +93,7 @@
       "name": "phi_incremental",
       "status": "ok",
       "exit_code": 0,
-      "seconds": 270.93,
+      "seconds": 268.46,
       "missing": [],
       "tail": "verdict: has incremental value",
       "why": "Φ 相对 35 个漂移指标是否还有增量信息"
@@ -106,6 +106,15 @@
       "missing": [],
       "tail": "verdict='not the same metric' median_rho=0.017284798534798536 flips=4/8 pairing_violations=0",
       "why": "有符号与绝对 capacity 漂移是不是同一个指标"
+    },
+    {
+      "name": "early_vs_robbench",
+      "status": "ok",
+      "exit_code": 0,
+      "seconds": 117.4,
+      "missing": [],
+      "tail": "n=64 rho(target,clean)=+0.982 best=feature_spectral_participation_ratio_static partial=+0.575 counts={'direct': 28, 'suppressed': 9, 'weak': 30, 'via_clean': 17, 'uncovered': 1}",
+      "why": "早期指标预测的是鲁棒性，还是只预测了 clean 准确率"
     }
   ]
 }

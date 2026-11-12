@@ -361,6 +361,53 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 被当成新引用又报了一遍。现在改为 `GENERATED_REPORTS = ("doc-links", "doc-claims", "audit-suite")`
 按前缀跳过，并加了两条测试：生成报告不扫、人写报告（`metric-redundancy-*.md`）仍然扫。
 
+### 17. 早期指标预测的是鲁棒性，还是只预测了 clean 准确率（2026-11-12）
+
+**背景**：RQ2 一直缺「训练完成后的真实鲁棒准确率」。本轮在
+`.worktrees/activation-survival/data/official_nasrobbench201_source/` 找到官方
+NAS-RobBench-201 发布（15.6 MiB，按策略不入库），其中 cifar10 有 **6466 个架构**的训练后
+`val_acc`、`val_pgd_3.0_acc`、`val_pgd_8.0_acc`、`autoattack` 等字段。e0 的 64 个架构
+**64/64 全部能对上**，因此 RQ2 的第一步不需要训练。
+
+**必须先看的陷阱**：在这份数据里，训练后 clean 准确率与 AutoAttack 准确率的秩相关是
+**+0.982**。任何能预测「这个架构好不好训」的早期指标，都会自动看起来像鲁棒性预测器。
+所以每个指标都报三列：`ρ(target)`、`ρ(clean)`、偏相关（控制 clean 后的秩相关）。
+
+**运行**：`scripts/audit_early_metrics_vs_robbench.py`（已接入 `run_audit_suite` 第 12 步），
+`n=64`，bootstrap 2000 次（按架构重采样），置换 2000 次，种子 20261112。
+
+**结果（已验证事实）**：84 个指标判定分布 **direct 28 / via_clean 17 / suppressed 9 /
+weak 30 / uncovered 1**。
+
+| 指标 | ρ(target) | ρ(clean) | 偏相关 [95%] | 判定 |
+|---|---|---|---|---|
+| `trnas_consistency_phi` | +0.849 | +0.847 | **+0.170** [−0.171, +0.479] | weak |
+| `trnas_r_score` | +0.848 | +0.843 | +0.197 [−0.081, +0.425] | weak |
+| `trnas_activation_psi` | +0.580 | +0.614 | −0.150 [−0.391, +0.181] | suppressed |
+| `fsp_delta` | +0.745 | +0.732 | +0.199 [−0.097, +0.450] | weak |
+| `feature_delta` | +0.690 | +0.672 | +0.215 [−0.056, +0.426] | weak |
+| `feature_measure_multiview_max_delta` | +0.686 | +0.693 | +0.040 [−0.215, +0.308] | via_clean |
+| `feature_measure_swd` | +0.738 | +0.679 | **+0.512** [+0.282, +0.636] | direct |
+| `adversarial_loss` | +0.600 | +0.541 | **+0.432** [+0.217, +0.573] | direct |
+| `feature_spectral_participation_ratio_static` | +0.202 | +0.096 | **+0.575** [+0.288, +0.696] | direct |
+
+偏相关前 10：`feature_spectral_participation_ratio_static` +0.575、`jacobian_effective_rank`
++0.565（原始相关 **−0.487**，控制后翻号）、`input_loss_delta` +0.536、`jacobian_spectral_norm`
++0.527、`jacobian_spectral_decay` +0.523、`input_grad_l2` +0.522、`racl_input_gradient_lower`
++0.522、`local_logit_lipschitz` +0.519、`feature_measure_swd` +0.512、`feature_spectral_erank_static` +0.508。
+
+**怎么读**：RQ2 的「表面强信号」（Φ 的原始相关 +0.849）大部分由 clean 准确率传递，
+控制后只剩 +0.170 且区间跨 0。真正在控制 clean 后仍然站住的，是**输入敏感性族**
+（input_grad_l2、local_logit_lipschitz、input_loss_delta、jacobian_spectral_norm）
+与 `feature_measure_swd`，量级 +0.5。换句话说：**「早期指标能预测训练后鲁棒性」有了第一份
+正面证据，但这批证据不属于 Φ/R-Score。**
+
+**这份结果不能说明什么**（报告里逐条列出）：跨协议（e0 指标来自本仓库前向，target 来自
+RobBench 的训练协议）、单次初始化、n=64、非因果、RobBench 的 `autoattack` 不是最强评估配置。
+控制 clean 只排除了一条混杂路径，参数量与可训练性仍可能同时影响两者。
+
+**产出**：`results/audits/early-vs-robbench-20261112.{json,md}`、`tests/test_audit_early_metrics_vs_robbench.py`（14 个测试）。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**
@@ -373,6 +420,11 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
   `trnas_activation_psi` 第 76/84，而 `adversarial_loss` 第 2、`feature_adv_excess_centered_unit_l2` 第 1。
 - 自研指标在 NB201 五阶段内部排序能力可用（0.63–0.76），但**跨空间**（DARTS）几乎失效（≈0）。
 - RB40 上自研指标与鲁棒性的相关性，在控制家族与参数量后大幅下降（max 0.576→0.186）。
+- **早期指标的原始相关主要来自 clean 准确率**：在 64 个 NB201 架构上，
+  `ρ(训练后 clean, 训练后 AutoAttack) = +0.982`；控制 clean 后，Φ 的偏相关只剩 +0.170
+  （区间 [−0.171, +0.479]），R-Score +0.197，Ψ 为 −0.150（符号翻转）。
+  84 个 e0 指标里 17 个属于「与 clean 高度共线、控制后消失」，28 个仍保持 ≥0.3 的偏相关
+  （最强 `feature_spectral_participation_ratio_static` +0.575）。
 
 **合理推断**
 
@@ -388,7 +440,12 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 **尚待验证的假设**
 
 - 特征空间稳定性是否是**因果**因素，而不只是与鲁棒性共变的伴随现象——目前所有结果都是相关性。
-- 训练早期指标能否预测"训练完成后"的鲁棒性——需要同一协议训练到底的对照，目前尚无完整证据链。
+- 训练早期指标能否预测"训练完成后"的鲁棒性：**已有第一份正面证据，但混杂也已识别**。
+  在 64 个 NB201 架构上，输入敏感性族（`input_grad_l2`、`local_logit_lipschitz`、
+  `input_loss_delta`、`jacobian_spectral_norm`）与 `feature_measure_swd` 在控制训练后 clean
+  准确率后仍有 +0.5 量级偏相关；但样本只有 64 个架构、只做了单次初始化、且 target 来自
+  另一套训练协议。要把这变成结论，需要扩大架构覆盖（RobBench 有 6466 个，目前只有 64 个
+  有 e0 指标）并补第二套训练协议。
 
 ## 5. 四方差异盘点结果（2026-11-12，本机可完成的部分）
 
@@ -475,6 +532,11 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 8. ~~Φ 的增量检验只有方案、还没跑~~（2026-11-12 已完成，见第 3 节第 12 条）：
    `scripts/audit_phi_incremental.py` 已按方案实现并执行，结论是 Φ 确实带来增量信息
    （Δρ = +0.695）、不是漂移族的重复。剩下的开放问题是机制，不是这个检验本身。
+9. **RQ2 的混杂控制只做了 clean 准确率这一项**（2026-11-12 新增，见第 3 节第 17 条）：
+   RobBench 的 clean 与 AutoAttack 秩相关 +0.982，控制 clean 后 Φ 降到 +0.170。
+   但参数量、训练难度、RobBench 自身的训练协议都还没控制；e0 指标也只有 64 个架构覆盖，
+   而 RobBench 里有 6466 个。扩大覆盖（需要给更多架构算 e0 指标，约数小时 GPU）是下一步的
+   第一优先级，见 `docs/ROADMAP.md` 的 M1。
 
 ## 7. 本地未提交资产（已确认为 `dc6fb9c` 与 `893a994` 的子集，不再有丢失风险）
 
