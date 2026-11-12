@@ -139,3 +139,6 @@ results/manifests/*/trees/
 
 # Full per-file worktree inventory (1.5 MB, regenerate on demand; summary is committed)
 results/manifests/reconciliation-20261112/worktrees.json
+
+# scratch files from the agent session
+.tmp_*
