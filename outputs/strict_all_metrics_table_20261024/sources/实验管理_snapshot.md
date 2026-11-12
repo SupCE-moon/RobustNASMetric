@@ -1,0 +1,2045 @@
+# Robust Metric 实验文档管理
+
+Last updated: 2026-09-12
+
+本文档是 `robust_metric_lab` 唯一的实验总控与复现入口，统一维护全部 robust metric 的实验设置、结果对比、原始文件和运行命令。目标是让每个实验都能回答五个问题：
+
+1. 在哪里执行？
+2. 执行什么命令？
+3. 原始数据、模型、缓存在哪里？
+4. metric 与 robust accuracy 的相关系数是怎么计算出来的？
+5. 该实验改变了什么结论？
+
+项目目录：
+
+```powershell
+E:\projects\robust_metric_lab
+```
+
+## 总控面板
+
+### 当前实验规模
+
+| 项目 | 当前状态 |
+|---|---|
+| 实验编号 | E00-E35，共 36 项记录 |
+| 已完成 | 34 项 |
+| 设计但未单独执行 | E20；其目标随后由 E23 覆盖 |
+| 中止但保留结果 | E17，完成 91/96 个架构 |
+| 最新完整比较 | E35 最终结论（通用指标=gram 族）；E34 capacity 翻转是训练强度依赖；E33 通用性机制（尺度不变性）；E32 signed capacity 证伪 |
+| 模型/搜索空间 | RobustBench-20、NAS-RobBench-201 64 architectures、DARTS/RACL 20 architectures |
+| checkpoint 网格 | RobustBench mature；NB201 epoch 0/5/10/25/50；DARTS epoch 0/50/100 |
+| 最新总榜源文件 | `outputs\e24_fractal_topology\summary\cross_space_spearman_matrix.csv` |
+| 全部理论定义 | `docs\theory\理论管理.md` |
+
+### 三种结果不能混用
+
+| 协议 | Target | 用途 | 当前代表结果 |
+|---|---|---|---|
+| RobustBench white-box | 官方 RobustBench robust accuracy | 检验成熟异构模型上的单模型白盒敏感性 | E24 的 45-metric `RobustBench20` 列 |
+| RobustBench three-source shared-adv | 官方 RobustBench robust accuracy | 降低单一 source model 对 metric 排名的影响 | `perturbation_capacity_delta (Ours)` K=8 adj-Spearman $0.744$ [0.417, 0.917] |
+| NAS cross-space | NB201 官方 AutoAttack / DARTS full-test PGD-20 | 检验 low-fidelity、zero-cost 与跨搜索空间迁移 | E23/E24 的 checkpoint 轨迹 |
+
+`perturbation_capacity_delta (Ours)` 的三源 Spearman 已由 E25 更新为 $0.744$（K=8，含 bootstrap 95% CI $[0.417, 0.917]$）；下方 45-metric 总榜中 RB20 列仍为 E24 白盒 FGSM K=4 的旧值 $0.626$，仅供参考。两个协议不同，不能互相覆盖。
+
+### 最近新增实验 E21-E35
+
+| 实验 | 新增内容 | 样本/架构 | 是否训练 | 核心结论 | 证据 |
+|---|---|---:|---|---|---|
+| E21 | TRNAS $\Psi$、$\Phi$、R-Score 与 MMD | NB201 512 arch, epoch 0 | 否，复用初始化权重 | TRNAS raw rank 更强，但大部分 $\Phi$ 信号来自层数；MMD 在控制层数后仍保留部分信号。 | `docs\experiments\nasrobbench201_trnas_mmd_report.md` |
+| E22 | $K=2/4/8/16$ 与 `all_leaf`/`post_relu`/`post_activation` | RobustBench 20 models | 否 | Capacity 在 `all_leaf, K=8` 的 white-box utility 达 $0.805$；MMD 从 $K=4$ 到 $K=8$ 无可靠提升。严格 ReLU 仅覆盖 15/20。 | `docs\experiments\robustbench20_feature_sampling_ablation_report.md` |
+| E23 | 36 旧指标 + 2 RACL + 3 TRNAS | RB20 + NB201 64 + DARTS 20 | NB201/DARTS 已训练并保存关键 checkpoints | TRNAS 是当前最强 zero-cost baseline；MMD 的 NB201 信号未迁移到 DARTS；capacity 更适合成熟异构模型。 | `docs\experiments\e23_cross_space_metric_validation.md` |
+| E24 | Hausdorff、QH95、box dimension、graph fundamental rank | 与 E23 相同 | 否，复用全部 checkpoints | Graph rank 在 NB201 e0 较强，但 DARTS 迁移弱且训练后反向；暂作 zero-cost topology ablation。 | `docs\experiments\e24_fractal_topology_validation.md` |
+| E25 | K=2/4/8/16 三源共享对抗完整消融 + bootstrap 95% CI | RobustBench 20 models | 否，复用全部 adv caches | Capacity K=8 adj-Spearman $0.744$ $[0.417, 0.917]$ 为唯一 CI 不跨零的 Ours 指标；K=16 三源下退化远超白盒；几何指标在 K=16 下持续改善。 | `docs\experiments\e25_k2_k8_k16_three_source_validation_report.md` |
+| E26 | 容量四维度稳健性验证（partial Spearman / NAS 诊断 / 样本量 / 种子） | RB20 + NB201 + DARTS | 容量不是 clean acc 代理（partial 0.7692 > 零阶 0.7444）；偏好异构架构家族；n=32 足够（交叉样本相关 0.985）；种子极稳（std 0.0023，交叉种子相关 ≥ 0.9985）。 | `outputs\e26_capacity_robustness\e26_capacity_robustness_report.md` |
+| E27 | 静态谱 / Jacobian 谱 / 容量改进 16 指标 + 结构去混杂调查 | RB20 + NB201 e0 + DARTS e0 | 否，复用 | 16 个新指标全部失败；结构去混杂重排排名——trnas_r_score 崩到 0.206，flow_rel / feature_delta 是唯二存活（73–79% 存活率）。 | `docs\experiments\e27_spectral_jacobian_capacity_validation.md` |
+| E28 | 5 个容量精化 + fixed 扰动 + 冠军组合 | RB20 + NB201 e0 | 否，复用 | 13 个容量变体集体卡在 partial 0.28–0.38；fixed 扰动摧毁信号（fgsm 才是架构信息）；flow_rel/feature_delta 是零成本唯二纯指标。 | `docs\experiments\e28_capacity_family_deconfounding_validation.md` |
+| E29 | flow_rel 变体（all-pairs/corr）+ RB20 饱和诊断 | RB20 + NB201 e0 | 否，复用 | 零成本去混杂天花板 ~0.63（all-pairs raw 更高但 partial 持平）；flow_rel 在 RB20 失效是「饱和」（接线固定），非宽度/攻击强度。 | `docs\experiments\e29_flow_rel_variants_ceiling.md` |
+| E30 | 计算图结构直接测 op 交互 | NB201 e0 | 否，纯 CPU | 直接读 op 转移矩阵比 flow_rel 弱（手工标量 partial 0.41 < 0.63），learned 版本过拟合崩到 0.08。 | `docs\experiments\e30_graph_structure.md` |
+| E31 | 通用性分析 + 多尺度通道 gram | RB20 + NB201 e0/e5/e10/e25/e50 | 否，复用 | 通用指标是 gram 族（fsp_delta/moment/struct01，NB201 全阶段 min≥0.63）；capacity 在 e5 符号翻转（非通用）。 | `docs\experiments\e31_generality_gram_family.md` |
+| E32 | signed capacity 证伪 + 通用性-强度权衡 | RB20 + NB201 e0/e5/e10/e25/e50 + DARTS e0 | 否，复用 + DARTS 零成本重跑 | signed capacity 三空间全死（机制证伪：信息在幅度不在符号）；capacity 族「成熟强但非通用」（relu_active RB20 0.71 但跨阶段 mean −0.245）；gram 族是唯一通用指标；DARTS oracle 退化（std 0.0077）不可测。 | `docs\experiments\e32_signed_capacity_falsified.md` |
+| E33 | 通用性机制：尺度不变性 | RB20 + NB201 e0/e5/e10/e25/e50 | 否，纯分析 | 通用=尺度不变的相对结构量：gram 跨协议稳健（0.67-0.84）；loss（绝对幅度）跨协议翻转（−0.33）。注意：跨训练稳定性（capacity 翻转）是训练强度依赖的，见 E34 修正。 | `docs\experiments\e33_generality_mechanism_scale_invariance.md` |
+| E34 | capacity 翻转是训练强度依赖 | NB201 64（e0/e5，本地重训） | 是，PGD-1 训练至 e5 | PGD-1 弱对抗训练下 capacity 稳定（+0.491）、gram 反而不稳定（+0.12～0.18），与 e23（PGD-7）几乎颠倒；「capacity e5 翻转」非固有属性而是强对抗训练特有；E33 的稳健结论只剩「跨协议尺度不变性」。 | `docs\experiments\e34_capacity_flip_training_strength.md` |
+| E35 | 最终综合总结 | 全部 | 否 | 通用鲁棒 NAS 指标 = gram 族（fsp_delta/moment/struct01，跨协议尺度不变）；capacity 成熟强但跨协议中间、e5 翻转是训练强度依赖；loss 跨协议翻转；三族各占一角、无「通用+成熟最强」的指标。 | `docs\experiments\e35_final_summary.md` |
+
+### 当前最重要的排序
+
+所有数值均为方向校正后的 Spearman：
+
+$$
+S_{\mathrm{rank}}(m)
+=
+\begin{cases}
+-\rho_s(m,A_{\mathrm{rob}}), & m\text{ is lower-is-better},\\
+\rho_s(m,A_{\mathrm{rob}}), & m\text{ is higher-is-better}.
+\end{cases}
+$$
+
+因此数值越大越好，负值表示观测排序违背预注册方向。
+
+| 场景 | 当前第一名 | Score | 当前最强 Ours | Score |
+|---|---|---:|---|---:|
+| RobustBench-20 white-box | `adversarial_loss [10]` | 0.805 | `perturbation_capacity_relu_active_delta (Ours)` | 0.699 |
+| RobustBench-20 three-source shared | `perturbation_capacity_delta (Ours)` | 0.744 [0.417, 0.917] | 同左 | 0.744 [0.417, 0.917] |
+| NB201 epoch 0 | `trnas_r_score [11]` | 0.897 | `feature_delta (Ours)` | 0.806 |
+| DARTS epoch 0 | `trnas_consistency_phi [11]` | 0.776 | `feature_measure_flow_rel_delta (Ours)` | 0.329 |
+| 两搜索空间 zero-cost mean | `trnas_r_score [11]` | 0.824 | `feature_measure_flow_rel_delta (Ours)` | 0.561 |
+| 三空间 mature mean | `adversarial_loss [10]` | 0.826 | `perturbation_capacity_delta (Ours)` | 0.405 |
+
+这张表用于快速定位，不等同于论文最终结论。尤其是 TRNAS 的结构混杂、成熟 loss 的高计算成本和小样本 bootstrap 区间必须一并报告。
+
+### 完整 45-Metric 跨空间总表
+
+以下按九个 setting 的简单平均排序，仅用于实验管理。`Zero-cost mean` 是 NB201 e0 与 DARTS e0 的平均；`Mature mean` 是 RobustBench、NB201 e50 与 DARTS e100 的平均。完整 epoch 5/10/25/50 数值保存在 source CSV。
+
+| Rank | Metric | Attribution | RB20 | NB201 e0 | NB201 e50 | DARTS e0 | DARTS e100 | Zero-cost mean | Mature mean | All-setting mean |
+|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 | `trnas_r_score` | TRNAS [11] | -0.0394 | 0.897 | 0.912 | 0.750 | 0.753 | 0.824 | 0.542 | 0.748 |
+| 2 | `adversarial_loss` | [10], loss control | 0.805 | 0.588 | 0.980 | -0.0195 | 0.693 | 0.284 | 0.826 | 0.687 |
+| 3 | `trnas_consistency_phi` | TRNAS [11] | -0.143 | 0.843 | 0.785 | 0.776 | 0.764 | 0.810 | 0.469 | 0.682 |
+| 4 | `trnas_activation_psi` | TRNAS [11,12] | -0.137 | 0.822 | 0.900 | 0.499 | 0.710 | 0.661 | 0.491 | 0.681 |
+| 5 | `natural_loss` | [10], loss control | -0.0226 | 0.572 | 0.983 | -0.0120 | 0.738 | 0.280 | 0.566 | 0.599 |
+| 6 | `margin_input_grad_ratio` | [7] | -0.235 | 0.446 | 0.954 | 0.304 | 0.421 | 0.375 | 0.380 | 0.497 |
+| 7 | `fsp_delta` | FSP [1,2] | 0.493 | 0.773 | 0.669 | 0.277 | 0.0436 | 0.525 | 0.402 | 0.474 |
+| 8 | `feature_measure_struct01_delta (Ours)` | Ours | 0.499 | 0.765 | 0.656 | 0.233 | 0.0346 | 0.499 | 0.396 | 0.462 |
+| 9 | `feature_measure_moment_delta (Ours)` | Ours | 0.380 | 0.788 | 0.648 | 0.293 | 0.0180 | 0.540 | 0.349 | 0.462 |
+| 10 | `feature_measure_flow_rel_delta (Ours)` | Ours | 0.205 | 0.793 | 0.498 | 0.329 | 0.0857 | 0.561 | 0.263 | 0.424 |
+| 11 | `feature_measure_struct_delta (Ours)` | Ours | 0.456 | 0.736 | 0.566 | 0.135 | 0.0451 | 0.436 | 0.356 | 0.423 |
+| 12 | `feature_measure_cov_delta` | distribution baseline | 0.537 | 0.763 | 0.315 | 0.0571 | 0.230 | 0.410 | 0.361 | 0.393 |
+| 13 | `feature_delta (Ours)` | Ours | 0.135 | 0.806 | 0.514 | 0.286 | -0.0887 | 0.546 | 0.187 | 0.382 |
+| 14 | `feature_measure_robust_rel_delta (Ours)` | Ours | 0.221 | 0.750 | 0.443 | 0.165 | 0.0842 | 0.458 | 0.249 | 0.368 |
+| 15 | `racl_arch_lipschitz_log_upper` | RACL [5] | 0.633 | 0.254 | 0.454 | -0.558 | 0.690 | -0.152 | 0.593 | 0.345 |
+| 16 | `feature_measure_relu_active_hybrid_rel_delta (Ours)` | Ours | 0.290 | 0.757 | 0.364 | 0.143 | 0.0571 | 0.450 | 0.237 | 0.291 |
+| 17 | `feature_measure_robust_hybrid_rel_delta (Ours)` | Ours | 0.283 | 0.746 | 0.350 | 0.104 | 0.0135 | 0.425 | 0.215 | 0.287 |
+| 18 | `perturbation_capacity_delta (Ours)` | Ours | 0.626 | 0.703 | 0.208 | 0.0511 | 0.382 | 0.377 | 0.405 | 0.251 |
+| 19 | `feature_measure_mmd (Ours)` | Ours | 0.314 | 0.794 | 0.0159 | 0.0947 | -0.335 | 0.444 | -0.00172 | 0.224 |
+| 20 | `feature_measure_flow_delta (Ours)` | Ours | -0.174 | 0.751 | 0.214 | 0.215 | -0.156 | 0.483 | -0.0388 | 0.194 |
+| 21 | `feature_measure_relu_active_delta (Ours)` | Ours | 0.355 | 0.744 | 0.0432 | 0.131 | 0.0211 | 0.437 | 0.140 | 0.193 |
+| 22 | `fsp_strict_delta` | FSP [1,2] | -0.170 | 0.731 | -0.530 | 0.281 | 0.0195 | 0.506 | -0.227 | 0.191 |
+| 23 | `feature_measure_weighted_delta (Ours)` | Ours | 0.253 | 0.714 | -0.0748 | 0.0571 | -0.0451 | 0.385 | 0.0442 | 0.177 |
+| 24 | `feature_measure_relu_active_hybrid_delta (Ours)` | Ours | 0.286 | 0.761 | 0.0849 | 0.131 | 0.00451 | 0.446 | 0.125 | 0.177 |
+| 25 | `feature_measure_robust_delta (Ours)` | Ours | -0.0150 | 0.729 | -0.0762 | 0.0361 | -0.00451 | 0.383 | -0.0319 | 0.160 |
+| 26 | `feature_box_dimension_delta (Ours)` | Ours | 0.365 | 0.642 | 0.146 | 0.179 | -0.114 | 0.410 | 0.133 | 0.154 |
+| 27 | `feature_measure_robust_hybrid_delta (Ours)` | Ours | 0.242 | 0.745 | -0.0305 | 0.0722 | -0.120 | 0.409 | 0.0304 | 0.149 |
+| 28 | `feature_measure_robust_spatial_delta (Ours)` | Ours | 0.340 | 0.737 | -0.00339 | 0.0902 | -0.0692 | 0.414 | 0.0891 | 0.141 |
+| 29 | `feature_measure_local_delta (Ours)` | Ours | 0.287 | 0.710 | -0.174 | 0.0466 | -0.0120 | 0.378 | 0.0337 | 0.124 |
+| 30 | `feature_measure_robust_spatial_rel_delta (Ours)` | Ours | 0.329 | 0.725 | -0.0479 | 0.155 | -0.0647 | 0.440 | 0.0723 | 0.106 |
+| 31 | `feature_measure_relu_active_spatial_delta (Ours)` | Ours | 0.457 | 0.751 | 0.208 | 0.168 | 0.0406 | 0.460 | 0.235 | 0.106 |
+| 32 | `feature_measure_swd` | distribution baseline | 0.492 | 0.751 | -0.544 | 0.501 | -0.0451 | 0.626 | -0.0324 | 0.101 |
+| 33 | `perturbation_capacity_above_mean_delta (Ours)` | Ours | 0.555 | 0.419 | -0.169 | -0.140 | 0.365 | 0.140 | 0.250 | 0.0786 |
+| 34 | `feature_measure_spatial_gram_delta (Ours)` | Ours | 0.454 | 0.766 | 0.101 | 0.158 | -0.00150 | 0.462 | 0.184 | 0.0751 |
+| 35 | `input_loss_delta` | [8,9] | 0.483 | 0.734 | -0.630 | 0.185 | 0.262 | 0.460 | 0.0381 | 0.00728 |
+| 36 | `feature_measure_relu_active_spatial_rel_delta (Ours)` | Ours | 0.209 | 0.718 | 0.000504 | 0.182 | -0.0707 | 0.450 | 0.0463 | 0.00611 |
+| 37 | `feature_measure_spatial_gram_rel_delta (Ours)` | Ours | 0.235 | 0.733 | 0.0153 | 0.185 | -0.0767 | 0.459 | 0.0577 | 0.00502 |
+| 38 | `perturbation_capacity_relu_active_delta (Ours)` | Ours | 0.699 | 0.398 | -0.475 | 0.00150 | -0.123 | 0.200 | 0.0335 | -0.0610 |
+| 39 | `local_logit_lipschitz` | [5,6] | 0.329 | 0.753 | -0.842 | 0.483 | -0.0677 | 0.618 | -0.193 | -0.0970 |
+| 40 | `feature_graph_fundamental_rank_delta (Ours)` | Ours | 0.403 | 0.750 | -0.636 | 0.304 | -0.239 | 0.527 | -0.157 | -0.129 |
+| 41 | `racl_input_gradient_lower` | RACL [5], alias | 0.429 | 0.709 | -0.844 | 0.456 | 0.107 | 0.582 | -0.103 | -0.164 |
+| 42 | `input_grad_l2` | [4,7] | 0.429 | 0.709 | -0.844 | 0.456 | 0.107 | 0.582 | -0.103 | -0.164 |
+| 43 | `feature_hausdorff_delta (Ours)` | Ours | 0.328 | 0.704 | -0.870 | 0.197 | -0.188 | 0.451 | -0.243 | -0.207 |
+| 44 | `feature_quantile_hausdorff_delta (Ours)` | Ours | 0.400 | 0.715 | -0.883 | 0.131 | -0.248 | 0.423 | -0.244 | -0.214 |
+| 45 | `logit_kl` | TRADES [3] | 0.382 | 0.734 | -0.933 | 0.195 | -0.370 | 0.465 | -0.307 | -0.261 |
+
+原始完整矩阵：
+
+```text
+outputs\e24_fractal_topology\summary\cross_space_spearman_matrix.csv
+outputs\e24_fractal_topology\summary\cross_space_correlations_long.csv
+outputs\e24_fractal_topology\robustbench20_correlations_45metrics.csv
+outputs\e24_fractal_topology\nb201_correlations_45metrics.csv
+outputs\e24_fractal_topology\darts_correlations_45metrics.csv
+```
+
+### 当前实验决策
+
+1. 论文不能只展示 RobustBench-20：capacity 的主要优势来自成熟异构模型，必须和 NAS checkpoint 轨迹并列。
+2. 论文不能只展示 NB201：MMD、graph rank 和部分 FSP-family 指标在 NB201 初始化时较强，但 DARTS 迁移显著下降。
+3. TRNAS 是必须保留的 zero-cost 强 baseline，同时必须报告结构控制后的 partial Spearman。
+4. `adversarial_loss` 是成熟模型的强上界式 baseline，但不应与 training-free metric 混成同一成本等级。
+5. ReLU-active 和 above-mean capacity 作为消融保留；当前不替代原始 `perturbation_capacity_delta`。
+6. E24 四个几何/拓扑指标没有超过现有主方法；graph rank 只保留为 zero-cost topology ablation。
+
+## 0. Local Environment
+
+在本地 Windows PowerShell 中，所有本地命令先执行：
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+```
+
+如果已经执行过：
+
+```powershell
+pip install -e .
+```
+
+则可以不设置 `PYTHONPATH`。但为了复现实验更稳，本文档命令统一保留 `$env:PYTHONPATH="$PWD\src"`。
+
+## 1. Data And Cache Paths
+
+| 数据/缓存 | 本地或服务器路径 | 说明 | 已验证 |
+|---|---|---|---|
+| CIFAR10 local | `F:\Datasets\cifar10` | 内含 `cifar-10-batches-py`。E00-E05 使用。 | yes |
+| CIFAR100 local | `E:\projects\robust_metric_lab\data\cifar100` | 内含 `cifar-100-python`。E07 使用。 | yes |
+| MNIST local | `E:\projects\robust_metric_lab\data\mnist` | 内含 `MNIST\raw`。E07 legacy 使用。 | yes |
+| SVHN local | `E:\projects\robust_metric_lab\data\svhn` | 内含 `train_32x32.mat` 和 `test_32x32.mat`。E07 legacy 使用。 | yes |
+| ImageNet local | `F:\Datasets\ImageNet` | 内含 `val` ImageFolder。E07 可本地跑；原报告中 ImageNet 曾在 A100 上跑。 | yes |
+| Legacy checkpoint root | `D:\old_research_code\adversarial_research` | MNIST/SVHN legacy checkpoint 来源。 | yes |
+| RobustBench CIFAR10 score | `outputs\robustbench_cifar10_linf_scores.csv` | join 后得到 `rb_clean_acc`、`rb_robust_acc`。 | yes |
+| RobustBench CIFAR100 score | `outputs\robustbench_cifar100_linf_scores.csv` | CIFAR100 official robust accuracy。 | yes |
+| RobustBench ImageNet score | `outputs\robustbench_imagenet_linf_scores.csv` | ImageNet official robust accuracy。 | yes |
+| Shared adv caches | `outputs\adv_cache\*.pt` | Standard / Engstrom / Wang2023 三个 source model。 | yes |
+| NAS-RobBench fixture | `outputs\nasrobbench201_fixture\*.json`, `proxy.csv` | 本地 fixture 验证。 | yes |
+| NAS server project | `/home/huangyue/projects/robust_metric_lab_nas` | 成都 516 RTX 5090 docker。 | pulled outputs exist |
+| NAS-RobBench official JSON on server | `/home/huangyue/projects/robust_metric_lab_nas/data/nasrobbench201/NAS-RobBench-201_all.json` | 服务器实验使用。 | pulled outputs exist |
+| CIFAR10 on server | `/home/huangyue/projects/robust_metric_lab_nas/data/torchvision` | `compute_nb201_metric_subset.py --data-root` 应传这个父目录。 | pulled outputs exist |
+
+## 2. Command Validation Record
+
+这次我实际验证了以下内容：
+
+| 类型 | 验证内容 | 结果 |
+|---|---|---|
+| package import | 本地未安装 editable 时，必须设置 `$env:PYTHONPATH="$PWD\src"` | verified |
+| script args | `compute_metric_batch.py`, `generate_adv_cache.py`, `compute_legacy_metric_batch.py`, `compute_nb201_metric_subset.py` 的参数名 | verified by `--help` |
+| E03 join | `join_robustbench_scores.py` on E03 white-box CSV | verified, temp output in `outputs\command_validation\e03_join_check.csv` |
+| E03 correlation | `analyze_metric_correlation.py` on E03 white-box CSV | verified, output in `outputs\correlations\e03_whitebox_fgsm_n64_spatial_vs_rb.csv` |
+| E05 aggregate | `aggregate_shared_metrics.py` on three shared source CSVs | verified, temp output in `outputs\command_validation\e05_multisource_aggregate_check.csv` |
+| E05 correlation | multi-source shared CSV vs RobustBench robust accuracy | verified, output in `outputs\correlations\e05_multisource_pgd10_n128_rel_avg_vs_rb.csv` |
+| E06 residual | `residual_value_analysis.py` | verified, temp output in `outputs\command_validation\residual_value_check` |
+| E07 correlation | CIFAR100/ImageNet/MNIST/SVHN analysis commands | verified, outputs in `outputs\correlations` |
+| E08 fixture search | `search_nasrobbench201.py` with fixture data | verified, output in `outputs\command_validation\e08_fixture_search_check.csv` |
+| server commands | 本地验证脚本参数；服务器重计算未在本次文档整理中重跑 | existing pulled outputs verified |
+| E14 ReLU capacity | 20-model white-box、三源 shared-adv、aggregate、score join、correlation | verified on 516 RTX 4090 docker and local analysis |
+| E15 above-mean capacity | 20-model full protocols、36-metric correlation、paired bootstrap | verified on 516 RTX 4090 docker and local analysis |
+
+Important fix: `scripts\analyze_metric_correlation.py` 已更新。现在旧 CSV 缺少新 metric 列时会跳过缺失列并打印 `# skipped_missing_metrics=...`，不会再因为 `KeyError` 中断。
+
+Number formatting rule: report-facing metric/correlation outputs use 3 significant digits. Raw metric CSV files keep full precision for reproducibility and later statistical analysis.
+
+Direction rule: `expected_direction` is the theoretical direction of the metric. Most robust displacement metrics are `lower_is_better`; accuracy-style metrics such as `clean_acc`, `adv_acc`, `rb_clean_acc`, `rb_robust_acc`, and `margin_input_grad_ratio` are `higher_is_better`. `observed_correlation_sign` is only the empirical Pearson sign against the selected target. For a lower-is-better robust metric and a higher-is-better target such as `rb_robust_acc`, the expected sign is negative, and `direction_agreement=yes` means the experiment matches the theoretical direction.
+
+## 3. Experiment Overview
+
+| 编号 | 实验名称 | Target | 执行位置 | 主要输出 | 总结报告 |
+|---|---|---|---|---|---|
+| E00 | Smoke sanity test | same-run `adv_acc` | local Windows | `outputs\metrics_smoke*.csv` | `outputs\metric_smoke10_report.md` |
+| E01 | Baseline metric comparison | same-run `adv_acc` | local Windows | `outputs\metrics_baseline_smoke10_pgd3_n512_v2.csv` | `outputs\baseline_comparison_report.md` |
+| E02 | Feature-measure/FSP iteration | same-run `adv_acc` | local Windows | `outputs\metrics_feature_measure*.csv`, `outputs\metrics_*_m7.csv` | `outputs\feature_measure_metric_iteration_report.md`, `outputs\strict_fsp_vs_robust_balanced_report.md`, `outputs\flow_only_vs_robust_report.md` |
+| E03 | 20-model white-box CIFAR10 | `rb_robust_acc` | local Windows | `outputs\metrics_20_whitebox_*.csv` | `outputs\metric_validation_20_models_report.md` |
+| E04 | Shared-adv Standard source | `rb_robust_acc` | local Windows | `outputs\metrics_20_shared_standard_*.csv` | `outputs\shared_adv_multisource_validation_report.md` |
+| E05 | Shared-adv multi-source | `rb_robust_acc` | local Windows | `outputs\metrics_20_shared_*_rel*.csv` | `outputs\shared_adv_multisource_validation_report.md` |
+| E06 | Residual-value calibration | `rb_robust_acc` | local Windows | `outputs\residual_value_multisource\*.csv` | `outputs\residual_value_multisource\residual_value_calibration_report.md` |
+| E07 | Cross-dataset validation | `rb_robust_acc` or same-run `adv_acc` | local Windows / A100 historical | `outputs\cross_dataset\*.csv` | `outputs\cross_dataset\cross_dataset_validation_report.md` |
+| E08 | NAS-RobBench fixture search | fixture `robust_acc` | local Windows | `outputs\nasrobbench201_fixture\search_results.csv` | `docs\experiments\nasrobbench201_search_validation.md` |
+| E09 | NAS-RobBench official tabular search | `autoattack` | 516 RTX 5090 docker | `outputs\nasrobbench201_server\nasrobbench201_*_search_summary.csv` | `outputs\nasrobbench201_server\quick_validation_report.md` |
+| E10 | NB201 Ours metric quick32/128/512 | `autoattack` | 516 RTX 5090 docker | `outputs\nasrobbench201_server\nb201_ours_metric_quick*.csv` | `outputs\nasrobbench201_server\quick_validation_report.md` |
+| E11 | NB201 medium512 | `autoattack` | 516 RTX 5090 docker | `outputs\nasrobbench201_server\nasrobbench201_medium512_*.csv` | `outputs\nasrobbench201_server\quick_validation_report.md` |
+| E12 | NB201 ReLU-active metric | `autoattack` | 516 RTX 5090 docker | `outputs\nasrobbench201_server\nb201_ours_metric_relu_quick512.csv` | `outputs\nasrobbench201_server\relu_active_metric_report.md` |
+| E13 | 20-model ReLU-active complete comparison | `rb_robust_acc` | 516 RTX 4090 docker | `outputs\metrics_20_*_relu_*.csv`, `outputs\correlations\*_relu_*.csv` | `outputs\metric_validation_20_models_report.md` |
+| E14 | ReLU-active perturbation capacity | `rb_robust_acc` | 516 RTX 4090 docker | `outputs\metrics_20_*_capacity_relu_*.csv`, `outputs\correlations\e14_*_capacity_relu_*.csv` | `outputs\perturbation_capacity_relu_active_20model_report.md` |
+| E15 | Above-mean perturbation capacity | `rb_robust_acc` | 516 RTX 4090 docker | `outputs\metrics_20_*_capacity_above_mean_*.csv`, `outputs\correlations\e15_*_capacity_above_mean_*.csv` | `outputs\perturbation_capacity_above_mean_20model_report.md` |
+| E16 | NAS-RobBench 5/10-epoch fidelity and search | `autoattack` | 516 RTX 4090 + 中测院 2x RTX 4090D | `outputs\nasrobbench201_server\fidelity512_e5e10\*.csv` | `outputs\nasrobbench201_server\fidelity512_e5e10_report.md` |
+| E17 | NAS-RobBench official-style 50-epoch capacity validation | `autoattack` | 516 RTX 4090 + 中测院 2x RTX 4090D | `outputs\nasrobbench201_server\e17_full50_seed0\*`; stopped at 91/96 | `outputs\nasrobbench201_server\e17_full50_seed0\analysis_final_stopped\e17_full50_capacity_report.md` |
+| E18 | RobustBench white-box attack-step ablation | `rb_robust_acc` | 516 RTX 4090 | `outputs\metrics_20_whitebox_{fgsm,pgd3,pgd10}_*` | `outputs\robustbench_attack_parameter_ablation_report.md` |
+| E19 | NAS-RobBench RACL/MMD zero-cost and epoch 0/5/10 | `autoattack` | 516 RTX 4090 + 中测院 RTX 4090D | `outputs\nasrobbench201_server\e19_*` | `docs\experiments\nasrobbench201_racl_mmd_low_fidelity_report.md` |
+| E20 | MMD cross-space DARTS protocol | final PGD/AutoAttack | design only | `data\darts_e20_*`, planned | `docs\experiments\e20_mmd_cross_space_darts_plan.md` |
+| E21 | NAS-RobBench TRNAS vs MMD | `autoattack` | 516 RTX 4090 | `outputs\nasrobbench201_server\e21_trnas_mmd\*` | `docs\experiments\nasrobbench201_trnas_mmd_report.md` |
+| E22 | RobustBench layer/activation sampling ablation | `rb_robust_acc` | 516 RTX 4090 | `outputs\e22_feature_sampling\*` | `docs\experiments\robustbench20_feature_sampling_ablation_report.md` |
+| E23 | 41-metric three-space validation | RobustBench official RA / NAS-RobBench AA / DARTS full-test PGD20 | 516 RTX 4090 + 中测院 RTX 4090D + one A100 timing pilot | `outputs\e23_cross_space\*` | `docs\experiments\e23_cross_space_metric_validation.md` |
+| E24 | 45-metric fractal/topology extension | same E23 targets | 516 RTX 4090 + 中测院 RTX 4090D; saved checkpoints | `outputs\e24_fractal_topology\*` | `docs\experiments\e24_fractal_topology_validation.md` |
+| E25 | K=2/4/8/16 三源共享对抗完整消融 + bootstrap CI | `rb_robust_acc` | local Windows RTX 4080 | `outputs\e25_k2_k8_k16_three_source_validation\*` | `docs\experiments\e25_k2_k8_k16_three_source_validation_report.md` |
+| E26 | 容量四维度稳健性验证 | `rb_robust_acc` / NB201 AA / DARTS PGD-20 | local Windows RTX 4080 + 数据分析 | `outputs\e26_capacity_robustness\*` | `outputs\e26_capacity_robustness\e26_capacity_robustness_report.md` |
+| E27 | 静态谱/Jacobian/容量改进验证 + 结构去混杂 | RB20 official RA / NB201 AA / DARTS PGD-20 | local Windows RTX 4080 | `outputs\e27_*` | `docs\experiments\e27_spectral_jacobian_capacity_validation.md` |
+| E28 | 容量家族精化与去混杂墙验证 | `rb_robust_acc` / NB201 AA | local Windows RTX 4080 | `outputs\e28_capacity_family\*` | `docs\experiments\e28_capacity_family_deconfounding_validation.md` |
+| E29 | flow_rel 变体 + RB20 饱和诊断 | `rb_robust_acc` / NB201 AA | local Windows RTX 4080 | `outputs\e28_capacity_family\nb201_e0_v2.csv` | `docs\experiments\e29_flow_rel_variants_ceiling.md` |
+| E30 | 计算图结构直接测 op 交互 | NB201 AA | local Windows（纯 CPU） | `scripts\analyze_e30_graph_structure*.py` | `docs\experiments\e30_graph_structure.md` |
+| E31 | 通用性分析 + 多尺度 gram | `rb_robust_acc` / NB201 AA | local Windows RTX 4080 | `outputs\e28_capacity_family\nb201_e0_v3.csv`, `rb20_whitebox_v3.csv` | `docs\experiments\e31_generality_gram_family.md` |
+| E32 | signed capacity 证伪 + 通用性-强度权衡 | `rb_robust_acc` / NB201 AA / DARTS PGD-20 | local Windows RTX 4060（纯分析 + DARTS 零成本） | `scripts\analyze_e32_generality.py`, `outputs\e32_darts_e0_zerocost.csv` | `docs\experiments\e32_signed_capacity_falsified.md` |
+| E33 | 通用性机制：尺度不变性 | `rb_robust_acc` / NB201 AA | local Windows RTX 4060（纯分析） | `scripts\analyze_e33_mechanism.py`（e23 CSV + nb201_e0_v3.csv + rb20_whitebox_v3.csv） | `docs\experiments\e33_generality_mechanism_scale_invariance.md` |
+| E34 | capacity 翻转是训练强度依赖 | NB201 AA | local Windows RTX 4060（PGD-1 训练 64 架构至 e5） | `scripts\train_nb201_e34_stability.py`, `scripts\analyze_e34_stability.py`, `outputs\e34_nb201_e5_stability_pgd1.csv` | `docs\experiments\e34_capacity_flip_training_strength.md` |
+| E35 | 最终综合总结 | 全部 | 否 | `docs\experiments\e31*`…`e35*` | `docs\experiments\e35_final_summary.md` |
+
+## 4. E00 Smoke Sanity Test
+
+Purpose: verify config loading, dependency versions, model list, attack/metric pipeline.
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\smoke_test.py `
+  --config configs\cifar10_linf_20.yaml
+```
+
+Recompute smoke metrics:
+
+```powershell
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_smoke3.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --output outputs\metrics_smoke3_fgsm.csv `
+  --model-limit 3 `
+  --sample-limit 64 `
+  --attack fgsm `
+  --seed 20260704
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_smoke3.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --output outputs\metrics_smoke3_pgd3.csv `
+  --model-limit 3 `
+  --sample-limit 64 `
+  --attack pgd `
+  --pgd-steps 3 `
+  --seed 20260704
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_smoke10.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --output outputs\metrics_smoke10_pgd3_n512.csv `
+  --model-limit 10 `
+  --sample-limit 512 `
+  --attack pgd `
+  --pgd-steps 3 `
+  --seed 20260704
+```
+
+Correlation:
+
+```powershell
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_smoke10_pgd3_n512.csv `
+  --target adv_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e00_smoke10_pgd3_n512_vs_adv_acc.csv
+```
+
+## 5. E01 Baseline Metric Comparison
+
+Purpose: compare early baseline metrics on 10 CIFAR10 RobustBench models.
+
+Recompute:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_smoke10.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --output outputs\metrics_baseline_smoke10_pgd3_n512_v2.csv `
+  --model-limit 10 `
+  --sample-limit 512 `
+  --attack pgd `
+  --pgd-steps 3 `
+  --seed 20260704
+```
+
+Correlation:
+
+```powershell
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_baseline_smoke10_pgd3_n512_v2.csv `
+  --target adv_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e01_baseline_smoke10_pgd3_n512_v2_vs_adv_acc.csv
+```
+
+Verified output:
+
+```text
+outputs\correlations\e01_baseline_smoke10_pgd3_n512_v2_vs_adv_acc.csv
+```
+
+## 6. E02 Feature-Measure / FSP Iteration
+
+Purpose: compare strict FSP, flow-only, weighted local feature displacement, and combined ROBUST metric.
+
+Recompute representative 10-model feature-measure result:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_smoke10.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --output outputs\metrics_feature_measure_struct01_smoke10_pgd3_n512.csv `
+  --model-limit 10 `
+  --sample-limit 512 `
+  --attack pgd `
+  --pgd-steps 3 `
+  --seed 20260704
+```
+
+Correlation:
+
+```powershell
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_feature_measure_struct01_smoke10_pgd3_n512.csv `
+  --target adv_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e02_struct01_smoke10_pgd3_n512_vs_adv_acc.csv
+```
+
+Strict FSP vs ROBUST, 7-model balanced subset:
+
+```powershell
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --output outputs\metrics_strict_fsp_vs_robust_balanced_seed20260704_m7.csv `
+  --model-limit 7 `
+  --sample-limit 512 `
+  --attack pgd `
+  --pgd-steps 3 `
+  --seed 20260704
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_strict_fsp_vs_robust_balanced_seed20260704_m7.csv `
+  --target adv_acc `
+  --metrics fsp_strict_delta feature_measure_robust_delta feature_measure_weighted_delta `
+  | Out-File -Encoding utf8 outputs\correlations\e02_strict_fsp_vs_robust_balanced_m7_vs_adv_acc.csv
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_strict_fsp_vs_robust_balanced_seed20260704_m7.csv `
+  --target adv_acc `
+  --exclude-model Standard `
+  --metrics fsp_strict_delta feature_measure_robust_delta feature_measure_weighted_delta `
+  | Out-File -Encoding utf8 outputs\correlations\e02_strict_fsp_vs_robust_balanced_m7_exclude_standard_vs_adv_acc.csv
+```
+
+Flow-only vs ROBUST:
+
+```powershell
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --output outputs\metrics_flow_vs_robust_seed20260704_m7.csv `
+  --model-limit 7 `
+  --sample-limit 512 `
+  --attack pgd `
+  --pgd-steps 3 `
+  --seed 20260704
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_flow_vs_robust_seed20260704_m7.csv `
+  --target adv_acc `
+  --metrics feature_measure_flow_delta feature_measure_robust_delta feature_measure_weighted_delta fsp_strict_delta `
+  | Out-File -Encoding utf8 outputs\correlations\e02_flow_vs_robust_m7_vs_adv_acc.csv
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_flow_vs_robust_seed20260704_m7.csv `
+  --target adv_acc `
+  --exclude-model Standard `
+  --metrics feature_measure_flow_delta feature_measure_robust_delta feature_measure_weighted_delta fsp_strict_delta `
+  | Out-File -Encoding utf8 outputs\correlations\e02_flow_vs_robust_m7_exclude_standard_vs_adv_acc.csv
+```
+
+Important: E02 使用 same-run `adv_acc` 作为 target，不是 RobustBench official `rb_robust_acc`。
+
+## 7. E03 20-Model White-Box CIFAR10
+
+Purpose: compute metrics on 20 CIFAR10 RobustBench models under white-box FGSM, then correlate each metric with RobustBench official robust accuracy.
+
+Recompute metrics:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --output outputs\metrics_20_whitebox_fgsm_n64_spatial_seed20260704.csv `
+  --model-limit 20 `
+  --sample-limit 64 `
+  --attack fgsm `
+  --seed 20260704
+```
+
+Join RobustBench official scores:
+
+```powershell
+python scripts\join_robustbench_scores.py `
+  --metrics outputs\metrics_20_whitebox_fgsm_n64_spatial_seed20260704.csv `
+  --scores outputs\robustbench_cifar10_linf_scores.csv `
+  --output outputs\metrics_20_whitebox_fgsm_n64_spatial_with_rb_scores.csv
+```
+
+Analyze correlation:
+
+```powershell
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_20_whitebox_fgsm_n64_spatial_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e03_whitebox_fgsm_n64_spatial_vs_rb.csv
+```
+
+Also analyzed historical non-spatial CSV:
+
+```powershell
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_20_whitebox_fgsm_n64_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e03_whitebox_fgsm_n64_vs_rb.csv
+```
+
+Verified output:
+
+```text
+outputs\correlations\e03_whitebox_fgsm_n64_spatial_vs_rb.csv
+```
+
+## 8. E04 Shared-Adv Standard Source
+
+Purpose: generate one shared adversarial cache from `Standard`, then evaluate all 20 models on the same adversarial examples.
+
+Generate cache:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\generate_adv_cache.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --source-model Standard `
+  --attack pgd `
+  --pgd-steps 10 `
+  --sample-limit 128 `
+  --batch-size 64 `
+  --seed 20260704 `
+  --output outputs\adv_cache\cifar10_linf_standard_pgd10_n128_seed20260704.pt
+```
+
+Compute metrics from cache:
+
+```powershell
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --adv-cache outputs\adv_cache\cifar10_linf_standard_pgd10_n128_seed20260704.pt `
+  --output outputs\metrics_20_shared_standard_pgd10_n128_rel_seed20260704.csv `
+  --model-limit 20 `
+  --sample-limit 128 `
+  --batch-size 128 `
+  --seed 20260704
+```
+
+Join scores:
+
+```powershell
+python scripts\join_robustbench_scores.py `
+  --metrics outputs\metrics_20_shared_standard_pgd10_n128_rel_seed20260704.csv `
+  --scores outputs\robustbench_cifar10_linf_scores.csv `
+  --output outputs\metrics_20_shared_standard_pgd10_n128_rel_with_rb_scores.csv
+```
+
+Analyze correlation:
+
+```powershell
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_20_shared_standard_pgd10_n128_rel_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e04_shared_standard_pgd10_n128_rel_vs_rb.csv
+```
+
+## 9. E05 Shared-Adv Multi-Source
+
+Purpose: average metrics over adversarial caches generated from weak/mid/strong source models.
+
+Generate three caches:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\generate_adv_cache.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --source-model Standard `
+  --attack pgd `
+  --pgd-steps 10 `
+  --sample-limit 128 `
+  --batch-size 64 `
+  --seed 20260704 `
+  --output outputs\adv_cache\cifar10_linf_standard_pgd10_n128_seed20260704.pt
+
+python scripts\generate_adv_cache.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --source-model Engstrom2019Robustness `
+  --attack pgd `
+  --pgd-steps 10 `
+  --sample-limit 128 `
+  --batch-size 64 `
+  --seed 20260704 `
+  --output outputs\adv_cache\cifar10_linf_engstrom_pgd10_n128_seed20260704.pt
+
+python scripts\generate_adv_cache.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --source-model Wang2023Better_WRN-28-10 `
+  --attack pgd `
+  --pgd-steps 10 `
+  --sample-limit 128 `
+  --batch-size 64 `
+  --seed 20260704 `
+  --output outputs\adv_cache\cifar10_linf_wang2023_pgd10_n128_seed20260704.pt
+```
+
+Compute source-specific metrics:
+
+```powershell
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --adv-cache outputs\adv_cache\cifar10_linf_standard_pgd10_n128_seed20260704.pt `
+  --output outputs\metrics_20_shared_standard_pgd10_n128_rel_seed20260704.csv `
+  --model-limit 20 `
+  --batch-size 128 `
+  --seed 20260704
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --adv-cache outputs\adv_cache\cifar10_linf_engstrom_pgd10_n128_seed20260704.pt `
+  --output outputs\metrics_20_shared_engstrom_pgd10_n128_rel_seed20260704.csv `
+  --model-limit 20 `
+  --batch-size 128 `
+  --seed 20260704
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --adv-cache outputs\adv_cache\cifar10_linf_wang2023_pgd10_n128_seed20260704.pt `
+  --output outputs\metrics_20_shared_wang2023_pgd10_n128_rel_seed20260704.csv `
+  --model-limit 20 `
+  --batch-size 128 `
+  --seed 20260704
+```
+
+Join scores for each source:
+
+```powershell
+python scripts\join_robustbench_scores.py `
+  --metrics outputs\metrics_20_shared_standard_pgd10_n128_rel_seed20260704.csv `
+  --scores outputs\robustbench_cifar10_linf_scores.csv `
+  --output outputs\metrics_20_shared_standard_pgd10_n128_rel_with_rb_scores.csv
+
+python scripts\join_robustbench_scores.py `
+  --metrics outputs\metrics_20_shared_engstrom_pgd10_n128_rel_seed20260704.csv `
+  --scores outputs\robustbench_cifar10_linf_scores.csv `
+  --output outputs\metrics_20_shared_engstrom_pgd10_n128_rel_with_rb_scores.csv
+
+python scripts\join_robustbench_scores.py `
+  --metrics outputs\metrics_20_shared_wang2023_pgd10_n128_rel_seed20260704.csv `
+  --scores outputs\robustbench_cifar10_linf_scores.csv `
+  --output outputs\metrics_20_shared_wang2023_pgd10_n128_rel_with_rb_scores.csv
+```
+
+Analyze each source:
+
+```powershell
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_20_shared_standard_pgd10_n128_rel_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e04_shared_standard_pgd10_n128_rel_vs_rb.csv
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_20_shared_engstrom_pgd10_n128_rel_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e05_shared_engstrom_pgd10_n128_rel_vs_rb.csv
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_20_shared_wang2023_pgd10_n128_rel_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e05_shared_wang2023_pgd10_n128_rel_vs_rb.csv
+```
+
+Aggregate multi-source metrics:
+
+```powershell
+python scripts\aggregate_shared_metrics.py `
+  --inputs `
+    outputs\metrics_20_shared_standard_pgd10_n128_rel_with_rb_scores.csv `
+    outputs\metrics_20_shared_engstrom_pgd10_n128_rel_with_rb_scores.csv `
+    outputs\metrics_20_shared_wang2023_pgd10_n128_rel_with_rb_scores.csv `
+  --output outputs\metrics_20_shared_multisource_pgd10_n128_rel_avg_seed20260704.csv
+```
+
+Analyze multi-source average:
+
+```powershell
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_20_shared_multisource_pgd10_n128_rel_avg_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e05_multisource_pgd10_n128_rel_avg_vs_rb.csv
+```
+
+Note: `aggregate_shared_metrics.py` preserves numeric `rb_*` columns from the input files. The existing project also contains `outputs\metrics_20_shared_multisource_pgd10_n128_rel_avg_with_rb_scores.csv`; use that file for analysis.
+
+## 10. E06 Residual-Value And Coefficient Calibration
+
+Purpose: test whether Ours explains robust accuracy variation left unexplained by strong baselines such as `local_logit_lipschitz` and `input_grad_l2`.
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\residual_value_analysis.py `
+  --input outputs\metrics_20_shared_multisource_pgd10_n128_rel_avg_with_rb_scores.csv `
+  --target rb_robust_acc `
+  --output-dir outputs\residual_value_multisource
+```
+
+Verified temp run:
+
+```text
+outputs\command_validation\residual_value_check
+```
+
+Official result files:
+
+```text
+outputs\residual_value_multisource\baseline_residuals.csv
+outputs\residual_value_multisource\coefficient_calibration_grid.csv
+outputs\residual_value_multisource\coefficient_calibration_best.csv
+outputs\residual_value_multisource\residual_value_summary.csv
+outputs\residual_value_multisource\residual_value_calibration_report.md
+```
+
+## 11. E07 Cross-Dataset Validation
+
+### CIFAR100
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar100_linf_10.yaml `
+  --data-root E:\projects\robust_metric_lab\data\cifar100 `
+  --output outputs\cross_dataset\metrics_cifar100_linf10_fgsm_n128_seed20260704.csv `
+  --model-limit 10 `
+  --sample-limit 128 `
+  --attack fgsm `
+  --seed 20260704
+
+python scripts\join_robustbench_scores.py `
+  --metrics outputs\cross_dataset\metrics_cifar100_linf10_fgsm_n128_seed20260704.csv `
+  --scores outputs\robustbench_cifar100_linf_scores.csv `
+  --output outputs\cross_dataset\metrics_cifar100_linf10_fgsm_n128_with_rb_scores.csv
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\cross_dataset\metrics_cifar100_linf10_fgsm_n128_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e07_cifar100_linf10_fgsm_n128_vs_rb.csv
+```
+
+### ImageNet
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\compute_metric_batch.py `
+  --config configs\imagenet_linf_5.yaml `
+  --data-root F:\Datasets\ImageNet `
+  --output outputs\cross_dataset\metrics_imagenet_linf5_fgsm_n64_seed20260704.csv `
+  --model-limit 5 `
+  --sample-limit 64 `
+  --attack fgsm `
+  --seed 20260704
+
+python scripts\join_robustbench_scores.py `
+  --metrics outputs\cross_dataset\metrics_imagenet_linf5_fgsm_n64_seed20260704.csv `
+  --scores outputs\robustbench_imagenet_linf_scores.csv `
+  --output outputs\cross_dataset\metrics_imagenet_linf5_fgsm_n64_with_rb_scores.csv
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\cross_dataset\metrics_imagenet_linf5_fgsm_n64_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e07_imagenet_linf5_fgsm_n64_vs_rb.csv
+```
+
+Historical note: the original ImageNet run was recorded as Chengdu A100 docker using server ImageNet validation data. The local path `F:\Datasets\ImageNet` is now also verified as an ImageFolder root.
+
+### MNIST Legacy
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\compute_legacy_metric_batch.py `
+  --dataset mnist `
+  --data-root E:\projects\robust_metric_lab\data\mnist `
+  --legacy-root D:\old_research_code\adversarial_research `
+  --output outputs\cross_dataset\metrics_mnist_legacy_fgsm_n128_seed20260704.csv `
+  --batch-size 4 `
+  --sample-limit 128 `
+  --attack fgsm `
+  --seed 20260704
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\cross_dataset\metrics_mnist_legacy_fgsm_n128_seed20260704.csv `
+  --target adv_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e07_mnist_legacy_fgsm_n128_vs_adv_acc.csv
+```
+
+### SVHN Legacy
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\compute_legacy_metric_batch.py `
+  --dataset svhn `
+  --data-root E:\projects\robust_metric_lab\data\svhn `
+  --legacy-root D:\old_research_code\adversarial_research `
+  --output outputs\cross_dataset\metrics_svhn_legacy_fgsm_n128_seed20260704.csv `
+  --batch-size 4 `
+  --sample-limit 128 `
+  --attack fgsm `
+  --seed 20260704
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\cross_dataset\metrics_svhn_legacy_fgsm_n128_seed20260704.csv `
+  --target adv_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e07_svhn_legacy_fgsm_n128_vs_adv_acc.csv
+```
+
+## 12. E08 NAS-RobBench-201 Fixture Search
+
+Purpose: verify local random search and NSGA-II logic using small fixture data.
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\search_nasrobbench201.py `
+  --benchmark-json outputs\nasrobbench201_fixture\benchmark.json `
+  --meta-json outputs\nasrobbench201_fixture\meta.json `
+  --dataset cifar10 `
+  --target-metric robust_acc `
+  --clean-metric clean_acc `
+  --proxy-csv outputs\nasrobbench201_fixture\proxy.csv `
+  --proxy-column feature_measure_robust_spatial_delta `
+  --proxy-direction lower `
+  --budget 20 `
+  --trials 3 `
+  --population 8 `
+  --generations 3 `
+  --seed 20260707 `
+  --output outputs\nasrobbench201_fixture\search_results.csv
+```
+
+Verified temp output:
+
+```text
+outputs\command_validation\e08_fixture_search_check.csv
+```
+
+Important: fixture proxy column is `feature_measure_robust_spatial_delta`, not `proxy_metric`.
+
+## 13. E09 NAS-RobBench-201 Official Tabular Search
+
+Run location: 成都 516 RTX 5090 docker.
+
+```bash
+cd /home/huangyue/projects/robust_metric_lab_nas
+export PYTHONPATH=$PWD/src
+
+python3 scripts/search_nasrobbench201.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --dataset cifar10 \
+  --target-metric autoattack \
+  --clean-metric val_acc \
+  --proxy-column val_pgd_3.0_acc \
+  --proxy-direction higher \
+  --budget 200 \
+  --trials 20 \
+  --population 64 \
+  --generations 25 \
+  --seed 20260707 \
+  --output outputs/nasrobbench201_cifar10_sanity_pgd3_to_autoattack.csv
+```
+
+Pulled local outputs:
+
+```text
+outputs\nasrobbench201_server\nasrobbench201_cifar10_sanity_pgd3_to_autoattack.csv
+outputs\nasrobbench201_server\nasrobbench201_quick128_search_summary.csv
+outputs\nasrobbench201_server\nasrobbench201_quick512_search_summary.csv
+```
+
+## 14. E10 NB201 Ours Metric Quick32/128/512
+
+Run location: 成都 516 RTX 5090 docker.
+
+Quick512 command:
+
+```bash
+cd /home/huangyue/projects/robust_metric_lab_nas
+export PYTHONPATH=$PWD/src
+
+python3 scripts/compute_nb201_metric_subset.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --nasrobbench-repo /home/huangyue/projects/nasrobbench201 \
+  --dataset cifar10 \
+  --data-root data/torchvision \
+  --target-metric autoattack \
+  --sample-size 512 \
+  --epochs 1 \
+  --train-samples 4096 \
+  --metric-samples 512 \
+  --batch-size 128 \
+  --train-attack pgd \
+  --metric-attack pgd \
+  --metric-pgd-steps 5 \
+  --max-layers 4 \
+  --seed 20260707 \
+  --output outputs/nb201_ours_metric_quick512.csv
+```
+
+Search with quick512 proxy:
+
+```bash
+python3 scripts/search_nasrobbench201.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --dataset cifar10 \
+  --target-metric autoattack \
+  --clean-metric val_acc \
+  --proxy-csv outputs/nb201_ours_metric_quick512.csv \
+  --proxy-column feature_measure_robust_spatial_rel_delta \
+  --proxy-direction lower \
+  --budget 200 \
+  --trials 20 \
+  --population 64 \
+  --generations 25 \
+  --seed 20260707 \
+  --output outputs/nasrobbench201_quick512_search_summary.csv
+```
+
+For quick32/quick128, change:
+
+```bash
+--sample-size 32   --output outputs/nb201_ours_metric_quick32.csv
+--sample-size 128  --output outputs/nb201_ours_metric_quick128.csv
+```
+
+Pulled local outputs:
+
+```text
+outputs\nasrobbench201_server\nb201_ours_metric_quick32.csv
+outputs\nasrobbench201_server\nb201_ours_metric_quick128.csv
+outputs\nasrobbench201_server\nb201_ours_metric_quick512.csv
+outputs\nasrobbench201_server\nasrobbench201_quick128_search_summary.csv
+outputs\nasrobbench201_server\nasrobbench201_quick512_search_summary.csv
+```
+
+## 15. E11 NB201 Medium512
+
+Run location: 成都 516 RTX 5090 docker.
+
+The exact original shell wrapper was not preserved in this repo, but the pulled outputs indicate a medium512 run. Reproducible command template:
+
+```bash
+cd /home/huangyue/projects/robust_metric_lab_nas
+export PYTHONPATH=$PWD/src
+
+python3 scripts/compute_nb201_metric_subset.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --nasrobbench-repo /home/huangyue/projects/nasrobbench201 \
+  --dataset cifar10 \
+  --data-root data/torchvision \
+  --target-metric autoattack \
+  --sample-size 512 \
+  --epochs 5 \
+  --train-samples 8192 \
+  --metric-samples 512 \
+  --batch-size 128 \
+  --train-attack pgd \
+  --metric-attack pgd \
+  --metric-pgd-steps 5 \
+  --max-layers 4 \
+  --seed 20260707 \
+  --output outputs/nb201_ours_metric_medium512.csv
+
+python3 scripts/search_nasrobbench201.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --dataset cifar10 \
+  --target-metric autoattack \
+  --clean-metric val_acc \
+  --proxy-csv outputs/nb201_ours_metric_medium512.csv \
+  --proxy-column feature_measure_robust_spatial_rel_delta \
+  --proxy-direction lower \
+  --budget 200 \
+  --trials 20 \
+  --population 64 \
+  --generations 25 \
+  --seed 20260707 \
+  --output outputs/nasrobbench201_medium512_search_summary.csv
+```
+
+Pulled local outputs:
+
+```text
+outputs\nasrobbench201_server\nasrobbench201_medium512_correlation.csv
+outputs\nasrobbench201_server\nasrobbench201_medium512_search_summary.csv
+```
+
+## 16. E12 NB201 ReLU-Active Metric
+
+Run location: 成都 516 RTX 5090 docker.
+
+Recompute ReLU-active metric quick512:
+
+```bash
+cd /home/huangyue/projects/robust_metric_lab_nas
+export PYTHONPATH=$PWD/src
+
+python3 scripts/compute_nb201_metric_subset.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --nasrobbench-repo /home/huangyue/projects/nasrobbench201 \
+  --dataset cifar10 \
+  --data-root data/torchvision \
+  --target-metric autoattack \
+  --sample-size 512 \
+  --epochs 1 \
+  --train-samples 4096 \
+  --metric-samples 512 \
+  --batch-size 128 \
+  --train-attack pgd \
+  --metric-attack pgd \
+  --metric-pgd-steps 5 \
+  --max-layers 4 \
+  --seed 20260707 \
+  --output outputs/nb201_ours_metric_relu_quick512.csv
+```
+
+Search with ReLU-active proxy:
+
+```bash
+python3 scripts/search_nasrobbench201.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --dataset cifar10 \
+  --target-metric autoattack \
+  --clean-metric val_acc \
+  --proxy-csv outputs/nb201_ours_metric_relu_quick512.csv \
+  --proxy-column feature_measure_relu_active_hybrid_rel_delta \
+  --proxy-direction lower \
+  --budget 200 \
+  --trials 20 \
+  --population 64 \
+  --generations 25 \
+  --seed 20260707 \
+  --output outputs/nasrobbench201_relu_quick512_search_summary.csv
+```
+
+Pulled local outputs:
+
+```text
+outputs\nasrobbench201_server\nb201_ours_metric_relu_quick512.csv
+outputs\nasrobbench201_server\nasrobbench201_relu_quick512_correlation.csv
+outputs\nasrobbench201_server\nasrobbench201_relu_quick512_search_summary.csv
+outputs\nasrobbench201_server\relu_active_metric_report.md
+```
+
+## 17. E13 20-Model ReLU-Active Complete Comparison
+
+Purpose: recompute all 34 implemented robust metric fields, including the five ReLU-active variants, on the same 20 RobustBench CIFAR-10 Linf models used by E03-E05.
+
+Actual run location: 成都 516 RTX 4090 docker, /root/robust_metric_lab.
+
+Server selection record: the preferred 516 RTX 5090 docker port 7001 returned Connection refused on 2026-07-16. The 516 RTX 4090 docker was reachable and idle, with one RTX 4090 (24564 MiB), about 871 GiB free disk, and no competing GPU process.
+
+Reused server resources:
+
+| Resource | Server path |
+|---|---|
+| CIFAR-10 | /data/cifar-10-batches-py |
+| 20 RobustBench model weights | /root/robust_metric_lab/models/cifar10/Linf |
+| Python dependencies | /root/robust_metric_lab/.deps |
+| Standard shared cache | /root/robust_metric_lab/outputs/adv_cache/cifar10_linf_standard_pgd10_n128_seed20260704.pt |
+| Engstrom shared cache | /root/robust_metric_lab/outputs/adv_cache/cifar10_linf_engstrom_pgd10_n128_seed20260704.pt |
+| Wang2023 shared cache | /root/robust_metric_lab/outputs/adv_cache/cifar10_linf_wang2023_pgd10_n128_seed20260704.pt |
+
+The current local src/robust_metric_lab modules, compute/analysis scripts, and three existing adversarial caches were transferred to the remote project before execution. CIFAR-10 and model weights were not downloaded again.
+
+Remote preflight and smoke test:
+
+    cd /root/robust_metric_lab
+    export PYTHONPATH=$PWD/src:$PWD/.deps
+    nvidia-smi --query-gpu=index,name,memory.total,memory.used,utilization.gpu --format=csv,noheader
+    df -h /root
+    find /data -maxdepth 2 -type d -name cifar-10-batches-py
+    python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/relu_active_20model_smoke.csv --model-limit 1 --sample-limit 8 --batch-size 8 --attack fgsm --seed 20260704
+
+The smoke test produced all five feature_measure_relu_active fields with finite values.
+
+White-box FGSM, 20 models, 64 samples:
+
+    python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_whitebox_fgsm_n64_relu_seed20260704.csv --model-limit 20 --sample-limit 64 --batch-size 16 --attack fgsm --seed 20260704
+
+Shared Standard PGD-10 cache:
+
+    python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_shared_standard_pgd10_n128_rel_relu_seed20260704.csv --model-limit 20 --batch-size 16 --attack pgd --adv-cache outputs/adv_cache/cifar10_linf_standard_pgd10_n128_seed20260704.pt --seed 20260704
+
+Shared Engstrom PGD-10 cache:
+
+    python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_shared_engstrom_pgd10_n128_rel_relu_seed20260704.csv --model-limit 20 --batch-size 16 --attack pgd --adv-cache outputs/adv_cache/cifar10_linf_engstrom_pgd10_n128_seed20260704.pt --seed 20260704
+
+Shared Wang2023 PGD-10 cache:
+
+    python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_shared_wang2023_pgd10_n128_rel_relu_seed20260704.csv --model-limit 20 --batch-size 16 --attack pgd --adv-cache outputs/adv_cache/cifar10_linf_wang2023_pgd10_n128_seed20260704.pt --seed 20260704
+
+Three-source aggregation:
+
+    python3 scripts/aggregate_shared_metrics.py --inputs outputs/metrics_20_shared_standard_pgd10_n128_rel_relu_seed20260704.csv outputs/metrics_20_shared_engstrom_pgd10_n128_rel_relu_seed20260704.csv outputs/metrics_20_shared_wang2023_pgd10_n128_rel_relu_seed20260704.csv --output outputs/metrics_20_shared_multisource_pgd10_n128_rel_relu_avg_seed20260704.csv
+
+The remote execution log was pulled to outputs\relu_active_20model_full.log. All five raw files contain exactly 20 model rows, and all five ReLU-active columns contain finite values.
+
+Local score join and correlation commands:
+
+    cd E:\projects\robust_metric_lab
+    $env:PYTHONPATH="$PWD\src"
+    python scripts\join_robustbench_scores.py --metrics outputs\metrics_20_whitebox_fgsm_n64_relu_seed20260704.csv --scores outputs\robustbench_cifar10_linf_scores.csv --output outputs\metrics_20_whitebox_fgsm_n64_relu_with_rb_scores.csv
+    python scripts\analyze_metric_correlation.py --input outputs\metrics_20_whitebox_fgsm_n64_relu_with_rb_scores.csv --target rb_robust_acc | Out-File -Encoding utf8 outputs\correlations\e03_whitebox_fgsm_n64_relu_vs_rb.csv
+    python scripts\join_robustbench_scores.py --metrics outputs\metrics_20_shared_multisource_pgd10_n128_rel_relu_avg_seed20260704.csv --scores outputs\robustbench_cifar10_linf_scores.csv --output outputs\metrics_20_shared_multisource_pgd10_n128_rel_relu_avg_with_rb_scores.csv
+    python scripts\analyze_metric_correlation.py --input outputs\metrics_20_shared_multisource_pgd10_n128_rel_relu_avg_with_rb_scores.csv --target rb_robust_acc | Out-File -Encoding utf8 outputs\correlations\e05_multisource_pgd10_n128_rel_relu_avg_vs_rb.csv
+
+The Standard, Engstrom, and Wang files use the same score-join and correlation pattern.
+
+Main outputs:
+
+    outputs\metrics_20_whitebox_fgsm_n64_relu_with_rb_scores.csv
+    outputs\metrics_20_shared_standard_pgd10_n128_rel_relu_with_rb_scores.csv
+    outputs\metrics_20_shared_engstrom_pgd10_n128_rel_relu_with_rb_scores.csv
+    outputs\metrics_20_shared_wang2023_pgd10_n128_rel_relu_with_rb_scores.csv
+    outputs\metrics_20_shared_multisource_pgd10_n128_rel_relu_avg_with_rb_scores.csv
+    outputs\correlations\e03_whitebox_fgsm_n64_relu_vs_rb.csv
+    outputs\correlations\e04_shared_standard_pgd10_n128_rel_relu_vs_rb.csv
+    outputs\correlations\e05_shared_engstrom_pgd10_n128_rel_relu_vs_rb.csv
+    outputs\correlations\e05_shared_wang2023_pgd10_n128_rel_relu_vs_rb.csv
+    outputs\correlations\e05_multisource_pgd10_n128_rel_relu_avg_vs_rb.csv
+    outputs\metric_validation_20_models_report.md
+
+## 18. E14 ReLU-Active Perturbation Capacity
+
+Purpose: test whether applying a clean-derived binary ReLU gate to `perturbation_capacity_delta (Ours)` improves robustness ranking on the same 20-model CIFAR-10 protocols as E13.
+
+Run location: 成都 516 RTX 4090 docker, `/root/robust_metric_lab`.
+
+Reused resources: `/data/cifar-10-batches-py`, `/root/robust_metric_lab/models/cifar10/Linf`, and the three existing files under `outputs/adv_cache`. No data or model was downloaded.
+
+Remote commands:
+
+```bash
+cd /root/robust_metric_lab
+export PYTHONPATH=$PWD/src:$PWD/.deps
+
+python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_whitebox_fgsm_n64_capacity_relu_seed20260704.csv --model-limit 20 --sample-limit 64 --batch-size 16 --attack fgsm --seed 20260704
+
+python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_shared_standard_pgd10_n128_capacity_relu_seed20260704.csv --model-limit 20 --batch-size 16 --attack pgd --adv-cache outputs/adv_cache/cifar10_linf_standard_pgd10_n128_seed20260704.pt --seed 20260704
+
+python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_shared_engstrom_pgd10_n128_capacity_relu_seed20260704.csv --model-limit 20 --batch-size 16 --attack pgd --adv-cache outputs/adv_cache/cifar10_linf_engstrom_pgd10_n128_seed20260704.pt --seed 20260704
+
+python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_shared_wang2023_pgd10_n128_capacity_relu_seed20260704.csv --model-limit 20 --batch-size 16 --attack pgd --adv-cache outputs/adv_cache/cifar10_linf_wang2023_pgd10_n128_seed20260704.pt --seed 20260704
+
+python3 scripts/aggregate_shared_metrics.py --inputs outputs/metrics_20_shared_standard_pgd10_n128_capacity_relu_seed20260704.csv outputs/metrics_20_shared_engstrom_pgd10_n128_capacity_relu_seed20260704.csv outputs/metrics_20_shared_wang2023_pgd10_n128_capacity_relu_seed20260704.csv --output outputs/metrics_20_shared_multisource_pgd10_n128_capacity_relu_avg_seed20260704.csv
+```
+
+Local join and correlation pattern:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\join_robustbench_scores.py `
+  --metrics outputs\metrics_20_shared_multisource_pgd10_n128_capacity_relu_avg_seed20260704.csv `
+  --scores outputs\robustbench_cifar10_linf_scores.csv `
+  --output outputs\metrics_20_shared_multisource_pgd10_n128_capacity_relu_avg_with_rb_scores.csv
+
+python scripts\analyze_metric_correlation.py `
+  --input outputs\metrics_20_shared_multisource_pgd10_n128_capacity_relu_avg_with_rb_scores.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\correlations\e14_multisource_capacity_relu_avg_vs_rb.csv
+```
+
+Apply the same join/correlation commands to the white-box, Standard, Engstrom, and Wang2023 CSVs. All five files contain 20 rows and finite values for `perturbation_capacity_relu_active_delta`.
+
+Main outputs:
+
+```text
+outputs\metrics_20_whitebox_fgsm_n64_capacity_relu_with_rb_scores.csv
+outputs\metrics_20_shared_standard_pgd10_n128_capacity_relu_with_rb_scores.csv
+outputs\metrics_20_shared_engstrom_pgd10_n128_capacity_relu_with_rb_scores.csv
+outputs\metrics_20_shared_wang2023_pgd10_n128_capacity_relu_with_rb_scores.csv
+outputs\metrics_20_shared_multisource_pgd10_n128_capacity_relu_avg_with_rb_scores.csv
+outputs\correlations\e14_whitebox_fgsm_n64_capacity_relu_vs_rb.csv
+outputs\correlations\e14_shared_standard_capacity_relu_vs_rb.csv
+outputs\correlations\e14_shared_engstrom_capacity_relu_vs_rb.csv
+outputs\correlations\e14_shared_wang2023_capacity_relu_vs_rb.csv
+outputs\correlations\e14_multisource_capacity_relu_avg_vs_rb.csv
+outputs\perturbation_capacity_relu_active_20model_full.log
+outputs\perturbation_capacity_relu_active_20model_report.md
+```
+
+Primary result: white-box Spearman improves from `-0.626` to `-0.699`, but three-source Spearman weakens from `-0.565` to `-0.392`. The ReLU-active variant is retained as an ablation rather than replacing the original metric.
+
+## 19. E15 Above-Mean Perturbation Capacity
+
+Purpose: replace the absolute $a>0$ gate with a per-sample, per-layer, per-channel clean spatial-mean threshold, while retaining the fixed-support paired comparison from E14.
+
+Run location and reused resources are the same as E14. No dataset, checkpoint, or adversarial cache was downloaded.
+
+Remote commands:
+
+```bash
+cd /root/robust_metric_lab
+export PYTHONPATH=$PWD/src:$PWD/.deps
+
+python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_whitebox_fgsm_n64_capacity_above_mean_seed20260704.csv --model-limit 20 --sample-limit 64 --batch-size 16 --attack fgsm --seed 20260704
+
+python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_shared_standard_pgd10_n128_capacity_above_mean_seed20260704.csv --model-limit 20 --batch-size 16 --attack pgd --adv-cache outputs/adv_cache/cifar10_linf_standard_pgd10_n128_seed20260704.pt --seed 20260704
+
+python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_shared_engstrom_pgd10_n128_capacity_above_mean_seed20260704.csv --model-limit 20 --batch-size 16 --attack pgd --adv-cache outputs/adv_cache/cifar10_linf_engstrom_pgd10_n128_seed20260704.pt --seed 20260704
+
+python3 scripts/compute_metric_batch.py --config configs/cifar10_linf_20.yaml --data-root /data --model-dir models --output outputs/metrics_20_shared_wang2023_pgd10_n128_capacity_above_mean_seed20260704.csv --model-limit 20 --batch-size 16 --attack pgd --adv-cache outputs/adv_cache/cifar10_linf_wang2023_pgd10_n128_seed20260704.pt --seed 20260704
+
+python3 scripts/aggregate_shared_metrics.py --inputs outputs/metrics_20_shared_standard_pgd10_n128_capacity_above_mean_seed20260704.csv outputs/metrics_20_shared_engstrom_pgd10_n128_capacity_above_mean_seed20260704.csv outputs/metrics_20_shared_wang2023_pgd10_n128_capacity_above_mean_seed20260704.csv --output outputs/metrics_20_shared_multisource_pgd10_n128_capacity_above_mean_avg_seed20260704.csv
+```
+
+Local join/correlation commands follow E14, using the corresponding E15 filenames. Main outputs:
+
+```text
+outputs\metrics_20_whitebox_fgsm_n64_capacity_above_mean_with_rb_scores.csv
+outputs\metrics_20_shared_standard_pgd10_n128_capacity_above_mean_with_rb_scores.csv
+outputs\metrics_20_shared_engstrom_pgd10_n128_capacity_above_mean_with_rb_scores.csv
+outputs\metrics_20_shared_wang2023_pgd10_n128_capacity_above_mean_with_rb_scores.csv
+outputs\metrics_20_shared_multisource_pgd10_n128_capacity_above_mean_avg_with_rb_scores.csv
+outputs\correlations\e15_whitebox_capacity_above_mean_vs_rb.csv
+outputs\correlations\e15_shared_standard_capacity_above_mean_vs_rb.csv
+outputs\correlations\e15_shared_engstrom_capacity_above_mean_vs_rb.csv
+outputs\correlations\e15_shared_wang2023_capacity_above_mean_vs_rb.csv
+outputs\correlations\e15_multisource_capacity_above_mean_avg_vs_rb.csv
+outputs\correlations\e15_capacity_variant_bootstrap.csv
+outputs\perturbation_capacity_above_mean_20model_full.log
+outputs\perturbation_capacity_above_mean_20model_report.md
+```
+
+Primary result: three-source Spearman is `-0.471`, better than the zero-threshold gate (`-0.392`) but weaker than the original all-position capacity (`-0.565`). It ranks fourth among 36 fixed metrics.
+
+## 20. E16 NAS-RobBench 5/10-Epoch Fidelity And Search
+
+Purpose: test whether robustness metrics computed from partially trained NAS-Bench-201 networks rank the official NAS-RobBench-201 CIFAR-10 AutoAttack accuracy, then compare matched-budget random search and NSGA-II.
+
+Protocol:
+
+- Select 512 architectures by stratified sampling over the official `autoattack` target, using seed `20260707`.
+- Deterministically shuffle the selected set before slicing. This keeps each hardware shard mixed across low/mid/high oracle robustness.
+- Use the same initialization seed, CIFAR-10 subset, augmentation order, optimizer, and epoch-specific PGD random starts for every architecture.
+- Train on 4096 existing CIFAR-10 samples with PGD-3 adversarial training; compute all metrics on 256 test samples with PGD-3 at epochs 5 and 10.
+- Treat official `autoattack` only as the post-search oracle target. Early `clean_acc` comes from the same proxy run; benchmark `val_acc` is not exposed to the search.
+
+Server and data allocation:
+
+| Shard | Slice | Server/GPU | Project root | Existing CIFAR-10 root |
+|---|---:|---|---|---|
+| 0 | `[0,171)` | 成都 516 RTX 4090 | `/root/robust_metric_lab_nas` | `/root/data` |
+| 1 | `[171,342)` | 中测院 RTX 4090D GPU 0 | `/root/robust_metric_lab_nas` | `/workspace/research/Datasets/cifar10` |
+| 2 | `[342,512)` | 中测院 RTX 4090D GPU 1 | `/root/robust_metric_lab_nas` | `/workspace/research/Datasets/cifar10` |
+
+The three shuffled slices have official AutoAttack means `0.369`, `0.362`, and `0.368`; hardware is therefore not tied to an ordered robustness interval.
+
+Run shard 0 on the 516 RTX 4090 docker:
+
+```bash
+cd /root/robust_metric_lab_nas
+export PYTHONPATH=$PWD/src
+
+python3 scripts/compute_nb201_metric_subset.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --nasrobbench-repo /root/nasrobbench201 \
+  --dataset cifar10 \
+  --data-root /root/data \
+  --target-metric autoattack \
+  --sample-size 512 \
+  --arch-start 0 \
+  --arch-stop 171 \
+  --eval-epochs 5 10 \
+  --train-samples 4096 \
+  --metric-samples 256 \
+  --batch-size 128 \
+  --train-attack pgd \
+  --train-pgd-steps 3 \
+  --metric-attack pgd \
+  --metric-pgd-steps 3 \
+  --max-layers 4 \
+  --lr 0.1 \
+  --lr-schedule onecycle \
+  --seed 20260707 \
+  --output outputs/fidelity512/nb201_fidelity512_e5e10_seed20260707_shard000_171.csv \
+  2>&1 | tee outputs/fidelity512/nb201_fidelity512_e5e10_seed20260707_shard000_171.log
+```
+
+Run shards 1 and 2 on the two Zhongceyuan GPUs. The arguments omitted below are identical to shard 0; the actual logged commands used the full argument list.
+
+```bash
+cd /root/robust_metric_lab_nas
+export PYTHONPATH=$PWD/src
+
+CUDA_VISIBLE_DEVICES=0 python3 scripts/compute_nb201_metric_subset.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --nasrobbench-repo /root/nasrobbench201 \
+  --dataset cifar10 --data-root /workspace/research/Datasets/cifar10 \
+  --target-metric autoattack --sample-size 512 --arch-start 171 --arch-stop 342 \
+  --eval-epochs 5 10 --train-samples 4096 --metric-samples 256 --batch-size 128 \
+  --train-attack pgd --train-pgd-steps 3 --metric-attack pgd --metric-pgd-steps 3 \
+  --max-layers 4 --lr 0.1 --lr-schedule onecycle --seed 20260707 \
+  --output outputs/fidelity512/nb201_fidelity512_e5e10_seed20260707_shard171_342.csv \
+  2>&1 | tee outputs/fidelity512/nb201_fidelity512_e5e10_seed20260707_shard171_342.log
+
+CUDA_VISIBLE_DEVICES=1 python3 scripts/compute_nb201_metric_subset.py \
+  --benchmark-json data/nasrobbench201/NAS-RobBench-201_all.json \
+  --meta-json data/nasrobbench201/meta.json \
+  --nasrobbench-repo /root/nasrobbench201 \
+  --dataset cifar10 --data-root /workspace/research/Datasets/cifar10 \
+  --target-metric autoattack --sample-size 512 --arch-start 342 --arch-stop 512 \
+  --eval-epochs 5 10 --train-samples 4096 --metric-samples 256 --batch-size 128 \
+  --train-attack pgd --train-pgd-steps 3 --metric-attack pgd --metric-pgd-steps 3 \
+  --max-layers 4 --lr 0.1 --lr-schedule onecycle --seed 20260707 \
+  --output outputs/fidelity512/nb201_fidelity512_e5e10_seed20260707_shard342_512.csv \
+  2>&1 | tee outputs/fidelity512/nb201_fidelity512_e5e10_seed20260707_shard342_512.log
+```
+
+After pulling the three raw CSVs, merge and validate the complete 512 x 2 grid locally:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\merge_metric_shards.py `
+  --inputs `
+    outputs\nasrobbench201_server\fidelity512_e5e10\nb201_fidelity512_e5e10_seed20260707_shard000_171.csv `
+    outputs\nasrobbench201_server\fidelity512_e5e10\nb201_fidelity512_e5e10_seed20260707_shard171_342.csv `
+    outputs\nasrobbench201_server\fidelity512_e5e10\nb201_fidelity512_e5e10_seed20260707_shard342_512.csv `
+  --expected-architectures 512 `
+  --expected-epochs 5 10 `
+  --output outputs\nasrobbench201_server\fidelity512_e5e10\nb201_fidelity512_e5e10_seed20260707.csv
+
+python scripts\analyze_nasrobbench_fidelity.py `
+  --benchmark-json data\nasrobbench201\NAS-RobBench-201_all.json `
+  --meta-json data\nasrobbench201\meta.json `
+  --metric-csv outputs\nasrobbench201_server\fidelity512_e5e10\nb201_fidelity512_e5e10_seed20260707.csv `
+  --epochs 5 10 `
+  --budget 150 `
+  --trials 100 `
+  --population 50 `
+  --generations 3 `
+  --seed 20260716 `
+  --output-dir outputs\nasrobbench201_server\fidelity512_e5e10
+```
+
+The analysis compares `random_uniform`, `random_clean`, `random_proxy`, `random_proxy_clean`, and `nsga2_proxy_clean`. `random_proxy_clean` and NSGA-II use the same Pareto-front recommendation, so their difference isolates candidate generation rather than the final decision rule.
+
+Main outputs:
+
+```text
+outputs\nasrobbench201_server\fidelity512_e5e10\nb201_fidelity512_e5e10_seed20260707.csv
+outputs\nasrobbench201_server\fidelity512_e5e10\correlations.csv
+outputs\nasrobbench201_server\fidelity512_e5e10\search_trials.csv
+outputs\nasrobbench201_server\fidelity512_e5e10\search_summary.csv
+outputs\nasrobbench201_server\fidelity512_e5e10_report.md
+```
+
+Primary result: the merged file passed the exact 512-architecture x 2-epoch grid check. `perturbation_capacity_delta (Ours)` has Spearman `+0.506` at epoch 5 and `+0.350` at epoch 10, opposite to its pre-specified lower-is-better direction. The best valid correlation is `feature_measure_mmd` at `-0.565/-0.635`, followed by `adversarial_loss [10]` at `-0.331/-0.524`. Under direct random-proxy selection, 10-epoch `adversarial_loss` reaches mean official AutoAttack accuracy `0.428`; the original capacity reaches only `0.206`. See the report for the full random, matched random-Pareto, NSGA-II, and cross-GPU audit tables.
+
+Important historical note: E09-E12 used benchmark `val_acc` in some search commands. Those runs are retained as sanity checks but are not the primary evidence for an early-fidelity metric, because full benchmark validation accuracy is unavailable during a real proxy search. E16 fixes this by using same-run early `clean_acc` only.
+
+## 21. E17 NAS-RobBench Official-Style Full-Training Validation
+
+Purpose: determine whether E16's wrong-sign epoch-5/10 capacity correlation is caused by severely undertrained representations or by failure to transfer from fully trained RobustBench models to the NAS-Bench-201 architecture family.
+
+Status: stopped on 2026-07-18 after 91/96 architectures had complete epoch-10/25/50 rows. The two unfinished supplemental processes were terminated and all GPUs were released. Interrupted source files contain partial architectures; `analyze_e17_capacity_validation.py` discards incomplete source/architecture groups before analysis.
+
+The timing pilot used full CIFAR-10, batch size 256, 50 epochs, PGD-7 adversarial training, SGD/OneCycleLR, and one PGD-3 metric evaluation at epoch 50. Measured wall times were 703, 712, and 745 seconds on the three allocated GPUs. Raw logs and CSVs are stored at:
+
+```text
+outputs\nasrobbench201_server\full50_pilot\full50_timing_516_slice0.*
+outputs\nasrobbench201_server\full50_pilot\full50_timing_zcy0_slice1.*
+outputs\nasrobbench201_server\full50_pilot\full50_timing_zcy1_slice2.*
+```
+
+The formal run uses 96 uniformly sampled architectures, fixed architecture seed `20260717`, training seed 0, and metric checkpoints 10/25/50. Exact protocol, common command, server slices, timing calculation, statistical analysis, and pre-specified decision rules are in:
+
+```text
+docs\experiments\nasrobbench201_full50_capacity_validation_plan.md
+```
+
+The runner separates `--architecture-seed` from the training `--seed`, supports `--sampling uniform`, restores RNG state after intermediate metric evaluation, and records `train_epoch_loss`. These changes keep architecture sampling reproducible and ensure that checkpoint evaluation does not alter the remaining training trajectory. A second training seed is reserved for later paper-level stability validation if the first experiment supports continuing with the metric.
+
+Interim analysis command:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\analyze_e17_capacity_validation.py `
+  --inputs `
+    outputs\nasrobbench201_server\e17_full50_seed0\e17_full50_seed0_shard000_032.csv `
+    outputs\nasrobbench201_server\e17_full50_seed0\e17_full50_seed0_shard032_064.csv `
+    outputs\nasrobbench201_server\e17_full50_seed0\e17_full50_seed0_shard064_096.csv `
+  --expected-architectures 96 `
+  --bootstrap-samples 5000 `
+  --output-dir outputs\nasrobbench201_server\e17_full50_seed0\analysis_interim
+```
+
+Stopped-run result on 91 complete architectures: original capacity Spearman is `-0.146`, `+0.0538`, and `-0.184` at epochs 10/25/50. The epoch-50 bootstrap 95% interval is `[-0.403, +0.0727]`. After controlling same-run clean accuracy, epoch-50 partial Spearman is `+0.176`; after diagnostically controlling official validation accuracy it is `+0.0483`. The raw negative association therefore does not provide independent robustness-ranking evidence.
+
+No E17 `.pt`, `.pth`, or `.ckpt` files exist. The runner has now been changed to save model, optimizer, scheduler, architecture metadata, oracle metadata, and run configuration at every `--eval-epochs` checkpoint by default. Use `--checkpoint-dir` to select the location; only use `--no-save-checkpoints` for an explicit storage-constrained smoke test.
+
+## 22. E18 RobustBench White-Box Attack-Step Ablation
+
+Purpose: isolate whether iterative PGD is responsible for the RobustBench-to-NAS capacity correlation gap while holding the 20 models, 64 samples, seed, epsilon, metric implementation, and white-box protocol fixed.
+
+| Attack | `perturbation_capacity_delta` Spearman |
+|---|---:|
+| FGSM | -0.626 |
+| PGD-3 | -0.621 |
+| PGD-10 | -0.573 |
+
+PGD-3 is effectively tied with FGSM, and PGD-10 remains much stronger than E17 epoch 50 (`-0.184`). Multi-step optimization has some effect but is not the primary explanation for the cross-benchmark gap. Full protocol, dispersion analysis, commands, and files are recorded in `outputs\robustbench_attack_parameter_ablation_report.md`.
+
+## 23. E19 RACL Terms and MMD Low-Fidelity / Zero-Cost Validation
+
+Purpose: evaluate the two fixed-architecture Lipschitz terms associated with `Adversarially Robust Neural Architectures`, and determine whether `feature_measure_mmd` can serve as a low-fidelity or random-initialization robust architecture proxy.
+
+Status: completed on 2026-07-18 with one initialization seed.
+
+Main results:
+
+- Random initialization, uniform 512: MMD Spearman `-0.705`, RACL gradient `-0.603`, and RACL architecture upper bound `-0.163` against official AutoAttack accuracy.
+- Matched 96 architectures: MMD Spearman is `-0.620/-0.532/-0.588` at epochs 0/5/10.
+- The RACL gradient term flips from `-0.486` at initialization to `+0.744/+0.812` at epochs 5/10, so it is not a valid isolated lower-is-better ranker after training.
+- Controlling operation counts reduces the 512-architecture MMD association to `-0.324`, showing that MMD contains both operation-prior and residual feature-distribution information.
+
+Exact server commands, equations, confidence intervals, top-10% selection results, path audit, checkpoint locations, and interpretation are in:
+
+```text
+docs\experiments\nasrobbench201_racl_mmd_low_fidelity_report.md
+```
+
+Primary local files:
+
+```text
+outputs\nasrobbench201_server\e19_zero_cost\metrics_uniform512_fgsm_n64_seed0.csv
+outputs\nasrobbench201_server\e19_zero_cost\analysis_final\
+outputs\nasrobbench201_server\e19_trajectory_uniform96\metrics_uniform96_e0e5e10.csv
+outputs\nasrobbench201_server\e19_trajectory_uniform96\analysis_final\
+```
+
+Analysis command:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\analyze_racl_mmd_fidelity.py `
+  --zero-cost outputs\nasrobbench201_server\e19_zero_cost\metrics_uniform512_fgsm_n64_seed0.csv `
+  --early-fidelity outputs\nasrobbench201_server\e19_trajectory_uniform96\metrics_uniform96_e0e5e10.csv `
+  --early-name E19-matched-trajectory `
+  --mature-fidelity outputs\nasrobbench201_server\e17_full50_seed0\analysis_final_stopped\complete_metrics.csv `
+  --bootstrap-repeats 2000 `
+  --seed 20260718 `
+  --output-dir outputs\nasrobbench201_server\e19_trajectory_uniform96\analysis_final
+```
+
+## 24. E20 Planned Cross-Space MMD Validation in DARTS/RACL
+
+Purpose: test whether epoch-0 `feature_measure_mmd` transfers from NAS-Bench-201 to the substantially different DARTS/PC-DARTS normal/reduction-cell search space used by RACL.
+
+Status: pre-registered design, not yet executed.
+
+The plan samples 64 discrete DARTS architectures before observing labels, computes MMD at random initialization, independently adversarially trains every candidate under a timing-gated 20-epoch protocol, and evaluates PGD-20 plus an AutoAttack confirmation subset. It includes operation-count, parameter/FLOP, RACL, and clean zero-cost controls.
+
+Full sampling rules, compute-budget gate, robustness labels, statistical endpoints, decision thresholds, servers, and required outputs:
+
+```text
+docs\experiments\e20_mmd_cross_space_darts_plan.md
+```
+
+## 25. E21 NAS-RobBench-201 TRNAS vs MMD
+
+Purpose: add the two TRNAS robust-proxy components and composite R-Score to the metric comparison, then compare them with `feature_measure_mmd (Ours)` on the same random-initialization NAS-RobBench-201 architectures.
+
+Status: completed on 2026-07-18 for 512 architectures and one initialization seed.
+
+Execution resources:
+
+| Item | Value |
+|---|---|
+| Server | Chengdu 516 RTX 4090 Docker |
+| GPU | GPU 0; one experiment process |
+| Server project | `/root/robust_metric_lab_nas` |
+| Existing data | `/root/data`, CIFAR-10 test split |
+| Existing checkpoints | `outputs/e19_zero_cost_uniform512/checkpoints` |
+| Main output | `outputs/e21_trnas_mmd/metrics_uniform512_step1e6.csv` |
+
+The exact metric command, implementation boundary, formulas, 5,000-repeat paired bootstrap, step-size sensitivity, structural controls, local file paths, and conclusions are recorded in:
+
+```text
+docs\experiments\nasrobbench201_trnas_mmd_report.md
+```
+
+Primary result: raw R-Score Spearman is `+0.807`, TRNAS consistency is `+0.789`, MMD is `-0.705`, and activation capability is `+0.567`. Raw R-Score is therefore the stronger ranker. However, learnable-layer count alone reaches `+0.809`; consistency has `+0.970` correlation with layer count and only `+0.0280` partial target correlation after controlling it. MMD retains `-0.347` after controlling layer count and `-0.543` after controlling official clean accuracy.
+
+Main local files:
+
+```text
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e6.csv
+outputs\nasrobbench201_server\e21_trnas_mmd\metrics_uniform512_step1e6.log
+outputs\nasrobbench201_server\e21_trnas_mmd\analysis\
+```
+
+## 26. E22 RobustBench-20 Feature Sampling Ablation
+
+Purpose: jointly test layer-count and post-activation sampling for every implemented feature-map robust metric without training models.
+
+Status: completed on 2026-07-18.
+
+| Item | Value |
+|---|---|
+| Server | Chengdu 516 RTX 4090 Docker, GPU 0 |
+| Server project | `/root/robust_metric_lab` |
+| Existing data | `/data/cifar-10-batches-py` |
+| Existing models | `models/cifar10/Linf`, 20 configured RobustBench models |
+| Conditions | $K\in\{2,4,8,16\}$ times `all_leaf`, `post_relu`, `post_activation` |
+| Attack | White-box FGSM, 64 samples, $\epsilon=8/255$ |
+| Training/download | None |
+
+The exact server command, local analysis command, 38-field coverage, ReLU/Swish/SiLU audit, complete results, and interpretation are recorded in:
+
+```text
+docs\experiments\robustbench20_feature_sampling_ablation_report.md
+```
+
+Primary files:
+
+```text
+outputs\e22_feature_sampling\metrics_20_whitebox_fgsm_n64_k2k4k8k16_three_hooks.csv
+outputs\e22_feature_sampling\run_three_hooks.log
+outputs\e22_feature_sampling\analysis\
+```
+
+Primary result: under E22 white-box FGSM, MMD changes from raw Spearman `-0.314` (utility `0.314`) at `all_leaf, K=4` to `-0.323` (utility `0.323`) at `K=8`; the paired difference interval crosses zero. The `-0.469` MMD value in the main leaderboard belongs to the separate three-source shared-PGD-10 protocol. Capacity improves from utility `0.626` to `0.805` at `K=8`, with paired interval `[0.018, 0.418]`. Strict ReLU sampling is defined for only 15/20 models because five models use Swish or SiLU; full 20-model activation comparisons use `post_activation`.
+
+## 27. E23 Three-Space 41-Metric Validation
+
+Purpose: combine all 36 metrics from the existing RobustBench main leaderboard with the two RACL terms [5] and the three TRNAS metrics [11], then evaluate fixed-direction Spearman correlation in three model/search spaces.
+
+Canonical metric list, formulas, directions, attribution, and duplicate-field audit:
+
+```text
+docs\theory\cross_space_metric_list.md
+```
+
+Complete protocol, exact commands, live server allocation, data roots, checkpoint paths, raw outputs, and reports:
+
+```text
+docs\experiments\e23_cross_space_metric_validation.md
+```
+
+Final status:
+
+- RobustBench 20 models: completed, joined to official robust accuracy, 2,000-bootstrap correlation table produced.
+- NAS-RobBench-201 64 architectures: completed with 320 metric rows and 320 epoch 0/5/10/25/50 checkpoints.
+- RACL/DARTS 20 architectures: completed with 60 metric rows, 60 epoch 0/50/100 checkpoints, and full 10,000-image PGD-20 targets.
+- Paper-final DARTS macro timing pilot: completed on A100 GPU 3; 493 seconds for one epoch and diverged to NaN, so it was not scaled blindly.
+
+## 28. E24 Fractal And Graph-Topology Metric Extension
+
+Purpose: add four lower-is-better `(Ours)` metrics derived from feature-support Hausdorff displacement, finite-scale box dimension, and multiscale graph fundamental-group rank, then compare all 45 canonical metrics under the exact E23 model/checkpoint grids.
+
+No training was run. The experiment reused 20 RobustBench models, 320 NAS-RobBench-201 checkpoints, and 60 DARTS checkpoints. Chengdu 516 RTX 4090 evaluated RobustBench and the first NAS shards; Zhongceyuan RTX 4090D GPU 1 evaluated the second NAS shards.
+
+Server metric commands:
+
+```bash
+python3 scripts/compute_geometry_metric_batch.py --config configs/cifar10_linf_20.yaml \
+  --data-root /data --model-dir models --output outputs/e24_geometry/rb20_geometry.csv \
+  --model-limit 20 --sample-limit 64 --batch-size 16 --attack fgsm --max-layers 4 --seed 20260720
+
+python3 scripts/evaluate_nb201_geometry_checkpoints.py \
+  --metrics-csv <E23_NB_SHARD> --nasrobbench-repo /root/nasrobbench201 \
+  --data-root <DATA_ROOT> --metric-samples 64 --batch-size 64 --max-layers 4 --seed 0 \
+  --output <E24_NB_SHARD>
+
+python3 scripts/evaluate_darts_geometry_checkpoints.py \
+  --metrics-csv <E23_DARTS_SHARD> --manifest data/darts_e23_architectures_seed20260720.json \
+  --data-root <DATA_ROOT> --metric-samples 64 --batch-size 64 --max-layers 4 --seed 0 \
+  --output <E24_DARTS_SHARD>
+```
+
+Local merge, join, and analysis use:
+
+```powershell
+python scripts\merge_metric_shards.py --inputs <SHARD_1> <SHARD_2> --key-columns arch_id train_epochs --output <MERGED>
+python scripts\join_metric_extensions.py --base <E23_TABLE> --extension <E24_TABLE> --keys <KEYS> --columns feature_hausdorff_delta feature_quantile_hausdorff_delta feature_box_dimension_delta feature_graph_fundamental_rank_delta --output <45_METRIC_TABLE>
+python scripts\analyze_cross_space_metrics.py --input <45_METRIC_TABLE> --target <TARGET> --output-csv <CORRELATION_CSV> --output-report <REPORT_MD>
+```
+
+Complete server paths, exact shard substitutions, formulas, smoke-test anomaly, grids, results, bootstrap intervals, and structural controls:
+
+```text
+docs\theory\fractal_topology_feature_metric_design.md
+docs\experiments\e24_fractal_topology_validation.md
+outputs\e24_fractal_topology\
+```
+
+Primary result: graph fundamental-rank drift reaches raw Spearman `-0.750` on NAS-RobBench-201 epoch 0, but only `-0.304` on DARTS epoch 0 and reverses direction after NB201 training. It remains a zero-cost ablation rather than replacing MMD/SWD/TRNAS.
+
+## 29. E25 Three-Source K=2/4/8/16 Feature Sampling Validation
+
+Purpose: validate K=8 as the optimal feature sampling depth under the project's three-source shared-adversarial protocol, then compare the full K=2/4/8/16 curve against E22 white-box FGSM results. Additionally run 10,000-sample bootstrap 95% confidence intervals for all metrics at K=8.
+
+Status: completed on 2026-07-31.
+
+| Item | Value |
+|---|---|
+| Machine | Local Windows, RTX 4080 8 GB |
+| Existing data | `F:\Datasets\cifar10` |
+| Existing models | 20 RobustBench CIFAR-10 Linf models (local cache) |
+| Existing adv caches | `outputs\adv_cache\cifar10_linf_{standard,engstrom,wang2023}_pgd10_n128_seed20260704.pt` |
+| Conditions | $K\in\{2,4,8,16\}$, `all_leaf` uniform sampling |
+| Attack | PGD-10 shared adversarial, $\epsilon=8/255$, $\alpha=2/255$, 128 samples |
+| Sources | Standard (weak), Engstrom2019Robustness (mid), Wang2023Better_WRN-28-10 (strong) |
+| Training/download | None |
+
+K=4 and K=8 CSVs were already computed in earlier E25 runs; K=2 and K=16 are new.
+
+Local metric computation commands (K=2 and K=16 only):
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+# K=2, three sources
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --adv-cache outputs\adv_cache\cifar10_linf_standard_pgd10_n128_seed20260704.pt `
+  --output outputs\e25_k2_k8_k16_three_source_validation\per_source\metrics_20_shared_standard_pgd10_n128_k2_seed20260704.csv `
+  --model-limit 20 --batch-size 8 --attack pgd --max-layers 2 --seed 20260704
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --adv-cache outputs\adv_cache\cifar10_linf_engstrom_pgd10_n128_seed20260704.pt `
+  --output outputs\e25_k2_k8_k16_three_source_validation\per_source\metrics_20_shared_engstrom_pgd10_n128_k2_seed20260704.csv `
+  --model-limit 20 --batch-size 8 --attack pgd --max-layers 2 --seed 20260704
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --adv-cache outputs\adv_cache\cifar10_linf_wang2023_pgd10_n128_seed20260704.pt `
+  --output outputs\e25_k2_k8_k16_three_source_validation\per_source\metrics_20_shared_wang2023_pgd10_n128_k2_seed20260704.csv `
+  --model-limit 20 --batch-size 8 --attack pgd --max-layers 2 --seed 20260704
+
+# K=16, three sources
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --adv-cache outputs\adv_cache\cifar10_linf_standard_pgd10_n128_seed20260704.pt `
+  --output outputs\e25_k2_k8_k16_three_source_validation\per_source\metrics_20_shared_standard_pgd10_n128_k16_seed20260704.csv `
+  --model-limit 20 --batch-size 8 --attack pgd --max-layers 16 --seed 20260704
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --adv-cache outputs\adv_cache\cifar10_linf_engstrom_pgd10_n128_seed20260704.pt `
+  --output outputs\e25_k2_k8_k16_three_source_validation\per_source\metrics_20_shared_engstrom_pgd10_n128_k16_seed20260704.csv `
+  --model-limit 20 --batch-size 8 --attack pgd --max-layers 16 --seed 20260704
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root F:\Datasets\cifar10 `
+  --adv-cache outputs\adv_cache\cifar10_linf_wang2023_pgd10_n128_seed20260704.pt `
+  --output outputs\e25_k2_k8_k16_three_source_validation\per_source\metrics_20_shared_wang2023_pgd10_n128_k16_seed20260704.csv `
+  --model-limit 20 --batch-size 8 --attack pgd --max-layers 16 --seed 20260704
+```
+
+Note: the K=4 and K=8 per-source CSVs were produced in an earlier E25 session and moved into `per_source/`. Their commands are identical to the above except `--max-layers 4` and `--max-layers 8`.
+
+Local aggregation and join (all K values):
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+# Aggregate three sources for each K
+foreach ($k in @(2,4,8,16)) {
+  python scripts\aggregate_shared_metrics.py `
+    --inputs `
+      outputs\e25_k2_k8_k16_three_source_validation\per_source\metrics_20_shared_standard_pgd10_n128_k${k}_seed20260704.csv `
+      outputs\e25_k2_k8_k16_three_source_validation\per_source\metrics_20_shared_engstrom_pgd10_n128_k${k}_seed20260704.csv `
+      outputs\e25_k2_k8_k16_three_source_validation\per_source\metrics_20_shared_wang2023_pgd10_n128_k${k}_seed20260704.csv `
+    --output outputs\e25_k2_k8_k16_three_source_validation\robustbench20_k${k}_3source_avg_seed20260704.csv
+
+  python scripts\join_robustbench_scores.py `
+    --metrics outputs\e25_k2_k8_k16_three_source_validation\robustbench20_k${k}_3source_avg_seed20260704.csv `
+    --scores outputs\robustbench_cifar10_linf_scores.csv `
+    --output outputs\e25_k2_k8_k16_three_source_validation\robustbench20_k${k}_3source_avg_with_rb_seed20260704.csv
+}
+```
+
+Full K-value correlation analysis:
+
+```powershell
+python scripts\analyze_metric_correlation.py `
+  --input outputs\e25_k2_k8_k16_three_source_validation\robustbench20_k2_3source_avg_with_rb_seed20260704.csv `
+  --target rb_robust_acc `
+  | Out-File -Encoding utf8 outputs\e25_k2_k8_k16_three_source_validation\robustbench20_k2k4k8k16_correlations.csv
+```
+
+The script was then manually extended to join all four K values into a single correlation table.
+
+Bootstrap 95% CI (K=8, inline Python):
+
+```python
+N_BOOTSTRAP = 10000
+random.seed(20260731)
+n = len(rows)
+for metric in sorted(METRICS):
+    xs = [float(r[metric]) for r in rows]
+    s_obs = spearman(xs, target)
+    adj_obs = -s_obs if metric not in HIGHER_IS_BETTER else s_obs
+    boot_vals = []
+    for _ in range(N_BOOTSTRAP):
+        idx = [random.randint(0, n-1) for _ in range(n)]
+        xs_boot = [xs[i] for i in idx]
+        t_boot = [target[i] for i in idx]
+        s_boot = spearman(xs_boot, t_boot)
+        adj_boot = -s_boot if metric not in HIGHER_IS_BETTER else s_boot
+        boot_vals.append(adj_boot)
+    boot_vals.sort()
+    low = boot_vals[int(0.025 * N_BOOTSTRAP)]
+    high = boot_vals[int(0.975 * N_BOOTSTRAP)]
+```
+
+Primary output files:
+
+```text
+outputs\e25_k2_k8_k16_three_source_validation\per_source\          # 12 raw per-source CSVs
+outputs\e25_k2_k8_k16_three_source_validation\robustbench20_k{2,4,8,16}_3source_avg_seed20260704.csv
+outputs\e25_k2_k8_k16_three_source_validation\robustbench20_k{2,4,8,16}_3source_avg_with_rb_seed20260704.csv
+outputs\e25_k2_k8_k16_three_source_validation\robustbench20_k2k4k8k16_correlations.csv
+outputs\e25_k2_k8_k16_three_source_validation\robustbench20_k8_bootstrap_ci.csv
+outputs\e25_k2_k8_k16_three_source_validation\robustbench20_report.md
+outputs\e25_k2_k8_k16_three_source_validation\summary\k2k4k8k16_spearman_matrix.csv
+outputs\e25_k2_k8_k16_three_source_validation\summary\k2k4k8k16_correlations_long.csv
+outputs\e25_k2_k8_k16_three_source_validation\summary\k4_vs_k8_summary.md
+```
+
+Primary result: `perturbation_capacity_delta (Ours)` peaks at K=8 with direction-adjusted Spearman $0.744$ (95% CI $[0.417, 0.917]$), and is the only Ours metric whose bootstrap CI excludes zero. K=16 drops to $0.532$ under three-source PGD-10 — a sharper penalty than E22 white-box FGSM where K=16 reaches $0.795$. Geometric/fractal metrics (box dimension, Hausdorff) improve monotonically through K=16; cross-layer pairing metrics (FSP, struct) collapse at K≥8; gradient/logit metrics are K-invariant. Three-source shared-adversarial protocol is more sensitive to K-value choice than white-box.
+
+Complete K-curve tables, E22 comparison, K-sensitivity classification, and bootstrap details:
+
+```text
+docs\experiments\e25_k2_k8_k16_three_source_validation_report.md
+```
+
+## 30. E26 容量四维度稳健性验证
+
+Purpose: 从信息独立性、跨空间迁移、样本效率、种子稳定性四个维度检验 `perturbation_capacity_delta (Ours)` 的稳健性。
+
+### 26.1 Partial Spearman — 控制 Clean Accuracy
+
+检验 capacity 是否只是 clean accuracy 的代理。方法：rank residuals → partial Spearman + semi-partial + 10000 bootstrap CI。数据来源：E25 K=8 三源聚合。
+
+| 类型 | adj-Spearman | 95% CI |
+|---|--:|--:|
+| 零阶 capacity vs robust | 0.7444 | [0.4297, 0.9164] |
+| Partial capacity vs robust \| clean | **0.7692** | [0.4269, 0.9177] |
+| Semi-partial (residual) | **0.6316** | [0.2487, 0.8635] |
+
+控制 clean accuracy 后容量-鲁棒性关联不降反升，半偏相关 CI 不跨零。**容量不是 clean accuracy 的代理。**
+
+### 26.2 NAS 空间容量信号诊断
+
+解释容量从 RobustBench-20（0.744）跨空间崩溃到 NB201 e50（0.208）和 DARTS（∼0）的原因。数据来源：E23/E24 跨空间 45-metric 表。
+
+| 空间 | 最优 adj-Spearman | 说明 |
+|---|--:|---|
+| RobustBench-20 | 0.744 (K=8, 三源) | 异构架构，成熟训练 |
+| NB201 e0 | 0.703 → 0.126 (控制 TRNAS $\Phi$) | 结构混杂解释大部分信号 |
+| NB201 e50 | 0.208 (不显著) | 训练后信号消失 |
+| DARTS e0 | 0.207 (p=0.38) | 从未有效 |
+
+NB201 e0 容量 vs TRNAS $\Phi$ Spearman = -0.783，控制后 partial = 0.126。e5 符号反转。**容量偏好架构多样性。**
+
+### 26.3 样本量鲁棒性 n=32/64/128
+
+K=8, all_leaf，独立生成 n=32/64/128 的 adv cache（同种子 20260704，前 N 样本一致）。
+
+| n | adj-Spearman | 95% CI |
+|--:|--:|--:|
+| 32 | 0.7053 | [0.3606, 0.9196] |
+| 64 | 0.7489 | [0.4492, 0.9257] |
+| 128 | 0.7444 | [0.4251, 0.9163] |
+
+交叉样本量容量 Spearman = 0.985（n=32 vs n=128）。**容量高度样本高效**：32 个 PGD 样本即可获得稳定排名。
+
+重要提示：`--adv-cache` 会覆盖 `--sample-limit`（`compute_metric_batch.py` 第 134 行），必须为每个样本量独立生成 adv cache。
+
+本地命令（n=32 Standard 源为例）：
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\generate_adv_cache.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root D:\Project\Datasets\cifar10 `
+  --source-model Standard --attack pgd --pgd-steps 10 `
+  --sample-limit 32 --batch-size 64 --seed 20260704 `
+  --output outputs\adv_cache\cifar10_linf_standard_pgd10_n32_seed20260704.pt
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root D:\Project\Datasets\cifar10 `
+  --model-dir D:\Project\RobustNAS\robustbench-master\models `
+  --adv-cache outputs\adv_cache\cifar10_linf_standard_pgd10_n32_seed20260704.pt `
+  --output outputs\e26_capacity_robustness\sample_size\per_source\metrics_20_shared_standard_pgd10_n32_k8_seed20260704.csv `
+  --model-limit 20 --batch-size 8 --attack pgd --max-layers 8 --seed 20260704
+```
+
+### 26.4 种子鲁棒性 — 4 个独立种子
+
+四个独立种子（20260704/20260731/20260801/20260802），各自生成 adv cache + 三源聚合。种子 20260704 复用 E25 K=8 已有结果。
+
+| 种子 | adj-Spearman | 95% CI |
+|--:|--:|--:|
+| 20260704 | 0.7444 | [0.4297, 0.9164] |
+| 20260731 | 0.7489 | [0.4196, 0.9213] |
+| 20260801 | 0.7489 | [0.4325, 0.9196] |
+| 20260802 | 0.7444 | [0.4264, 0.9182] |
+
+均值 0.7466 ± 0.0023，极差 0.0045，交叉种子容量相关 ≥ 0.9985。**容量对随机种子极端稳定。**
+
+本地命令（20260731 种子为例）：
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\generate_adv_cache.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root D:\Project\Datasets\cifar10 `
+  --source-model Standard --attack pgd --pgd-steps 10 `
+  --sample-limit 128 --batch-size 64 --seed 20260731 `
+  --output outputs\adv_cache\cifar10_linf_standard_pgd10_n128_seed20260731.pt
+
+python scripts\compute_metric_batch.py `
+  --config configs\cifar10_linf_20.yaml `
+  --data-root D:\Project\Datasets\cifar10 `
+  --model-dir D:\Project\RobustNAS\robustbench-master\models `
+  --adv-cache outputs\adv_cache\cifar10_linf_standard_pgd10_n128_seed20260731.pt `
+  --output outputs\e26_capacity_robustness\seed_robustness\per_source\metrics_20_shared_standard_pgd10_n128_k8_seed20260731.csv `
+  --model-limit 20 --batch-size 8 --attack pgd --max-layers 8 --seed 20260731
+
+python scripts\aggregate_shared_metrics.py `
+  --inputs `
+    outputs\e26_capacity_robustness\seed_robustness\per_source\metrics_20_shared_standard_pgd10_n128_k8_seed20260731.csv `
+    outputs\e26_capacity_robustness\seed_robustness\per_source\metrics_20_shared_engstrom_pgd10_n128_k8_seed20260731.csv `
+    outputs\e26_capacity_robustness\seed_robustness\per_source\metrics_20_shared_wang2023_pgd10_n128_k8_seed20260731.csv `
+  --output outputs\e26_capacity_robustness\seed_robustness\robustbench20_k8_3source_avg_seed20260731.csv
+
+python scripts\join_robustbench_scores.py `
+  --metrics outputs\e26_capacity_robustness\seed_robustness\robustbench20_k8_3source_avg_seed20260731.csv `
+  --scores outputs\robustbench_cifar10_linf_scores.csv `
+  --output outputs\e26_capacity_robustness\seed_robustness\robustbench20_k8_3source_avg_seed20260731_with_rb.csv
+```
+
+### 综合结论
+
+`perturbation_capacity_delta (Ours)` 在 RobustBench-20 异构模型上是一个**独立、样本高效、种子稳定**的鲁棒性代理指标。其主要局限是跨单一搜索空间的迁移能力弱。
+
+主要输出：
+
+```text
+outputs\e26_capacity_robustness\e26_capacity_robustness_report.md    （合并主报告）
+outputs\e26_capacity_robustness\e26_partial_spearman_report.md       （26.1 原始报告）
+outputs\e26_capacity_robustness\nas_diagnostic_report.md             （26.2 原始报告）
+outputs\e26_capacity_robustness\sample_size\                          （26.3 聚合 CSVs + per_source）
+outputs\e26_capacity_robustness\seed_robustness\                      （26.4 聚合 CSVs + per_source）
+```
+
+## 31. E27 静态谱/Jacobian/容量改进验证 + 结构去混杂
+
+Purpose: 检验静态谱浓度、Jacobian 谱、容量精化等 16 个新指标能否在结构去混杂后存活（即非平凡，而非 op 组成代理）。
+
+Status: completed（负结果 + 关键发现：结构去混杂重排排名）。
+
+主要结果：
+
+- RB20（成熟）：静态谱/Jacobian 指标排名 19–47/47，全部失败；容量已近最优。
+- NB201 e0 去混杂 partial：`trnas_r_score` 从 raw +0.897 崩到 **+0.206**（77% 是 op 组成）；`feature_delta` +0.615、`flow_rel` +0.626 是唯二存活（73–79% 存活率）。
+- 16 个新指标要么更弱（RB20）要么更 op 混杂（NB201）。
+
+关键结论：好的鲁棒 NAS 代理必须编码「op 交互」（哪个 op 连到哪个节点），而不是「op 组成」（每种 op 有多少个）。
+
+完整协议、公式、命令、输出见 `docs\experiments\e27_spectral_jacobian_capacity_validation.md`。
+
+## 32. E28 容量家族精化与去混杂墙验证
+
+Purpose: 检验扰动容量（MAD 离散度）能否通过任何精化在零成本去混杂后存活，并跨空间（成熟 + 零成本）迁移。
+
+Status: completed（容量家族负结果 + regime 特异性鲁棒性确认）。
+
+### 32.1 五个新容量指标
+
+| 字段 | 机制 | 针对的聚合层 |
+|---|---|---|
+| `perturbation_capacity_importance_delta` | 通道梯度重要性加权 MAD | 通道求和（死通道零权重） |
+| `perturbation_capacity_gini_delta` | 逐通道空间离散 Gini（尺度不变） | 空间平均 |
+| `perturbation_capacity_channelwise_delta` | 逐通道相对 MAD 漂移 | 通道求和 |
+| `perturbation_capacity_layerprofile_delta` | 容量沿深度的方向形状 | 逐层相加 |
+| `perturbation_capacity_flow_rel_delta` | 跨层「离散度流」＝dispersion map 的 FSP 相对漂移 | 跨层 |
+
+`importance_delta` 因在部分 RobustBench 大模型上死锁（额外 grad-enabled 前向）且 NB201 无效而禁用。
+
+### 32.2 NB201 e0 去混杂结果（核心判据）
+
+| 指标 | raw | partial（去 op 混杂） |
+|---|---:|---:|
+| `feature_measure_flow_rel_delta`（冠军） | +0.796 | **+0.626** |
+| `feature_delta`（冠军） | +0.845 | **+0.615** |
+| `perturbation_capacity_flow_rel_delta`（M5） | +0.688 | +0.378 |
+| `perturbation_capacity_gini_delta`（M2） | +0.534 | +0.335 |
+| `perturbation_capacity_channelwise_delta`（M4） | +0.563 | +0.308 |
+| `perturbation_capacity_delta`（原） | +0.552 | +0.283 |
+| `perturbation_capacity_importance_delta`（M1，禁用） | +0.574 | +0.280 |
+| `perturbation_capacity_layerprofile_delta`（M3） | +0.040 | 无意义 |
+
+### 32.3 RB20 成熟模型结果
+
+| 指标 | ρ |
+|---|---:|
+| `perturbation_capacity_relu_active_delta`（冠军） | **+0.699** |
+| `perturbation_capacity_gini_delta`（M2） | +0.629 |
+| `perturbation_capacity_delta`（原） | +0.626 |
+| `perturbation_capacity_flow_rel_delta`（M5） | +0.603 |
+| `perturbation_capacity_channelwise_delta`（M4） | +0.519 |
+| `perturbation_capacity_layerprofile_delta`（M3） | +0.302（CI 跨零） |
+
+### 32.4 附加检验
+
+- **fixed 扰动**：用固定随机符号扰动替代白盒 fgsm，检验「零成本下白盒方向是任意方向」的担忧。结果全面变差（flow_rel partial 0.626→0.172，feature_delta 0.615→0.227）——证明 fgsm 方向在零成本下其实编码架构接线。
+- **攻击强度**：RB20 上 flow_rel 在 FGSM/PGD-3/PGD-10/三源 PGD-10 下为 +0.20/+0.20/+0.18/−0.20，capacity 为 +0.63/+0.62/+0.57/+0.74。攻击强度不是 flow_rel 失效原因。
+- **冠军组合**：`flow_rel` + `feature_delta` rank 平均，partial 掉到 +0.21。
+
+### 32.5 综合结论
+
+1. 连同 E27 的 8 个，共 13 个容量变体在零成本去混杂后集体卡在 partial ≈ 0.28–0.38；根因是取绝对值丢了符号/结构（op 交互信号）。
+2. 零成本「纯机制」指标是 `flow_rel`/`feature_delta`（partial 0.62），成熟模型指标是 `capacity_relu_active`（0.699）。
+3. 不存在单一「去混杂后仍通用」指标；原始排序跨空间通用者是 `trnas_r_score`（0.748，但 op 混杂）。
+
+完整报告见 `docs\experiments\e28_capacity_family_deconfounding_validation.md`。
+
+## 33. E29 flow_rel 变体 + RB20 饱和诊断
+
+Purpose: 尝试推高零成本去混杂天花板（all-pairs / 归一化相关），并诊断 flow_rel 在成熟模型失效的原因。
+
+主要结果：
+
+- 零成本去混杂 partial：all-pairs +0.628、multiscale +0.627、flow_rel +0.626、feature_delta +0.615、corr_rel（归一化）+0.480。
+- RB20 饱和诊断：flow_rel 能把 Standard（0.718）与 19 个鲁棒模型（0.10–0.24）分开，但无法区分鲁棒模型内部——它测的是「接线」（架构固定属性），不是「训练质量」。
+
+结论：零成本天花板 ~0.63 被坐实；flow_rel 的 RB20 失效是「接线 vs 训练」的 regime 分界，不可归一化修复。完整见 `docs\experiments\e29_flow_rel_variants_ceiling.md`。
+
+## 34. E30 计算图结构直接测 op 交互
+
+Purpose: 直接读 NB201 DAG 的 op 转移矩阵（哪个 op 连哪个节点），看能否比 flow_rel 更直接地捕捉 op 交互信号。
+
+主要结果：op 转移矩阵在样本内额外解释 +10.85% oracle 方差，但 5 折交叉验证崩到 +0.08（过拟合）；手工标量 chain_score partial 只有 +0.41，低于 flow_rel 0.63。
+
+结论：特征响应（flow_rel）比直接读 op 转移更好地捕捉接线信号。完整见 `docs\experiments\e30_graph_structure.md`。
+
+## 35. E31 通用性分析 + 多尺度 gram
+
+Purpose: 找在所有设置（成熟 + 零成本 + 各训练阶段）方向一致且不差的通用指标。
+
+主要结果：
+
+- **通用指标是 gram 族**：`fsp_delta`、`feature_measure_moment_delta`、`feature_measure_struct01_delta` 在 NB201 全五个训练阶段方向一致、min ≥ 0.63，RB20 上 0.38–0.50。
+- **capacity 不是通用指标**：`perturbation_capacity_delta` 在 e0 +0.70、e5 翻转为 −0.40。
+- flow_rel 是「纯零成本」但非通用（RB20 0.205）。
+
+结论：「扰动容量」（capacity）方向应从 MAD 离散度（capacity）转向特征结构（gram）。完整见 `docs\experiments\e31_generality_gram_family.md`。
+
+## 36. RobustBench Score Fetching
+
+If official score CSV is missing, regenerate it:
+
+```powershell
+cd E:\projects\robust_metric_lab
+$env:PYTHONPATH="$PWD\src"
+
+python scripts\fetch_robustbench_scores.py `
+  --dataset cifar10 `
+  --output outputs\robustbench_cifar10_linf_scores.csv
+
+python scripts\fetch_robustbench_scores.py `
+  --dataset cifar100 `
+  --output outputs\robustbench_cifar100_linf_scores.csv
+
+python scripts\fetch_robustbench_scores.py `
+  --dataset imagenet `
+  --output outputs\robustbench_imagenet_linf_scores.csv
+```
+
+This command needs internet access because it reads the RobustBench GitHub README.
+
+## 37. Future Logging Rule
+
+For every new experiment, save command logs.
+
+PowerShell:
+
+```powershell
+Start-Transcript -Path outputs\logs\<experiment_id>.log
+# run commands
+Stop-Transcript
+```
+
+Linux:
+
+```bash
+mkdir -p outputs/logs
+python3 <script.py> <args> 2>&1 | tee outputs/logs/<experiment_id>.log
+```
+
+New experiments must update this file with:
+
+```text
+experiment id
+target variable
+server/local location
+data root
+model/checkpoint root
+metric computation command
+join command, if any
+correlation command
+raw outputs
+summary report
+checkpoint directory and saved epochs
+```
+
+For trainable models, save checkpoints at every metric-evaluation epoch. A checkpoint must contain at least the model state, architecture identifier, epoch, training seed, dataset, and complete run configuration. Save optimizer and scheduler state when later continuation may be useful.

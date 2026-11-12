@@ -1,0 +1,51 @@
+{
+  "date_local": "2026-10-27",
+  "scope": "RobustMetric RB40 frozen 11-model holdout material recovery only",
+  "model_name": "Rebuffi2021Fixing_70_16_cutmix_ddpm",
+  "source_claim": "User confirmed download from the Google Drive link registered by RobustBench",
+  "registered_gdrive_id": "1-8CWRT-OFWyrz4T4s0I2mbFjPg8K_MUi",
+  "source_claim_limit": "No independently published official file SHA-256 was available for a bitwise source match",
+  "old_damaged_weight": {
+    "path_in_container": "outputs/student_metrics/wangjiahao/heldout_rb12_20260922/bundle/rb40/models/cifar10/Linf/Rebuffi2021Fixing_70_16_cutmix_ddpm.pt",
+    "bytes": 783433120,
+    "sha256": "5bdb6cdc1b034628118bf8714c0c9e22fa0de45f47c109c2fdf9d944d2232f4b",
+    "error": "PytorchStreamReader failed reading zip archive: failed finding central directory",
+    "preserved_unchanged": true
+  },
+  "replacement_weight": {
+    "path_in_container": "outputs/student_metrics/wangjiahao/holdout_checkpoint_recovery_20261027/cifar10_linf_wrn70-16_cutmix_ddpm_v2.pt",
+    "bytes": 1067632495,
+    "sha256": "0769d395cbf77dc49caeab7e4c48fec5299e694937bd0b598293410a0e39a9bb",
+    "local_and_server_hash_match": true,
+    "zip_members": 409,
+    "zip_crc_check": "PASS",
+    "weights_only_tensor_count": 407,
+    "strict_state_dict_load": "PASS_local_and_wangjiahao_container",
+    "model_parameter_count": 266796506,
+    "cpu_forward_shape": [1, 10],
+    "cpu_forward_all_finite": true
+  },
+  "frozen_overlay": {
+    "base_manifest": "outputs/student_metrics/wangjiahao/heldout_rb12_20260922/bundle/manifests/rb40_models.csv",
+    "base_manifest_sha256": "b529fc7b722f1314a4cac9c6bf9ee383043d489e374d87e2119d8cce88fce372",
+    "base_weight_hash_list": "outputs/student_metrics/wangjiahao/heldout_rb12_20260922/heldout_rb11_20260922.sha256",
+    "base_weight_hash_list_sha256": "9ddf7faca73ccdfa7be0a8eb7a73f5ac337aaab80406bf1e8b6de2b8069fd7e4",
+    "expected_unique_models": 11,
+    "mapping_rule": "Keep all 11 frozen names, labels and sample protocol; replace only the named damaged model's checkpoint path and hash with replacement_weight values",
+    "all_original_weight_hashes_still_match_old_hash_list": true,
+    "old_damaged_file_not_reused": true
+  },
+  "fresh_container_load_audit": {
+    "status": "PASS",
+    "loadable_unique_models": 11,
+    "expected_unique_models": 11,
+    "all_forward_shapes": [1, 10],
+    "all_forward_outputs_finite": true,
+    "device": "cpu"
+  },
+  "result": "All 11 frozen RB40 holdout models load under the explicit one-file replacement overlay; no metric has yet been evaluated on this holdout",
+  "not_yet_verified": [
+    "Any candidate metric's complete 11/11 independent holdout calculation",
+    "Three-space independent validation or improvement over TRNAS Phi"
+  ]
+}

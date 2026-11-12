@@ -1,0 +1,45 @@
+{
+  "created_at_utc": "2026-10-23T18:03:01.558260+00:00",
+  "repair": "/workspace/robust_metric_lab_nas/outputs/student_metrics/wangjiahao/trnas_kang_direct_ode_repair_20261024T000000Z/repair_rows.csv",
+  "repair_rows": 3,
+  "repair_sha256": "91eaa8dae95082b6b042b943cbcb58dc44e10da9aa7a5ffd1b9e5a6ad74ad0eb",
+  "replaced_count": 3,
+  "replaced_keys": [
+    {
+      "benchmark": "rb40",
+      "checkpoint_epoch": "",
+      "metric_name": "trnas_activation_psi",
+      "model_or_arch_id": "Kang2021Stable",
+      "num_samples": 64,
+      "sample_offset": 0,
+      "seed": 20260808,
+      "setting": "rb40_mature"
+    },
+    {
+      "benchmark": "rb40",
+      "checkpoint_epoch": "",
+      "metric_name": "trnas_consistency_phi",
+      "model_or_arch_id": "Kang2021Stable",
+      "num_samples": 64,
+      "sample_offset": 0,
+      "seed": 20260808,
+      "setting": "rb40_mature"
+    },
+    {
+      "benchmark": "rb40",
+      "checkpoint_epoch": "",
+      "metric_name": "trnas_r_score",
+      "model_or_arch_id": "Kang2021Stable",
+      "num_samples": 64,
+      "sample_offset": 0,
+      "seed": 20260808,
+      "setting": "rb40_mature"
+    }
+  ],
+  "source": "/workspace/robust_metric_lab_nas/outputs/student_metrics/wangjiahao/strict_final_release_20261008T000000Z/metric_values_merged.csv",
+  "source_rows": 47600,
+  "source_sha256": "b5137e2b3fe89ce5a99a99ea94bafa48d1abb81c45837551e5b1a54fe42ac92d",
+  "target": "/workspace/robust_metric_lab_nas/outputs/student_metrics/wangjiahao/strict_trnas_direct_ode_release_20261024T000000Z/metric_values_merged.csv",
+  "target_rows": 47600,
+  "target_sha256": "deabce824ea0a175119cdee052d64fcb90b9f346372e0e8e253a9869dc697a69"
+}

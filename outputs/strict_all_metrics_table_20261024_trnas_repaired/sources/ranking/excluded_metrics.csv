@@ -1,0 +1,3 @@
+metric_name,eligibility,reason
+racl_arch_lipschitz_log_upper,space_specific,Architecture-cell upper bound is not mathematically defined for fixed RB40 networks.
+racl_fixed_network_log_upper_proxy,space_specific,Fixed-network proxy is not the same mathematical quantity as the architecture-cell bound.

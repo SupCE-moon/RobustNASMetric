@@ -120,3 +120,9 @@ runs/
 
 # Local isolated development worktrees
 /.worktrees/
+
+# Vendored JavaScript dependencies (found under outputs/ when building tables)
+node_modules/
+
+# Microsoft Office lock files
+~$*

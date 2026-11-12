@@ -1,0 +1,1590 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-11-12T08:19:59.646638+00:00",
+  "source": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric",
+  "source_head": "784fc74333a207020306125258085ea93e4c088e",
+  "source_branch": "main",
+  "counts": {
+    "import": 124,
+    "defer": 49,
+    "reject": 1,
+    "patch": 6
+  },
+  "total_bytes_import": 2296560,
+  "entries": [
+    {
+      "path": "docs/experiments/实验管理.md",
+      "status": " M",
+      "action": "patch",
+      "reason": "uncommitted tracked change; preserved in the patch artefact instead",
+      "size": 109498,
+      "sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6"
+    },
+    {
+      "path": "docs/theory/理论管理.md",
+      "status": " M",
+      "action": "patch",
+      "reason": "uncommitted tracked change; preserved in the patch artefact instead",
+      "size": 22357,
+      "sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e"
+    },
+    {
+      "path": "scripts/compute_metric_batch.py",
+      "status": " M",
+      "action": "patch",
+      "reason": "uncommitted tracked change; preserved in the patch artefact instead",
+      "size": 17579,
+      "sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61"
+    },
+    {
+      "path": "src/robust_metric_lab/attacks.py",
+      "status": " M",
+      "action": "patch",
+      "reason": "uncommitted tracked change; preserved in the patch artefact instead",
+      "size": 2628,
+      "sha256": "65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13"
+    },
+    {
+      "path": "src/robust_metric_lab/metric_registry.py",
+      "status": " M",
+      "action": "patch",
+      "reason": "uncommitted tracked change; preserved in the patch artefact instead",
+      "size": 5867,
+      "sha256": "c6af465bbe952bbe279387fc32601a73c6c546b8c1bd6659be323c1b09cf4be3"
+    },
+    {
+      "path": "src/robust_metric_lab/metrics.py",
+      "status": " M",
+      "action": "patch",
+      "reason": "uncommitted tracked change; preserved in the patch artefact instead",
+      "size": 67447,
+      "sha256": "5b18c5cf28fede3575d1aedcae7949f7bc0491bca4dcc160bdc619159fe119da"
+    },
+    {
+      "path": "docs/experiments/E36_E37_严格实验问题与排除说明.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 2303,
+      "sha256": "b1c9875de2b17dc866ba38562a120012fb3698d64e032e5fee383cf78efb06d0",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/E36_E37_严格跨空间实验最终报告.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 4998,
+      "sha256": "18265c6beb3883865f2e1bb80553dd08ca3939f30883ff4e21674d657c08523e",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/RB40留出权重恢复验证_20261027.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3021,
+      "sha256": "89e7afe140b5b9da36b633026343b99baa7dcb4bfffb3d9b6e6ce70935390124",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/RobustMetric_研究进展跟进说明_20261016.docx",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 59642,
+      "sha256": "b40b3a21e9ae04d17d86cfc6caec8fa53bc486d28355275ae153e7f98eb38e02",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/TRNAS_Kang直接求导补算与严格重排_20261024.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3763,
+      "sha256": "7a5efe6486942762c068d5c1fad37085359f7ded7eb3ed361fad1ee995d8ce54",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/TRNAS与自研指标结构匹配及阶段稳定性_20261024.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 6422,
+      "sha256": "6d6f64d2be06dd1d8f70e8bed3f10afa665bbdb0b5cc3aad6f6ca73f66951054",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e25_k8_three_source_validation_report.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 6197,
+      "sha256": "d86d12c7c5e43e87fe1e29cc02f32c73751937e98575bee174736c6d4eaa8506",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e27_spectral_jacobian_capacity_validation.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 7801,
+      "sha256": "4b531b15c1079fcde325207855e9cc0222e407824319a5f4fd0a7a92a7b1ecf5",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e28_capacity_family_deconfounding_validation.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 7463,
+      "sha256": "d3951715ed78733a559ace3ab919515f09379d209c5d478b231d9a3cc41c2ad5",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e29_flow_rel_variants_ceiling.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3370,
+      "sha256": "6f1798e812d796ba869c210fb2ebdc8d36f788caea46198f16794f02a76730c6",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e30_graph_structure.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 2516,
+      "sha256": "b6bf59936e4a27ec99934f4a6fddc511873c60fa8470845fab9fc3950fbc937f",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e31_generality_gram_family.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3798,
+      "sha256": "7056bc7101fedf83b57747c469c24750888cd19076f87be9f70ac73e53425296",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e32_signed_capacity_falsified.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 7081,
+      "sha256": "e961c7bb1bc9133c6fc8dff1bc98b316cc6f3e3e4757c1f40a253f1d2b00158e",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e33_generality_mechanism_scale_invariance.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 8517,
+      "sha256": "a160bb1b457ea458992fd288407644696b4d5b44323c88409993d59b0f257ed4",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e34_capacity_flip_training_strength.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 4980,
+      "sha256": "cc92904dc860857f937db06ce870c4ddcf26235b81d2ceb002b746aad7024a35",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/e35.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 13208,
+      "sha256": "dcd81465770b6053791f0c0c0cde5a468fc4e805064d0db7e96375e487f5fa21",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/严格发布接手审计与E37稳健性分析_20261016.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 11477,
+      "sha256": "e1d34edb5457f350a4ce15b36a3e83660a59d700b731e83b0d7d509636594c74",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/experiments/独立验证材料复建边界补充记录_20261027.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 2992,
+      "sha256": "4dec8b5e650b23eb99a99d37deee6614a4dd19d46b86812d9d7a03cc86196491",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-16-strict-release-audit-and-e37-analysis.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 6995,
+      "sha256": "2c8f8647ebebf64fbdcfb9f413da52aafd6226130e30921e8cec82adca0e4e38",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-24-adversarial-excess-feature-drift-implementation.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 25633,
+      "sha256": "490284014889eb24f7192f29f5719b0ca9f3851b6e9bd434b2375b3051d58ffb",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-24-adversarial-excess-feature-drift-design.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 9405,
+      "sha256": "baddc8afba62e53c1f988f2377b264398a672fd7cae111b77a4d08ffe5a0c75c",
+      "applied": "copied"
+    },
+    {
+      "path": "docs/theory/spectral_jacobian_static_metrics.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 10890,
+      "sha256": "b5392edfa2cfd24ecd4b6465d1a031eb5986b9ca49284a58d779e3ca454be4c2",
+      "applied": "copied"
+    },
+    {
+      "path": "finalize_e36_heldout.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3280,
+      "sha256": "42e521aa86a0e000d1f90e5eb09b3fc6fa57c5ae0426acd7de2a7e517d90676e",
+      "applied": "copied"
+    },
+    {
+      "path": "findings.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3028,
+      "sha256": "42201c6993e923b8b5287e4a91102201b63454eb4a43eb2156b3a9cd71a3e235",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k16_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20403,
+      "sha256": "5e2a525c8ae018de8c3d668f56fb596611830a64dd783ad68ed14fd95ea55bf8"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k2_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20319,
+      "sha256": "4b8ae7fc1827bc13ee455bde6830290d6d4c4cc0e2561a26c30b7edd197bf67e"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k4_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20339,
+      "sha256": "1e9d8bed988d1efa559775e5dfc1c9715a148823464aa36bbb6a779d847f899a"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20371,
+      "sha256": "b7c2c187198df1b79ccbdb188252a6f9e47b9587121bcd68624d463f35f8e9b1"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k16_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20335,
+      "sha256": "35c7b214f9baa36aa927cfd058764945b1a346cb1ac5947300d91f8ad6e69ec8"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k2_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20350,
+      "sha256": "59d2860784807b565c5f7f75c187b34747ab23b9542e831ffbfe8b1e0befb507"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k4_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20337,
+      "sha256": "11c696064ede907b8c8a1c0c38859661b52adf2f64205fddbbad0df7d0b5faf0"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20334,
+      "sha256": "bd3b8302f2fbdef729da120bf93b1b1afc4eeae45c791f4228eced1021fb175a"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k16_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20422,
+      "sha256": "dfee0667869c81862ba5d29c78a41725362f351312649c1d1a30af4bfb1ad5f7"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k2_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20357,
+      "sha256": "e332b2f642b1f3c6045fd9296fb6222bd33bbc43f1ca6dac3d67b4390e0de9c8"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k4_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20387,
+      "sha256": "c298c85e78d56a3246623bd796ad5361ffd8e9b5ce67954e6c49ca75d0ad4a48"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20387,
+      "sha256": "ef4939ad6cffd8cdb0d71a62c854f7b1418dc107ee69a364c4873b559aa2146e"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k16_3source_avg_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16534,
+      "sha256": "df99b080a784fea3cb6a15ffbad0d20d9cb6759632a18b321e7a608b2483f0f4",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k16_3source_avg_with_rb_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16975,
+      "sha256": "d51419e49b0d736df8c38b3d3f0348ac09db107b39ee995ed1077b9f6725e029",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k2_3source_avg_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16500,
+      "sha256": "56fe6f8969fcc8b6efb7e2b80fbd188c520d1264f3993736cdcf21ba18dc0242",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k2_3source_avg_with_rb_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16941,
+      "sha256": "dfa1bcc46ae22a5a714a32fba8970b625082fd4b5dd772cd66d247f06ebf7691",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k2k4k8k16_correlations.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 13270,
+      "sha256": "d535512125423c7bf41ab5e16636f39d641d3609904cb0a0984c146a65c2ac98",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k4_3source_avg_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16525,
+      "sha256": "2822f2dfd3e4a22d355c88c1908e4974e39031e1f41d3ac8bab2f27873ac4f8f",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k4_3source_avg_with_rb_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16966,
+      "sha256": "f25ce6d9d4a5ed82823af554c6a3bcd6b43c1e678439785abb498a44bf670916",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k8_3source_avg_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16498,
+      "sha256": "c44a24f81246ad326bf092c40c4bb6502646059ce1ee866d71e367b143407acc",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k8_3source_avg_with_rb_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16939,
+      "sha256": "dfb9267cceeea35c72b0a2686044db320fdb67a359a2c7f91781ab0443c6a455",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_k8_bootstrap_ci.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 3284,
+      "sha256": "bbe951136c71335670b9d48b1e46ce3183d28efd8c2aa5aa5efdb3f52dfa8c7f",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/robustbench20_report.md",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 4995,
+      "sha256": "4fd1f0e637b2a62cc1a07512c2be42629b4f8e974592e4baa3ee627348457d43",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/summary/k2k4k8k16_spearman_matrix.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 2936,
+      "sha256": "9ac8bb5c740eb9e37e0b46f30abf5096eb71c5980ee6eaa783bcfd9e29d3a6c9",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e25_k8_three_source_validation/summary/k4_vs_k8_summary.md",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 1725,
+      "sha256": "73b05121a1ca01be957cf994e1136beca3cfb181ceeaaa85fa7fc335b59ba320",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/e26_capacity_robustness_report.md",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 6156,
+      "sha256": "7dc88e4b02f12394d3d662d3bee5f099e0f8781a99b0919d4ccbf65c8ec4b009",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/e26_partial_spearman_report.md",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 1145,
+      "sha256": "d177dbccbb8bbceb7261edb93352a9b918298c1ab3302d6e5020d8e90dd23860",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/nas_diagnostic_report.md",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 1707,
+      "sha256": "199034109609466495246238ab223840d8036821545e10e537cf7899bf68a3a0",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n32_k8_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20235,
+      "sha256": "2854b0f4318c72b6ce5ed0abc7b309fabc93e05d13c60b8f200fc076d2c8c233"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n64_k8_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20284,
+      "sha256": "719fcd78d5d407241668cece8082dc724fab0b127a921682fe414b60ebfe0a78"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n32_k8_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20238,
+      "sha256": "dde7e29a781627a86b70a6539cdf7e2f9dea3be8c9b94bec187dc1bbd4f64a86"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n64_k8_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20248,
+      "sha256": "1eb200c3d45755d6789f2038715f7f998c91486c7a388f26f08b789e38528d39"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n32_k8_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20265,
+      "sha256": "3c2b52d4af416669ffbdcc3cbe18a732b586124c1840835ef702776972392368"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n64_k8_seed20260704.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20349,
+      "sha256": "60e49b3f9cd9a2b24e59defa8e9628cc3146ffa34cca5ce56cd4a1fd2ccd69a5"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/robustbench20_k8_3source_avg_n32_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16419,
+      "sha256": "ae7b2208dc00db6a7d420431368df2c1ee57df4e20d8b8824bbe7479e47f7d98",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/robustbench20_k8_3source_avg_n32_with_rb_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16860,
+      "sha256": "fa8aeb7be95a6f4a77d01597ced62da98f4915628271b8a6264a82170e1cf7ec",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/robustbench20_k8_3source_avg_n64_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16444,
+      "sha256": "d61aaaa2ea023ec6f43fc05488b82740004b67c00432909779ce050a801b9887",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/robustbench20_k8_3source_avg_n64_with_rb_seed20260704.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16885,
+      "sha256": "0c9d78d935f0a770b80516de08f7296fb2721782aad35114c2129c7f66063eb4",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/sample_size/sample_size_robustness_report.md",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 1077,
+      "sha256": "9b848e742cef5e244b0fb655e62d89b135e8a878ba948a8ae8833129bf6d57c6",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260731.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20349,
+      "sha256": "6b5f1dc83359647b6f086e6e3ef6549aaa16af53540f0d45bd89ecf93adaaaf3"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260801.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20367,
+      "sha256": "da2b6b1c2dce686f4cd99bfda33a7db1111ac00950163b4dbf4e6c58822b85b1"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260802.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20359,
+      "sha256": "e1b493fd8b9c676ff05bab001676cd2b03e476bf87c749725c517860128725de"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260731.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20327,
+      "sha256": "07e470e3e4b8d67ccc38b05344480b9713250ce3c3149e17925922f1e9c9f1ee"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260801.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20335,
+      "sha256": "8de568460a116b016b63930231763e1f25f4ebc7b1557ffaf77483cae32442fb"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260802.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20355,
+      "sha256": "2f8b09a41cc54bad0cf25a060120ef4aea6694aba38a75651a9e07e8cd1c755a"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260731.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20382,
+      "sha256": "cee7582e9f866b98fbb47a020aab08982759bed32fadc747ba92343dc0d1e1b4"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260801.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20395,
+      "sha256": "b1581e597bdf68a0fa5a94adc1c170085dde9d097abaa9c4f5a7a4e7648a90c1"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260802.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 20372,
+      "sha256": "a6c2326b996319fd3ec169504d0c36f789031ec0f2c874c2def7c29f2d903aa4"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/robustbench20_k8_3source_avg_seed20260731.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16508,
+      "sha256": "c2c84933a61baf289a9c955b1095b603039be725333432c3742bb30401ab46f0",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/robustbench20_k8_3source_avg_seed20260731_with_rb.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16949,
+      "sha256": "af4bd54baf5ddf26dc9d81ec741d2b71552a6368c8489396f23f0c958d1db15c",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/robustbench20_k8_3source_avg_seed20260801.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16499,
+      "sha256": "697edb5bf06c59896418fbafb74988a33b381c3d56a4ea245793db9930885165",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/robustbench20_k8_3source_avg_seed20260801_with_rb.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16940,
+      "sha256": "6123826e42248975c836f1db03712bf7227da89b99c59772ae1b09f08f8f96f0",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/robustbench20_k8_3source_avg_seed20260802.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16486,
+      "sha256": "7366dcbed676e50e0cf9b6b3a222130335a70ee26d84b9d59be424979c77a56a",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/robustbench20_k8_3source_avg_seed20260802_with_rb.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 16927,
+      "sha256": "44736110fa83f9a927ef9e60572466a681072c8f425b10804129fc2354fc49b2",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e26_capacity_robustness/seed_robustness/seed_robustness_report.md",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 1366,
+      "sha256": "a5dc13d371414d1c46ea7ba52130732249bb0767470543e33e334820754cf150",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_darts_e0_zerocost.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 2802,
+      "sha256": "3f5b392f5fd4aeecde090338a831810c7b046d87e8e22c68bf18f9b06a7c77fd",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_darts_e0_zerocost_v2.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 3148,
+      "sha256": "d9f6bbb58349fc7f0cc15e9c75acb9f6fc6322f95603fd6e75ca996f34453c77",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_darts_e0_zerocost_v3.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 23527,
+      "sha256": "9284712578205e8d205a2155087ab1194e3fc5f6b2df4baf2352232fdc90a52f",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_nb201_e0_zerocost.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 72182,
+      "sha256": "65b6983bd00526302095189b01021e5101c53632beebfdb8b5cf2d921bd1b4ba",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_nb201_e0_zerocost_v2.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 67662,
+      "sha256": "7fb766555cefa4e0eee93fe03c6d4c0b9436f6d12b3e0d5335802b7c4273aacd",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_nb201_e0_zerocost_v3.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 73541,
+      "sha256": "663c41b2baa55a2a68f830d1ec136c62211e6977ffb3f3c45c180946efb42d6b",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_nb201_e0_zerocost_v4.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 74934,
+      "sha256": "be5a9cb6f6564be50f8ae088430f65771f69b4cfb74b6fe1b1c7fcaa2b31adbe",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_rb20_correlations.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 6707,
+      "sha256": "983a8cbeae045d140cd5de2d3a6758869b24e2a1525f84d3158f8f7c4e61671a",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_rb20_whitebox_fgsm_n64.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 21526,
+      "sha256": "3521108a57f605b3331595732f36ae558e12cc101994ed4e8c285b199c66663e",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_rb20_whitebox_fgsm_n64_v2.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 22407,
+      "sha256": "5213b07667a151746d03fe5401f12589d15218d950db1c533986467592c00812",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_rb20_whitebox_fgsm_n64_v3.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 23760,
+      "sha256": "e9ffa193797ab8492eb22186ffc5f48fd48b1be886b67b54a1dc0a4286431b94",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e27_smoke.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 3474,
+      "sha256": "ee41ef8b515dfbe502e5bd9c5c60490f21fbbb6e7767aa0dde52632a3a439e55",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e28_capacity_family/nb201_e0.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 81855,
+      "sha256": "b68fe75f05d6f0064b802141648f1f5430fbfb22f80b573b6f61eb4435fdd54e",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e28_capacity_family/nb201_e0_fixed.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 80134,
+      "sha256": "4b804ff322fd0a4dc5202b89cd660d3caed6e33bbfebeb1ce45c76011be47323",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e28_capacity_family/nb201_e0_v2.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 83328,
+      "sha256": "e40691b70b3cef7bdac5208a04d3294d31ca09ada9bbff93e7606a47a6f46052",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e28_capacity_family/nb201_e0_v3.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 84716,
+      "sha256": "91f10d174ba59495f6f232f39ea7515574ff4772e70952f776ce27b00538de7f",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e28_capacity_family/rb20_whitebox.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 25656,
+      "sha256": "fdfa7f4e9d60e4802f476cc03ed993478a7071fd459ebe7fd10c53f6956e65ee",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e28_capacity_family/rb20_whitebox_v2.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 25664,
+      "sha256": "dbe13ebe831e273d14b51bae973d0de69dd6cfb9b4ee8907f4ee458698b96b74",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e28_capacity_family/rb20_whitebox_v3.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 26092,
+      "sha256": "82444e7c13e087a704936424dae4018ec0c946a16c046c877205fb69b0179084",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e32_darts_e0_zerocost.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 27712,
+      "sha256": "a6824c4c5ccceeeda3b8f47f32779b8a5c0185214dcce8a492e49b8f1552e707",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e34_nb201_e5_stability_pgd1.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 161645,
+      "sha256": "c9bd8b0a154011a183e2e668fdff1c8e033c717e97374b0866ad4c9367e41055",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e34_smoke4.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 12005,
+      "sha256": "6e14d98e348ba6bdcec2688dea6350d68fb8a759d22a21c27f995cef324901cb",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/e35_newmetrics_three_space.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 948,
+      "sha256": "4db3be627c60f9020df0c12b00298670aec2742eeb2b7ac9c1433881af8b0144",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/metrics_smoke_test.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 3865,
+      "sha256": "9d37dee0e2906d332295adf394fae26876f2eeb7621faccaacf59947a1a48ea7",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/smoke_rb20_newmetrics.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 2939,
+      "sha256": "fe023b89eff218622d6ddde0a5253b8201368b0fa8dd2f9dbe727fd75bbf4259",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/RobustMetric_严格全部指标总表_85项.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 35830,
+      "sha256": "6086ea494a0cfa1ff199d1d8843a48047c47db5b05d1d81c86b115d84b6fabae",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/RobustMetric_严格全部指标总表_85项.xlsx",
+      "status": "??",
+      "action": "defer",
+      "reason": "output format is not a small table or report",
+      "size": 21625,
+      "sha256": "754842ba01ae3ddca49522ced94f25be9fd410181945671bffd26a451d6139a6"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/RobustMetric_严格全部指标总表_85项.xlsx.inspect.ndjson",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 631972,
+      "sha256": "ef51cc1185aef652112c6e8f7ef65c0a32dba013ed6d98926b6370a8893a681d"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/build_all_metrics.mjs",
+      "status": "??",
+      "action": "defer",
+      "reason": "output format is not a small table or report",
+      "size": 8257,
+      "sha256": "e2056c64fd8e0ca993028e0a1c7d41706af2a7127be3467b08aa2d703b9ae96a"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/preview.png",
+      "status": "??",
+      "action": "defer",
+      "reason": "output format is not a small table or report",
+      "size": 126214,
+      "sha256": "a22d654c9eca836158f2922cbff64a151706f61b2c9c414947e4b16823a96b4b"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/sources/metric_values_merged.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "file exceeds the 10 MiB import comfort limit; keep it on the server",
+      "size": 14620237,
+      "sha256": "b5137e2b3fe89ce5a99a99ea94bafa48d1abb81c45837551e5b1a54fe42ac92d"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/sources/previous_ranked_provenance.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 18532,
+      "sha256": "9a27f4764ab2cb8ed8dbe19d926dcd5d720adf500a92fd56772222c99c5baf67",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/sources/ranking/confound_diagnostics.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 164060,
+      "sha256": "043be44b99efa2e4d258315a60e6850bd14f1512cec6e043ac06efbfa87de128",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/sources/ranking/excluded_metrics.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 679,
+      "sha256": "9afd81fb2acffe8d79eb03f4dba0c67636e468aff0850f05583103d248f2b39b",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/sources/ranking/strict_ranking.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 17258,
+      "sha256": "d58fc6f7a300d3bdd82a08ad569e37fd559d67c14f7651d3953a16c70a46721c",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/sources/release_verification.json",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 121,
+      "sha256": "9cf8904dc3777e089dfec24b1063ab455d5cd9ba01d25487b07cc1fa4d87a3c7",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024/sources/实验管理_snapshot.md",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 109498,
+      "sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/RobustMetric_严格全部指标总表_TRNAS补全_85项.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 37067,
+      "sha256": "9defb536829a83c4fb707ee074dd40b334b83aaed80067ab022be1213be5c05d",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/RobustMetric_严格全部指标总表_TRNAS补全_85项.xlsx",
+      "status": "??",
+      "action": "defer",
+      "reason": "output format is not a small table or report",
+      "size": 21842,
+      "sha256": "6eeac916925b609b2c666fce95e9d59ecc2d18ce38d69ea6870a90a68470a02a"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/RobustMetric_严格全部指标总表_TRNAS补全_85项.xlsx.inspect.ndjson",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 643694,
+      "sha256": "5b157c0062a1fd5f2f315a5bb064530f7304966b8b7147cfe9a36c5c6dc4e635"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/RobustMetric_严格全部指标总表_TRNAS补全_85项_三位小数.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 24833,
+      "sha256": "de46f15a9dd7e2fba7bd42b65e4adbbe2bd9dc0ca1e4748a4e94183996c590e6",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/RobustMetric_严格全部指标总表_TRNAS补全_85项_三位小数.xlsx",
+      "status": "??",
+      "action": "defer",
+      "reason": "output format is not a small table or report",
+      "size": 16016,
+      "sha256": "26a03fd2a6b3b4cb00c9063c162a8f7a73df2a35b245f2e31daabf801adae32a"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/RobustMetric_严格全部指标总表_TRNAS补全_85项_三位小数.xlsx.inspect.ndjson",
+      "status": "??",
+      "action": "defer",
+      "reason": "raw per-sample or vendored output stays out of Git",
+      "size": 632283,
+      "sha256": "6a689df018fe88b22e0f9c6acc99726a906fc493fb1312febba4cf6d1ba6b71e"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/build_all_metrics.mjs",
+      "status": "??",
+      "action": "defer",
+      "reason": "output format is not a small table or report",
+      "size": 10261,
+      "sha256": "e51480dd9f1e21081b585a70be8acba5c9cd0c0e6daca633800311929f11caa8"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/preview.png",
+      "status": "??",
+      "action": "defer",
+      "reason": "output format is not a small table or report",
+      "size": 121582,
+      "sha256": "6ee59bb58aaecb667f7d5bfa43495f24287a243196ae570d711621f8475878c1"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/preview_三位小数.png",
+      "status": "??",
+      "action": "defer",
+      "reason": "output format is not a small table or report",
+      "size": 124181,
+      "sha256": "0bf649758101f8971a1d646caf27f161e5be1303ef983c03c0baa5cca455757d"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/pytest_temp_full/test_load_complete_rows_drops_0/full.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "pytest scratch directory, not a research result",
+      "size": 233,
+      "sha256": "1402279d764514b051c4a4b284e007c5b8603a37639969c9d2fc7e494d85ab1c",
+      "applied": "removed"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/pytest_temp_full/test_load_complete_rows_drops_0/partial.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "pytest scratch directory, not a research result",
+      "size": 147,
+      "sha256": "12001e0effb615839817b9f1cc916d34e120899c761017712480870945100a3d",
+      "applied": "removed"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/pytest_temp_full/test_merge_rows_and_validate_c0/left.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "pytest scratch directory, not a research result",
+      "size": 33,
+      "sha256": "97282a1219dde26fd001812a691d17590c65493fd0d72f3eac6ab7da3bc9c0aa",
+      "applied": "removed"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/pytest_temp_full/test_merge_rows_and_validate_c0/right.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "pytest scratch directory, not a research result",
+      "size": 33,
+      "sha256": "4d068e308310117c690b79a4fc1a266ebd43cca197e4586028be9fc111da537b",
+      "applied": "removed"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/pytest_temp_full/test_merge_rows_rejects_duplic0/left.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "pytest scratch directory, not a research result",
+      "size": 27,
+      "sha256": "571ea52775ac8e19ac0e775da96122ead58172ebafe1b6b49fa212d433cc1301",
+      "applied": "removed"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/pytest_temp_full/test_merge_rows_rejects_duplic0/right.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "pytest scratch directory, not a research result",
+      "size": 27,
+      "sha256": "571ea52775ac8e19ac0e775da96122ead58172ebafe1b6b49fa212d433cc1301",
+      "applied": "removed"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/pytest_temp_full/test_proxy_csv_epoch_filter0/metrics.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "pytest scratch directory, not a research result",
+      "size": 66,
+      "sha256": "d659d96d9462d87332bad601dc2647446e6ae83ca4ca7f6b9acdb9cba49b37f8",
+      "applied": "removed"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/diagnostic.json",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 1040,
+      "sha256": "0dccaab5bdb63ff2eb05a1268f0bdadca4f4851130b1298cf595f93081bc1f0c",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_eligibility.json",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 31434,
+      "sha256": "3991f33ebfc86b74fc3e665da099ec9b2e095bfc8c5435b40f4b1f71515e730e",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv",
+      "status": "??",
+      "action": "defer",
+      "reason": "file exceeds the 10 MiB import comfort limit; keep it on the server",
+      "size": 14620237,
+      "sha256": "b5137e2b3fe89ce5a99a99ea94bafa48d1abb81c45837551e5b1a54fe42ac92d"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/previous_ranked_provenance.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 18532,
+      "sha256": "9a27f4764ab2cb8ed8dbe19d926dcd5d720adf500a92fd56772222c99c5baf67",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/ranking/excluded_metrics.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 301,
+      "sha256": "80dd9566190dd5115d64e99b8195abbd44fde15c9a204926064f2d537445b05e",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/ranking/strict_ranking.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 17839,
+      "sha256": "e0d6a8a293fce61a98b202f40112b1545143f4b332714e5f5a8a17588a6640e1",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/release_verification.json",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 121,
+      "sha256": "21789a8938231ceca7e969e9f25aff0ddc2eaf2726d2b4341936ca32ed09275b",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/repair_manifest.json",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 1673,
+      "sha256": "8dc2629e0acd03b46f41d68b7c2906a97422f34adda0060c275993559b6a3bf9",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/repair_rows.csv",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 1047,
+      "sha256": "91eaa8dae95082b6b042b943cbcb58dc44e10da9aa7a5ffd1b9e5a6ad74ad0eb",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/实验管理_snapshot.md",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 109498,
+      "sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
+      "applied": "copied"
+    },
+    {
+      "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/~$RobustMetric_严格全部指标总表_TRNAS补全_85项_三位小数.xlsx",
+      "status": "??",
+      "action": "reject",
+      "reason": "office lock/temporary file",
+      "size": 165,
+      "sha256": "424b12676b0dc3063985da2e638a87b7f6c0229f9e57b593304feab05a1d5aab"
+    },
+    {
+      "path": "outputs/student_metrics/wangjiahao/holdout_checkpoint_recovery_20261027/recovery_verification.json",
+      "status": "??",
+      "action": "import",
+      "reason": "small summary table or report",
+      "size": 2779,
+      "sha256": "263c0eea26bdf8c324ecb851f5b1f3440f872c30a0963789b1a57512414a2f90",
+      "applied": "copied"
+    },
+    {
+      "path": "progress.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3693,
+      "sha256": "44739ce1cef7c383659df3ddfa412cf893a54e473580d723ca37f462ffa8645f",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_e27_capacity_validation.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 5610,
+      "sha256": "126291193de89c06bf2f37e4c8e14d34360ade379181b8cd8a8606853ed772b2",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_e27_spectral_jacobian.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 4443,
+      "sha256": "115bbb3589edd20013f4ed59276fa5d368add74e7b3d0b9dc717a5c07d03e240",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_e30_graph_structure.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3538,
+      "sha256": "09ed33c247c1e4e667124ca5e3bb249a7599d4f4be35b89811c4179c967ed729",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_e30_graph_structure_cv.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3005,
+      "sha256": "eae872ce5509bad2bc4c79b19cedaf300533cf0a32a2dc3eba3f33bb66986bd4",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_e32_generality.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 4785,
+      "sha256": "823a8027b1f71e3b3c35878c15210731e672f5a042c4c48d0f5ce69534778cfc",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_e33_mechanism.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 4294,
+      "sha256": "e4942eb5632f786e44626872eb57a2b7fe088f79d9a59d923cf39c4f48c38a69",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_e34_stability.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 1969,
+      "sha256": "0ef77bcd867977490761166ed69fab3c0cb617087ee8f9c6d87b90964597979f",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_e35_newmetrics_cross_space.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3181,
+      "sha256": "dfa286c122302357abd16ca89f78f0ac418e8ad2f3a64bf435f6b06feb992b34",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_nb201_quick.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3400,
+      "sha256": "5e82b4c7fb5c0ea183a6b94c9651528781abeea1a384e9458c39873d4a3c064b",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/analyze_trnas_ours_comparison.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 12236,
+      "sha256": "08531b6ff2604c73722414581e0c892ebd1827dd8f0bc2cd71005825cf756b04",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/evaluate_darts_e27_zerocost.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 4139,
+      "sha256": "594a623f04f206dedda706c68ab9f75eb5facc04a0db1176878a5ad08e9c2bd4",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/evaluate_nb201_e27_zerocost.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3271,
+      "sha256": "de544ff6e978218ff6967873b58cba9756b19d474261d17a9ffbf4db49103e4d",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/evaluate_rb40_e36_batched.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 2871,
+      "sha256": "e6687f375af4d0fea207eddae2adef4be6e17a73d4b745b04c66e3ba53b5807b",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/repair_kang_trnas_direct_ode.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 6484,
+      "sha256": "009abcf0bfc2680073fdf115b08210a06207f43ee9049864b64ced8244e07de8",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/resume_e36_mixednuts_exclusive_gpu.sh",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 6528,
+      "sha256": "1fb5b8def286a94e4b268dd570e0484d518176d042c13a7ee8c840b6b00c9bd9",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/resume_e36_rb40_final_two.sh",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 6816,
+      "sha256": "ef8d6e83f4420cc3cf53928058c944b9b382001c9e61111f94cf9ecaef25f1c8",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/resume_e36_rb40_oom_cpu.sh",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 6405,
+      "sha256": "ee3f05bc8b42c2e13ab1df22637655b78e6c7031680970c484de4a14fa4efe3e",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/resume_e36_rb40_remaining_cpu.sh",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 7387,
+      "sha256": "2b2867ea3660d2032cbbf5347cbcedc2f77ff05d6a91921c729b347717695668",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/smoke_new_metrics.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 1371,
+      "sha256": "2b23fa01d29d4c59b913bf32ac3bc3d4cb566ae4888a3f62fd73e0cdec9cc76f",
+      "applied": "copied"
+    },
+    {
+      "path": "scripts/train_nb201_e34_stability.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 6707,
+      "sha256": "a1430d148336ecd2e2f80af9be5a49fe3d65cb3b89bf5921691dc2ad099b77ba",
+      "applied": "copied"
+    },
+    {
+      "path": "src/robust_metric_lab/e36_batched.py",
+      "status": "??",
+      "action": "defer",
+      "reason": "depends on the uncommitted metrics.py patch; preserved on the wip snapshot branch",
+      "size": 3748,
+      "sha256": "594d5693f0b50967ccccfa6e9e7e3039d85caf3d017b755ff815d3010da1df98",
+      "applied": "removed"
+    },
+    {
+      "path": "src/robust_metric_lab/nb201_space.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 5000,
+      "sha256": "6df284f338bde91ff44935e4c104a89e204f43769c76558a244561cea834fe4a",
+      "applied": "copied"
+    },
+    {
+      "path": "task_plan.md",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 3953,
+      "sha256": "f564267eec536748c5190b9cae1fea9934a59c4ab896ea9ec10101ee16b9da1e",
+      "applied": "copied"
+    },
+    {
+      "path": "tests/test_e36_batched.py",
+      "status": "??",
+      "action": "defer",
+      "reason": "depends on the uncommitted metrics.py patch; preserved on the wip snapshot branch",
+      "size": 2449,
+      "sha256": "19a57ac8f45ee16056be002b8e35ad4f0fd792711152361209a79939d910a938",
+      "applied": "removed"
+    },
+    {
+      "path": "tests/test_kang_trnas_repair.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 1330,
+      "sha256": "3f37e6328ba23058a6be9ae7a84210640e8aae263af5dee731d6a097956bd2dd",
+      "applied": "copied"
+    },
+    {
+      "path": "tests/test_trnas_ours_comparison.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 1224,
+      "sha256": "3946011477a470dcc04cda5f9ebae193b0163533d7523d43ca4e38bcb9dcab33",
+      "applied": "copied"
+    },
+    {
+      "path": "tools/build_research_progress_handoff_doc.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 18985,
+      "sha256": "69b275e63a9414058be06b3af0b77d56dc278796bcdde705a5e9f56299455cfa",
+      "applied": "copied"
+    },
+    {
+      "path": "tools/render_docx_word.ps1",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 532,
+      "sha256": "b500709fe3d71aaf3cffde91f9d3bd0622e7afa19fa491c47edeae3f29eb2152",
+      "applied": "copied"
+    },
+    {
+      "path": "tools/verify_research_progress_handoff_doc.py",
+      "status": "??",
+      "action": "import",
+      "reason": "source, test, config, documentation or top-level note",
+      "size": 1796,
+      "sha256": "2c8f43dc1d515a7461560b8fad90fbf1949c8e997c34406f138990c378d6c50f",
+      "applied": "copied"
+    }
+  ],
+  "copied": 133
+}

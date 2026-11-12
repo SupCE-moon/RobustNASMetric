@@ -1,0 +1,28 @@
+{
+  "created_at_utc": "2026-10-23T18:01:47.023208+00:00",
+  "source_raw": "/workspace/robust_metric_lab_nas/outputs/student_metrics/wangjiahao/strict_final_release_20261008T000000Z/metric_values_merged.csv",
+  "checkpoint_path": "/workspace/robust_metric_lab_nas/shared_benchmarks/robust_metric_v1/rb40/models/cifar10/Linf/Kang2021Stable.pt",
+  "device": "cpu",
+  "seed": 20260808,
+  "sample_offset": 0,
+  "num_samples": 64,
+  "epsilon": 0.03137254901960784,
+  "weight_step_size": 1e-06,
+  "gradient_route": "torchdiffeq.odeint direct autograd only for Kang TRNAS; unchanged forward solver",
+  "original_route": "torchdiffeq.odeint_adjoint",
+  "forward_clean_max_abs_delta": 0.0,
+  "forward_adversarial_max_abs_delta": 0.0,
+  "result": {
+    "activation_psi": 0.0,
+    "consistency_phi": 686.1439208984375,
+    "r_score": 0.0,
+    "num_relu_units": 0,
+    "num_consistency_layers": 181
+  },
+  "runtime_sec": 132.80680474359542,
+  "replaced_metric_names": [
+    "trnas_activation_psi",
+    "trnas_consistency_phi",
+    "trnas_r_score"
+  ]
+}

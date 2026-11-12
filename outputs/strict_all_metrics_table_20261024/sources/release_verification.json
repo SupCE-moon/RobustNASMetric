@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "raw_rows": 47600,
+  "unique_raw_keys": 47600,
+  "ranked_metrics": 80,
+  "excluded_metrics": 5
+}

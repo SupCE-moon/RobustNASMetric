@@ -1,0 +1,18 @@
+metric,NB201 e0,RB20,DARTS e0
+fsp_delta,0.5988,0.4503,0.0947
+feature_measure_struct01_delta,0.5352,0.4525,0.0917
+feature_measure_moment_delta,0.6317,0.3163,0.1008
+feature_measure_flow_rel_delta,0.7963,0.0484,0.2662
+feature_delta,0.8453,-0.0303,0.218
+perturbation_capacity_signed_delta,-0.0805,-0.1604,-0.3805
+perturbation_capacity_iqr_delta,0.5524,0.4366,-0.1338
+perturbation_capacity_multiscale_delta,0.8024,0.5751,-0.0075
+perturbation_capacity_relu_active_multiscale_delta,0.7922,0.6531,-0.0586
+perturbation_capacity_topk_delta,0.7015,0.5668,-0.0481
+perturbation_capacity_iqr_active_delta,0.3054,0.566,-0.1744
+feature_spectral_erank_static,0.1789,-0.3473,-0.0481
+feature_spectral_participation_ratio_static,0.2194,-0.2876,-0.0331
+feature_spectral_decay_exponent_static,0.1335,-0.0386,0.1459
+jacobian_spectral_norm,0.5031,0.4268,0.397
+jacobian_effective_rank,-0.7808,-0.1445,0.2767
+jacobian_spectral_decay,-0.8152,-0.1998,0.2767
