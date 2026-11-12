@@ -87,3 +87,26 @@ python tools/server_inventory.py --host <ip> --port <port> --user <user> `
 - 不要拿训练完成的模型与随机初始化模型直接比（攻击强度不可比）。
 - 不要引用 2026-10-09 那版名次（已被 10-24 版取代）。
 - 不要在 `main` 上"顺手"提交。
+
+## 8. 2026-11-12 第二轮：主线已判定并合并（接手者必读）
+
+上一版第 6 节把"定主线"当成未来任务，这件事已经做完，结论也改过一次，务必按新结论走：
+
+- **代码主线 = `893a994`（`codex/strict-metrics-e37` 一线，2026-10-09）**，判据是
+  `metrics.py` 的**函数集严格超集**（56 个函数 vs `dc6fb9c` 的 51 个），不是字节数、不是提交时间。
+- **`dc6fb9c` 只是"服务器基线提交"**：服务器目录据记录从它导出，但它不是最新代码。
+- 三条线都已并入 `codex/server-mainline-merge-20261112`：
+  `dc6fb9c`（→ `7400d49`）、`893a994`（→ `92c5d10`）、`dfc67f2` 的 68 个文件 + `2bcb95c` 的 9 个未跟踪文件（→ `13c1d49`）。
+- 九棵树对照现在只剩"已解释的残差"：数据集、xlsx 预览、超限 CSV、egg-info、`.tmp`。
+  明细 `results/manifests/reconciliation-20261112/tree-comparison.{json,md}`，可一键重算（见第 5 节工具）。
+- `pytest tests -q` = **477 passed / 3 skipped**。
+
+两个新踩到的坑（按顺序看，能省你半天）：
+
+1. **worktree 里套 worktree**：`ba02`、`strict-metrics-e37` 下面还有一层 `robust_metric/`。
+   按 worktree 根盘点会得到 391 / 441 个假"独有文件"；要按内层目录盘点。
+2. **换行符**：`server-mainline` 是 CRLF 检出的，56 个"内容不同"里 46 个只是换行符。
+   比对前先归一化，否则差异被夸大 5 倍。
+
+还剩的活（顺序不变）：服务器 SSH 一通就跑 `server_inventory.py`，把服务器停在哪个提交、有哪些大结果落成 manifest；
+然后才谈"三空间独立留出集"和 `feature_activation_sign_survival_sum` 的终态。

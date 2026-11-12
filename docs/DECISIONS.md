@@ -143,3 +143,51 @@ adversarial-excess feature drift", "Ours")`）。
 合并后主线代码比 `main` 完整，`main` 不再被当作代码基线。
 
 
+
+---
+
+## D-009 修正 D-008：代码主线是 `893a994`（strict-e37），`dc6fb9c` 只是服务器基线提交
+
+**背景**：D-008 用"主工作树 6 个未提交文件与 `dc6fb9c` 逐字节相同"认定 `dc6fb9c` 是主线。
+这个推理只证明"那 6 个文件来自 `dc6fb9c`"，不证明"`dc6fb9c` 是最新代码"。
+把 9 棵树的文件全部展开后，`strict-metrics-e37`（`893a994`，2026-10-09）的 `metrics.py`
+是 76,626 字节 / 56 个顶层函数，而 `dc6fb9c` 是 67,447 / 51 个。
+
+**选择**：判定 `893a994` 为代码主线，并把它合并进整理分支（`92c5d10`）；
+`dc6fb9c` 的定位改为"服务器基线提交"。判据用**函数集包含关系**（`ast` 解析后比较函数名集合），
+不用字节数，也不用提交时间。
+
+**理由**：
+1. 字节大不代表代码新——注释、换行、无关重构都能撑大文件。函数集是严格超集才说明"新代码包含旧代码"。
+2. 提交时间会被 rebase / checkout 伪造。实例：`dfc67f2`（activation-survival）提交最晚（10-31），
+   但它的 `metrics.py` 只有 43,562 字节 / 33 个函数，底子是 9 月那一版；按时间判会把它当主线。
+3. `893a994` 无论按函数集还是按业务内容（e36/e37 指标、strict release 流水线）都是最全的一支。
+
+**执行**：4 处冲突全部取 `893a994` 侧，并补回 adv-excess 声明与其 eligibility 行
+（`metric_eligibility.py` 的 `validate` 要求注册表里的每个指标都有资格行，缺一行就 3 个测试变红）。
+
+**后果**：`pytest tests -q` = **284 passed, 2 skipped**。D-008 的合并保留，因为它记录的是
+"服务器基线 = 哪一版"这个仍然有效的事实，只是不再等于"最新代码"。
+
+---
+
+## D-010 三个"补丁级"取舍：egg-info 拒绝入库、matplotlib 降为可选依赖、log 文件入库
+
+**背景**：把剩余的 worktree 独有文件并进来时，有三类文件需要当场定规则，否则会一边漏一边脏。
+
+**选择**：
+1. `tools/repository_policy.py` 增加规则：路径里出现 `<package>.egg-info/` → `reject`。
+   它是 `pip install -e .` 生成的产物，记录的是**这一台机器**的安装路径，进 Git 只会泄露本机路径。
+2. `pyproject.toml` 增加可选依赖 `plot = ["matplotlib"]`，
+   `tests/test_e37_diagnostic_plot.py` 改为 `pytest.importorskip("matplotlib")`。
+3. `outputs/e28_capacity_family/rb20*_run.log`、`outputs/e34_nb201_pgd1_run.log` 入库。
+
+**理由**：
+1. egg-info 是唯一让 `three-space` 看起来还有"5 个独有文件"的东西，拒绝后归零。
+2. 只有画图脚本需要 matplotlib，指标流水线不需要。把它设成硬依赖会让服务器环境安装变重；
+   设成可选又会让测试在没装的机器上红。`importorskip` 是标准做法：跳过是"环境不具备"，
+   失败是"代码有问题"，两者不能混。
+3. 运行日志是**实验档案**，不是缓存：它记录当时跑的哪条命令、多少轮、有没有报错，
+   丢了就无法复现"这个数字是哪次跑出来的"。三个文件合计 17 KB，属于应入库的小结果。
+
+**后果**：`pytest tests -q` = **477 passed, 3 skipped**（3 skip = 2 个符号链接 + 1 个 matplotlib）。

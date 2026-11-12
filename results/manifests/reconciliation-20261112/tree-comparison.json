@@ -31,26 +31,6 @@
           "sha256": "4156e97721677a12d392c322daddfec3d2618b7a89a6154e11f4db57d88eb14c"
         },
         {
-          "path": "outputs/e28_capacity_family/rb20_run.log",
-          "size": 1383,
-          "sha256": "19d7806361ea72fead9e9816a248f24fe2fc3923e33178f4f9a40f95461a884f"
-        },
-        {
-          "path": "outputs/e28_capacity_family/rb20_v2_run.log",
-          "size": 1386,
-          "sha256": "9174bb245631b64e3853a7d7b59d5133f897f6c0fb3dbf0767cb90674eb95698"
-        },
-        {
-          "path": "outputs/e28_capacity_family/rb20_v3_run.log",
-          "size": 1386,
-          "sha256": "0d7041772fbc033fd29de43e1021caf65d166e840e8319f53480d23015fc7ad3"
-        },
-        {
-          "path": "outputs/e34_nb201_pgd1_run.log",
-          "size": 12896,
-          "sha256": "3981f933123b4669e8309ebae8b585822eae50433b3520f68b20980100674577"
-        },
-        {
           "path": "outputs/strict_all_metrics_table_20261024/RobustMetric_严格全部指标总表_85项.xlsx",
           "size": 21625,
           "sha256": "754842ba01ae3ddca49522ced94f25be9fd410181945671bffd26a451d6139a6"
@@ -59,11 +39,6 @@
           "path": "outputs/strict_all_metrics_table_20261024/RobustMetric_严格全部指标总表_85项.xlsx.inspect.ndjson",
           "size": 631972,
           "sha256": "ef51cc1185aef652112c6e8f7ef65c0a32dba013ed6d98926b6370a8893a681d"
-        },
-        {
-          "path": "outputs/strict_all_metrics_table_20261024/build_all_metrics.mjs",
-          "size": 8257,
-          "sha256": "e2056c64fd8e0ca993028e0a1c7d41706af2a7127be3467b08aa2d703b9ae96a"
         },
         {
           "path": "outputs/strict_all_metrics_table_20261024/preview.png",
@@ -94,11 +69,6 @@
           "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/RobustMetric_严格全部指标总表_TRNAS补全_85项_三位小数.xlsx.inspect.ndjson",
           "size": 632283,
           "sha256": "6a689df018fe88b22e0f9c6acc99726a906fc493fb1312febba4cf6d1ba6b71e"
-        },
-        {
-          "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/build_all_metrics.mjs",
-          "size": 10261,
-          "sha256": "e51480dd9f1e21081b585a70be8acba5c9cd0c0e6daca633800311929f11caa8"
         },
         {
           "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/preview.png",
@@ -379,6 +349,13 @@
           "target_size": 20351
         },
         {
+          "path": "pyproject.toml",
+          "other_sha256": "c327e079bb2531d7aaf9b0f048fb24a4b6f9986f5c692aa8f7c2e6fed2132a15",
+          "target_sha256": "64cf64e1d8ae15381aa4a60789f80d8bfb38ba601764691ed0719f6a155edc8a",
+          "other_size": 509,
+          "target_size": 617
+        },
+        {
           "path": "src/robust_metric_lab/metric_registry.py",
           "other_sha256": "c6af465bbe952bbe279387fc32601a73c6c546b8c1bd6659be323c1b09cf4be3",
           "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
@@ -422,38 +399,13 @@
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 109,
-      "only_in_other_bytes": 32715384
+      "only_in_target_count": 184,
+      "only_in_other_bytes": 32679815
     },
     {
       "label": "adv-excess",
       "other_file_count": 459,
       "only_in_other": [
-        {
-          "path": "docs/experiments/DARTS_E37_逐层诊断严格复核报告_20261026.md",
-          "size": 5289,
-          "sha256": "2bc340f377d592b7411e4301ad707e7eb275ac6b65424d74b0450f99bed93bcf"
-        },
-        {
-          "path": "docs/experiments/DARTS_E37_逐层诊断最终验收补充记录_20261026.md",
-          "size": 3799,
-          "sha256": "602e06a7c5e993349d96a37550dc9367c74d94d47c0d74f980595a4dc20e68ca"
-        },
-        {
-          "path": "docs/experiments/DARTS_E37_逐层诊断结果与问题记录_20261025.md",
-          "size": 9357,
-          "sha256": "e96f9dab0274f1b9813c6a69b13b7e0a9fcbb9b358f1887dc1e3fbf4ed6042de"
-        },
-        {
-          "path": "docs/superpowers/plans/2026-10-25-darts-e37-layer-diagnostic-implementation.md",
-          "size": 34131,
-          "sha256": "f686ffc1bba854697ba2ee2833d87a082e6236445ece72d485aa655d4490acd7"
-        },
-        {
-          "path": "docs/superpowers/specs/2026-10-25-darts-e37-layer-diagnostic-design.md",
-          "size": 7588,
-          "sha256": "3b6632213439c31406f33ac91e93d3d5986699f94f30c15d674092eec04b1d47"
-        },
         {
           "path": "outputs/strict_adv_excess_release_20261024T110422Z/RobustMetric_严格全部指标总表_86项_三位小数.xlsx",
           "size": 16298,
@@ -465,84 +417,9 @@
           "sha256": "9d26bb235b24d8aa6dbc4ae117b59b5c0f7e7cd99314fbab9e9ea53371e8f2e2"
         },
         {
-          "path": "outputs/strict_adv_excess_release_20261024T110422Z/build_teacher_xlsx.mjs",
-          "size": 3222,
-          "sha256": "89c3f903f8e592c6d74a3a176c224de2b1d7e1ae093fd774672edd03e189c511"
-        },
-        {
           "path": "outputs/strict_adv_excess_release_20261024T110422Z/teacher_table_preview.png",
           "size": 89349,
           "sha256": "370b04b1949d0d44b6d5f33d7c7a129c846476d8eb79e4200fd4cd49a732e6c4"
-        },
-        {
-          "path": "scripts/analyze_e37_layer_diagnostic.py",
-          "size": 9176,
-          "sha256": "7404997e6c662dd99a9908b814aca4d6b290ad7e466182a596e14071b2a1244c"
-        },
-        {
-          "path": "scripts/attest_e37_legacy_batch.py",
-          "size": 3700,
-          "sha256": "d4682390ceed429db08c68d56b0caaf91ed030cea5bf372465382443cdc4a5c6"
-        },
-        {
-          "path": "scripts/e37_diagnostic_manifest.py",
-          "size": 8179,
-          "sha256": "4e82cccfb8438cb56933730d99773acb60573d17ef74f612b54942a4a208b0ce"
-        },
-        {
-          "path": "scripts/plot_e37_layer_diagnostic.py",
-          "size": 3903,
-          "sha256": "32b3ea7c25c32df6880130b82297b308b253d52cecd184f470693bd7dfb2dc43"
-        },
-        {
-          "path": "scripts/run_e37_layer_diagnostic.py",
-          "size": 13642,
-          "sha256": "d4890f7496c4d9a37b3735f6dd3ebf51349428a2e4851c9603f5624b4e6e073d"
-        },
-        {
-          "path": "scripts/verify_e37_layer_diagnostic.py",
-          "size": 23805,
-          "sha256": "520aa74d7b43b17f55e3279680d7647f573204852b9bb8b0dc92bb57c5174dad"
-        },
-        {
-          "path": "src/robust_metric_lab/e37_layer_diagnostic.py",
-          "size": 6168,
-          "sha256": "bde0fdba9e8fe6dbdc7c6d99781ec55e6b7d34a484baf842a39757ea5afbd946"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_analysis.py",
-          "size": 4845,
-          "sha256": "82dab0bfcd13d7d1060bd9e75368fb448581ba0c693deca3bcdcbb066a7b370a"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_attempts.py",
-          "size": 5418,
-          "sha256": "4fd9365f55d112d4e57363a0ccfcd061254407600f9142b8ff4682e128ec6f89"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_legacy_attestation.py",
-          "size": 1897,
-          "sha256": "58de318e732aa41747f0af81d99040dda72a7dd22387bc47a35c266124917c71"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_manifest.py",
-          "size": 4644,
-          "sha256": "5728c21bb2dd291d009bb3b59eb3c9844a507e6664a475acc207b5395985bc9a"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_plot.py",
-          "size": 2185,
-          "sha256": "192ba89d8cfa9ebe80c1ff696d95b0511c65ba67f85002f80a0a1bffbe2ff91a"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_verification.py",
-          "size": 14256,
-          "sha256": "d9cb12fdb08018e0df1bb611518a51e84eb79db89c435b2ed26d589d751841f2"
-        },
-        {
-          "path": "tests/test_e37_layer_diagnostic.py",
-          "size": 3738,
-          "sha256": "491bcc835599e6fd9e299fdfcab50b410ee95646870007142f6b215385baa722"
         }
       ],
       "differs": [
@@ -589,6 +466,13 @@
           "target_size": 22357
         },
         {
+          "path": "pyproject.toml",
+          "other_sha256": "c327e079bb2531d7aaf9b0f048fb24a4b6f9986f5c692aa8f7c2e6fed2132a15",
+          "target_sha256": "64cf64e1d8ae15381aa4a60789f80d8bfb38ba601764691ed0719f6a155edc8a",
+          "other_size": 509,
+          "target_size": 617
+        },
+        {
           "path": "scripts/compute_metric_batch.py",
           "other_sha256": "d235c24f0af171eddc22511c4e8ba61ec629eccc96cb1a6784c971cc6e015eaa",
           "target_sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61",
@@ -631,6 +515,13 @@
           "target_size": 7132
         },
         {
+          "path": "tests/test_e37_diagnostic_plot.py",
+          "other_sha256": "192ba89d8cfa9ebe80c1ff696d95b0511c65ba67f85002f80a0a1bffbe2ff91a",
+          "target_sha256": "e155d148db35e0efa5b407a1096524beb31e4c753c73cce02d7254db7db7c936",
+          "other_size": 2185,
+          "target_size": 2383
+        },
+        {
           "path": "tests/test_racl_lipschitz_metric.py",
           "other_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
           "target_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
@@ -646,8 +537,8 @@
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 221,
-      "only_in_other_bytes": 873071
+      "only_in_target_count": 282,
+      "only_in_other_bytes": 704129
     },
     {
       "label": "ba02",
@@ -674,6 +565,13 @@
           "target_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
           "other_size": 19656,
           "target_size": 22357
+        },
+        {
+          "path": "pyproject.toml",
+          "other_sha256": "c327e079bb2531d7aaf9b0f048fb24a4b6f9986f5c692aa8f7c2e6fed2132a15",
+          "target_sha256": "64cf64e1d8ae15381aa4a60789f80d8bfb38ba601764691ed0719f6a155edc8a",
+          "other_size": 509,
+          "target_size": 617
         },
         {
           "path": "scripts/compute_metric_batch.py",
@@ -733,7 +631,7 @@
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 266,
+      "only_in_target_count": 347,
       "only_in_other_bytes": 0
     },
     {
@@ -768,6 +666,13 @@
           "target_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
           "other_size": 19656,
           "target_size": 22357
+        },
+        {
+          "path": "pyproject.toml",
+          "other_sha256": "c327e079bb2531d7aaf9b0f048fb24a4b6f9986f5c692aa8f7c2e6fed2132a15",
+          "target_sha256": "64cf64e1d8ae15381aa4a60789f80d8bfb38ba601764691ed0719f6a155edc8a",
+          "other_size": 509,
+          "target_size": 617
         },
         {
           "path": "scripts/compute_metric_batch.py",
@@ -806,7 +711,7 @@
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 217,
+      "only_in_target_count": 298,
       "only_in_other_bytes": 0
     },
     {
@@ -822,346 +727,6 @@
           "path": "data/official_nasrobbench201_source/meta.json",
           "size": 2112697,
           "sha256": "54b6d2c2780cfb63de98e9d67e72db9cb0c02be426191d429dbe02c898d4577e"
-        },
-        {
-          "path": "docs/experiments/DARTS_E37_逐层诊断严格复核报告_20261026.md",
-          "size": 5289,
-          "sha256": "2bc340f377d592b7411e4301ad707e7eb275ac6b65424d74b0450f99bed93bcf"
-        },
-        {
-          "path": "docs/experiments/DARTS_E37_逐层诊断最终验收补充记录_20261026.md",
-          "size": 3799,
-          "sha256": "602e06a7c5e993349d96a37550dc9367c74d94d47c0d74f980595a4dc20e68ca"
-        },
-        {
-          "path": "docs/experiments/DARTS_E37_逐层诊断结果与问题记录_20261025.md",
-          "size": 9357,
-          "sha256": "e96f9dab0274f1b9813c6a69b13b7e0a9fcbb9b358f1887dc1e3fbf4ed6042de"
-        },
-        {
-          "path": "docs/experiments/activation_holdout_provenance_audit_20261027.md",
-          "size": 32252,
-          "sha256": "40cd90c24d556e45d07fc5bb007c7fac57b500f75e022c4f3cc1acb574c98215"
-        },
-        {
-          "path": "docs/experiments/activation_sign_survival_run_20261027.md",
-          "size": 6852,
-          "sha256": "6605ae3866568c9df240dd28b0b6653c8debb3a8a1d2f047d59326dd480a02c6"
-        },
-        {
-          "path": "docs/experiments/activation_sign_survival_source_audit_20261030.md",
-          "size": 4419,
-          "sha256": "0eff7125ac45eae78fc2e9a244ef2a4313b42a027db7e5c12a5fc1900d78ac48"
-        },
-        {
-          "path": "docs/experiments/教师交接README服务器核对_20261031.md",
-          "size": 3625,
-          "sha256": "92eaa7cbbb617750ca2e58b5b8607a52ebbe9bde0137e20984c23656327a866c"
-        },
-        {
-          "path": "docs/experiments/自研指标定位与TRNAS对照进度_20261030.md",
-          "size": 3259,
-          "sha256": "950fa2af1cf13ede01337b5eba0735744027a23f302dee3bf7fb73967b4edcb7"
-        },
-        {
-          "path": "docs/superpowers/plans/2026-10-25-darts-e37-layer-diagnostic-implementation.md",
-          "size": 34131,
-          "sha256": "f686ffc1bba854697ba2ee2833d87a082e6236445ece72d485aa655d4490acd7"
-        },
-        {
-          "path": "docs/superpowers/plans/2026-10-27-activation-sign-survival-independent-validation.md",
-          "size": 20091,
-          "sha256": "a01052ecea77df8d40e6f64975d9011f301d2c7ae9dcda31a9adc49dcc89fdf0"
-        },
-        {
-          "path": "docs/superpowers/plans/2026-10-27-activation-sign-survival-main-grid.md",
-          "size": 23028,
-          "sha256": "a0a57d519ad9c700c4252f5d2afce4f898d2bfa5c17fd2a0726a1b5ff5a93509"
-        },
-        {
-          "path": "docs/superpowers/plans/2026-10-31-darts-independent-holdout-weights-and-targets.md",
-          "size": 10389,
-          "sha256": "92331ad5ca406ffc9bdee59882a9801eceb35848f02e0db77e227f970a11f869"
-        },
-        {
-          "path": "docs/superpowers/specs/2026-10-25-darts-e37-layer-diagnostic-design.md",
-          "size": 7588,
-          "sha256": "3b6632213439c31406f33ac91e93d3d5986699f94f30c15d674092eec04b1d47"
-        },
-        {
-          "path": "docs/superpowers/specs/2026-10-27-activation-boundary-survival-design.md",
-          "size": 10162,
-          "sha256": "86f6e78d4f3aee72bcbc3982333bc670fa4be44eff55bfce764af1cf8499418b"
-        },
-        {
-          "path": "scripts/activation_survival_manifest.py",
-          "size": 11876,
-          "sha256": "0b3b6972d838d7beb5093f775b9b0707cb6df311d548626a0a96ed19d9eceff6"
-        },
-        {
-          "path": "scripts/analyze_activation_survival.py",
-          "size": 8520,
-          "sha256": "5aefaeb2f9dfbf497fe90a99cfd5e649aef426d7c1e00475496e802d17eb5e3c"
-        },
-        {
-          "path": "scripts/analyze_e37_layer_diagnostic.py",
-          "size": 9176,
-          "sha256": "7404997e6c662dd99a9908b814aca4d6b290ad7e466182a596e14071b2a1244c"
-        },
-        {
-          "path": "scripts/attest_e37_legacy_batch.py",
-          "size": 3700,
-          "sha256": "d4682390ceed429db08c68d56b0caaf91ed030cea5bf372465382443cdc4a5c6"
-        },
-        {
-          "path": "scripts/build_activation_holdout_manifest.py",
-          "size": 10268,
-          "sha256": "f8dd2fa708ff5a33a737bebcf3b81d0a3a35762ff2dc992e799bba78a1fce6ef"
-        },
-        {
-          "path": "scripts/build_activation_survival_strict_release.py",
-          "size": 11204,
-          "sha256": "2836ffca49fdbac1ff4802a457f58485bca9a89f3b295aea54c51683ba79c399"
-        },
-        {
-          "path": "scripts/collect_activation_survival_attempts.py",
-          "size": 4235,
-          "sha256": "fb5c52ef533a1ae6bb100ba580bbab05020b45937451bf9f76dd2733c3695f14"
-        },
-        {
-          "path": "scripts/e37_diagnostic_manifest.py",
-          "size": 8179,
-          "sha256": "4e82cccfb8438cb56933730d99773acb60573d17ef74f612b54942a4a208b0ce"
-        },
-        {
-          "path": "scripts/evaluate_activation_holdout_darts_targets.py",
-          "size": 3567,
-          "sha256": "9c2f1387b805338892419bdcfa4c73718be2b2da1fd289eec9b19e6dcb228ced"
-        },
-        {
-          "path": "scripts/evaluate_activation_survival_student.py",
-          "size": 10534,
-          "sha256": "1d3b709686df1faff392f7f41e3afcc88bea99ec7bf12d093187bc22c986bbd8"
-        },
-        {
-          "path": "scripts/holdout_exposure_inventory.py",
-          "size": 5152,
-          "sha256": "c4d352765f66a89622594ce9a2acb04ceca7cdc3b7671e69e1f4eb11acebbe79"
-        },
-        {
-          "path": "scripts/holdout_overlap_audit.py",
-          "size": 4858,
-          "sha256": "23ce9a67631ef7faeecb69c1fff824ed63d69ffdd437dc4c870b83ab8cf48da2"
-        },
-        {
-          "path": "scripts/plot_e37_layer_diagnostic.py",
-          "size": 3903,
-          "sha256": "32b3ea7c25c32df6880130b82297b308b253d52cecd184f470693bd7dfb2dc43"
-        },
-        {
-          "path": "scripts/resolve_darts_id_only_sources.py",
-          "size": 5546,
-          "sha256": "2d1cc6a4240631a35f1fad8e14ce5a81dceec6dac62827f1d215ba1c2b61e60e"
-        },
-        {
-          "path": "scripts/run_e37_layer_diagnostic.py",
-          "size": 13642,
-          "sha256": "d4890f7496c4d9a37b3735f6dd3ebf51349428a2e4851c9603f5624b4e6e073d"
-        },
-        {
-          "path": "scripts/select_activation_holdout_darts.py",
-          "size": 1697,
-          "sha256": "2778206ea8b8d2200e35f37713d23cc8e8f31e8ac273bf3bd36573461b466aae"
-        },
-        {
-          "path": "scripts/select_activation_holdout_nb201.py",
-          "size": 2139,
-          "sha256": "50b164f7e3ebcd1a09f7f0b82417ef1f63546faa122e81499fc0abda46d846c1"
-        },
-        {
-          "path": "scripts/smoke_activation_survival.py",
-          "size": 6726,
-          "sha256": "7efe020bdb409a0745aac0e1ce203ac1c017ef0c8817af10bb7d557a53a13698"
-        },
-        {
-          "path": "scripts/train_activation_holdout_nb201.py",
-          "size": 11884,
-          "sha256": "99bd26c2b8fd4849641ec407e0fb892151adc6fc6205667ec2251e5140537081"
-        },
-        {
-          "path": "scripts/verify_activation_survival.py",
-          "size": 10510,
-          "sha256": "e44b16ab6bfd9dd72b3fc7fe0cf6a3e91d55b333ff00b7bc8ca56874bf747acb"
-        },
-        {
-          "path": "scripts/verify_e37_layer_diagnostic.py",
-          "size": 23805,
-          "sha256": "520aa74d7b43b17f55e3279680d7647f573204852b9bb8b0dc92bb57c5174dad"
-        },
-        {
-          "path": "scripts/verify_holdout_provenance.py",
-          "size": 4733,
-          "sha256": "9a8b1824c9244bde32dee258ac956e0eff5726c3d199eb11152612055b6e5f61"
-        },
-        {
-          "path": "scripts/verify_holdout_targets.py",
-          "size": 26687,
-          "sha256": "6d2e889041da05d954215024df1df32e7c4a0acd9624ce78e28c6990673e8792"
-        },
-        {
-          "path": "scripts/wait_and_release_activation_survival.sh",
-          "size": 1854,
-          "sha256": "1b724236e8e4964cc30f6fd93c6ff731bf852b5d4174b433fa6eb1405118ffc7"
-        },
-        {
-          "path": "scripts/wait_and_run_activation_survival_full.sh",
-          "size": 3172,
-          "sha256": "5c3b9795bd377df34d1ddefb8c3be38d6aed578ec82415e487d53e9b225121d7"
-        },
-        {
-          "path": "scripts/wait_and_run_activation_survival_smoke.sh",
-          "size": 1396,
-          "sha256": "145eff171b9f34fac629b99e94362dc8e9bb37b0a6adb99147eed1b199b9110d"
-        },
-        {
-          "path": "scripts/wait_and_verify_activation_survival.sh",
-          "size": 1450,
-          "sha256": "51a887bbb9fa9df9a9b6b07aca600ae0e9846f8d8ad0c89fa2963ab5e3be5029"
-        },
-        {
-          "path": "src/robust_metric_lab/activation_sign_survival.py",
-          "size": 6698,
-          "sha256": "d7a415a3f9f253148dc389b5a447b7aec165575ea6344e3169ee2ac368837bf8"
-        },
-        {
-          "path": "src/robust_metric_lab/e37_layer_diagnostic.py",
-          "size": 6168,
-          "sha256": "bde0fdba9e8fe6dbdc7c6d99781ec55e6b7d34a484baf842a39757ea5afbd946"
-        },
-        {
-          "path": "tests/test_activation_holdout_manifest.py",
-          "size": 25171,
-          "sha256": "62ba9a570ff307bc74ada8960a638be56c71aa48febd49b51c81ec2121356ce4"
-        },
-        {
-          "path": "tests/test_activation_sign_survival.py",
-          "size": 3950,
-          "sha256": "cf02843aa5f9f8fbeed2aca5d9703d5f203548982a68b92b30ffda9e45ca2487"
-        },
-        {
-          "path": "tests/test_activation_survival_analysis.py",
-          "size": 3061,
-          "sha256": "5f8ff98fa06329b742ca642197f8e0846fd067a78b0f6a0e047c86912ed4f47b"
-        },
-        {
-          "path": "tests/test_activation_survival_attempt_collection.py",
-          "size": 4143,
-          "sha256": "74869c2005c8742e6838353c4b181453de70e5943f6a77ed5db1500e0a0ffb4c"
-        },
-        {
-          "path": "tests/test_activation_survival_attempts.py",
-          "size": 5847,
-          "sha256": "60e705c37f3a358ea3cc2d347f023d8bf2a4d33c34a859a8bb0fdc0ccf2a5931"
-        },
-        {
-          "path": "tests/test_activation_survival_manifest.py",
-          "size": 4262,
-          "sha256": "a3d04aa46f910a9995efe7cd8fc9b337885fa1665c7a1b94952f686405fd1814"
-        },
-        {
-          "path": "tests/test_activation_survival_smoke.py",
-          "size": 1021,
-          "sha256": "012bde7f52dcfe0e060d920a6591ac4af4a62783fdd50fbb5c87843a59dd5711"
-        },
-        {
-          "path": "tests/test_activation_survival_source_audit.py",
-          "size": 690,
-          "sha256": "1f9e542367adf80d70fdc4d939e06ad5cadf042c5b579c6befae6151fc366adf"
-        },
-        {
-          "path": "tests/test_activation_survival_strict_release.py",
-          "size": 5239,
-          "sha256": "2698b9103f05eb5a8c09b0c5459242394d9cd4ee368585f5dddcc918d13b3245"
-        },
-        {
-          "path": "tests/test_activation_survival_verification.py",
-          "size": 5348,
-          "sha256": "4fb5bf15a10499d509173aa1fd489d2fd8ce1b3826ea1df13dff008c1f65ac10"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_analysis.py",
-          "size": 4845,
-          "sha256": "82dab0bfcd13d7d1060bd9e75368fb448581ba0c693deca3bcdcbb066a7b370a"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_attempts.py",
-          "size": 5418,
-          "sha256": "4fd9365f55d112d4e57363a0ccfcd061254407600f9142b8ff4682e128ec6f89"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_legacy_attestation.py",
-          "size": 1897,
-          "sha256": "58de318e732aa41747f0af81d99040dda72a7dd22387bc47a35c266124917c71"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_manifest.py",
-          "size": 4644,
-          "sha256": "5728c21bb2dd291d009bb3b59eb3c9844a507e6664a475acc207b5395985bc9a"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_plot.py",
-          "size": 2185,
-          "sha256": "192ba89d8cfa9ebe80c1ff696d95b0511c65ba67f85002f80a0a1bffbe2ff91a"
-        },
-        {
-          "path": "tests/test_e37_diagnostic_verification.py",
-          "size": 14256,
-          "sha256": "d9cb12fdb08018e0df1bb611518a51e84eb79db89c435b2ed26d589d751841f2"
-        },
-        {
-          "path": "tests/test_e37_layer_diagnostic.py",
-          "size": 3738,
-          "sha256": "491bcc835599e6fd9e299fdfcab50b410ee95646870007142f6b215385baa722"
-        },
-        {
-          "path": "tests/test_evaluate_activation_holdout_darts_targets.py",
-          "size": 2046,
-          "sha256": "458141c07c3809c2cd684e4ad5ee6bc429f476022d7ede42a5c263ac267bd05b"
-        },
-        {
-          "path": "tests/test_holdout_exposure_inventory.py",
-          "size": 2947,
-          "sha256": "649a436d7d17d1068bad08bc64304fac508b1566b2fdac0a3620861566def2ab"
-        },
-        {
-          "path": "tests/test_holdout_overlap_audit.py",
-          "size": 2705,
-          "sha256": "bc1f7055a860ee6b2fd6bf43269d1513dbfec98df6d73d17774810866bbfcd31"
-        },
-        {
-          "path": "tests/test_holdout_targets.py",
-          "size": 15629,
-          "sha256": "ffc17a1669178c7d2eea500255061d575f44c57de961efd48389ef8d4ff72ffe"
-        },
-        {
-          "path": "tests/test_resolve_darts_id_only_sources.py",
-          "size": 3921,
-          "sha256": "bf185d62e8889859452d72d0867f5bb35700a32698f0951ca0eb71b8c6488613"
-        },
-        {
-          "path": "tests/test_select_activation_holdout_darts.py",
-          "size": 1158,
-          "sha256": "65f2d3265852755fddef3126ff79528a734947cee2d9e3b10c70dd586d5aec1a"
-        },
-        {
-          "path": "tests/test_select_activation_holdout_nb201.py",
-          "size": 1371,
-          "sha256": "cb136ab12b3b1121534d124fc11d22d5cd04596924cc1be05b27cdde7bd3da11"
-        },
-        {
-          "path": "tests/test_train_activation_holdout_nb201.py",
-          "size": 4037,
-          "sha256": "78552c59ff11d3e8a82617a6b251dff987da74e6fa9aa0e68c8faf367eb21fc6"
         }
       ],
       "differs": [
@@ -1185,6 +750,13 @@
           "target_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
           "other_size": 19656,
           "target_size": 22357
+        },
+        {
+          "path": "pyproject.toml",
+          "other_sha256": "c327e079bb2531d7aaf9b0f048fb24a4b6f9986f5c692aa8f7c2e6fed2132a15",
+          "target_sha256": "64cf64e1d8ae15381aa4a60789f80d8bfb38ba601764691ed0719f6a155edc8a",
+          "other_size": 509,
+          "target_size": 617
         },
         {
           "path": "scripts/compute_metric_batch.py",
@@ -1229,6 +801,13 @@
           "target_size": 7132
         },
         {
+          "path": "tests/test_e37_diagnostic_plot.py",
+          "other_sha256": "192ba89d8cfa9ebe80c1ff696d95b0511c65ba67f85002f80a0a1bffbe2ff91a",
+          "target_sha256": "e155d148db35e0efa5b407a1096524beb31e4c753c73cce02d7254db7db7c936",
+          "other_size": 2185,
+          "target_size": 2383
+        },
+        {
           "path": "tests/test_racl_lipschitz_metric.py",
           "other_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
           "target_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
@@ -1244,24 +823,13 @@
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 249,
-      "only_in_other_bytes": 18261856
+      "only_in_target_count": 262,
+      "only_in_other_bytes": 17734807
     },
     {
       "label": "repository-reconciliation",
       "other_file_count": 397,
-      "only_in_other": [
-        {
-          "path": "docs/superpowers/plans/2026-11-05-repository-reconciliation-implementation.md",
-          "size": 8780,
-          "sha256": "ac5166a850540af96b6c949a0e45a5f69cc2a212f8ef01e4a861e5e4de1c4c9a"
-        },
-        {
-          "path": "docs/superpowers/specs/2026-11-05-repository-reconciliation-design.md",
-          "size": 4136,
-          "sha256": "bb2d70541c018f2ec5303414f0dc13f488f6f8110f62377b78e0f24a46ce45da"
-        }
-      ],
+      "only_in_other": [],
       "differs": [
         {
           "path": ".gitignore",
@@ -1283,6 +851,13 @@
           "target_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
           "other_size": 19656,
           "target_size": 22357
+        },
+        {
+          "path": "pyproject.toml",
+          "other_sha256": "c327e079bb2531d7aaf9b0f048fb24a4b6f9986f5c692aa8f7c2e6fed2132a15",
+          "target_sha256": "64cf64e1d8ae15381aa4a60789f80d8bfb38ba601764691ed0719f6a155edc8a",
+          "other_size": 509,
+          "target_size": 617
         },
         {
           "path": "scripts/compute_metric_batch.py",
@@ -1342,8 +917,8 @@
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 262,
-      "only_in_other_bytes": 12916
+      "only_in_target_count": 341,
+      "only_in_other_bytes": 0
     },
     {
       "label": "server-mainline",
@@ -1680,6 +1255,13 @@
           "target_size": 2939
         },
         {
+          "path": "pyproject.toml",
+          "other_sha256": "c327e079bb2531d7aaf9b0f048fb24a4b6f9986f5c692aa8f7c2e6fed2132a15",
+          "target_sha256": "64cf64e1d8ae15381aa4a60789f80d8bfb38ba601764691ed0719f6a155edc8a",
+          "other_size": 509,
+          "target_size": 617
+        },
+        {
           "path": "src/robust_metric_lab/metric_registry.py",
           "other_sha256": "c6af465bbe952bbe279387fc32601a73c6c546b8c1bd6659be323c1b09cf4be3",
           "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
@@ -1723,48 +1305,13 @@
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 144,
+      "only_in_target_count": 225,
       "only_in_other_bytes": 0
     },
     {
       "label": "three-space-benchmark",
       "other_file_count": 546,
       "only_in_other": [
-        {
-          "path": "docs/experiments/student_benchmark_issue_log.md",
-          "size": 9798,
-          "sha256": "7e7600ea8e83293b870fdf50d51ec25097d179df7b728dc1bc96493a1be97c12"
-        },
-        {
-          "path": "docs/experiments/student_three_space_sensitivity_20260922.md",
-          "size": 7364,
-          "sha256": "f121a55b45c5e5c980e206dfc8818f923b6ebe9ab0e8fd5d36413209421d2d6d"
-        },
-        {
-          "path": "outputs/e28_capacity_family/rb20_run.log",
-          "size": 1383,
-          "sha256": "19d7806361ea72fead9e9816a248f24fe2fc3923e33178f4f9a40f95461a884f"
-        },
-        {
-          "path": "outputs/e28_capacity_family/rb20_v2_run.log",
-          "size": 1386,
-          "sha256": "9174bb245631b64e3853a7d7b59d5133f897f6c0fb3dbf0767cb90674eb95698"
-        },
-        {
-          "path": "outputs/e28_capacity_family/rb20_v3_run.log",
-          "size": 1386,
-          "sha256": "0d7041772fbc033fd29de43e1021caf65d166e840e8319f53480d23015fc7ad3"
-        },
-        {
-          "path": "outputs/e34_nb201_pgd1_run.log",
-          "size": 12896,
-          "sha256": "3981f933123b4669e8309ebae8b585822eae50433b3520f68b20980100674577"
-        },
-        {
-          "path": "scripts/run_e36_full_metric_design.sh",
-          "size": 14296,
-          "sha256": "2a012fdc1c19119bebea78f295d6f175aaf7c59274e1fc2fbae362fbf559b01c"
-        },
         {
           "path": "src/robust_metric_lab.egg-info/PKG-INFO",
           "size": 6818,
@@ -1789,16 +1336,6 @@
           "path": "src/robust_metric_lab.egg-info/top_level.txt",
           "size": 18,
           "sha256": "7bc7aad0b7a808d58383d492491e121557ee78a5d2a714ec3cfc96a673589354"
-        },
-        {
-          "path": "tests/test_e36_relative_structure_metrics.py",
-          "size": 2867,
-          "sha256": "58d324af82244f2e9f668d19832328ee2aa805bd9b7ffb36e81494ea0e4e5387"
-        },
-        {
-          "path": "tests/test_spectral_stability.py",
-          "size": 897,
-          "sha256": "cb9b4a5e1bfa3e2c232ce24dd6c090283977e9ade24d187a490f1636cb60f88d"
         }
       ],
       "differs": [
@@ -2001,9 +1538,9 @@
         {
           "path": "pyproject.toml",
           "other_sha256": "39d2a6a0893119f2a4e117505eda4a77bf8dbbd4fc7d21bd44f6fe7f3fee2082",
-          "target_sha256": "c327e079bb2531d7aaf9b0f048fb24a4b6f9986f5c692aa8f7c2e6fed2132a15",
+          "target_sha256": "64cf64e1d8ae15381aa4a60789f80d8bfb38ba601764691ed0719f6a155edc8a",
           "other_size": 530,
-          "target_size": 509
+          "target_size": 617
         },
         {
           "path": "src/robust_metric_lab/metric_registry.py",
@@ -2035,8 +1572,8 @@
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 144,
-      "only_in_other_bytes": 60184
+      "only_in_target_count": 216,
+      "only_in_other_bytes": 7911
     }
   ]
 }
