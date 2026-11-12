@@ -128,6 +128,24 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
    索引每次生成都会在"⚠ 需要人看的不一致"一节列出这三条，等确认后一次性改配置。
    详见 `docs/theory/METRIC_INDEX.md` 与 D-016。
 
+10. **文档路径引用体检（2026-11-12 新增）：389 条路径、0 条断链**
+    "详见 `results/audits/xxx.md`" 是项目对可追溯性的承诺，文件不在就等于承诺落空。
+    `tools/check_doc_links.py` 扫 88 份 Markdown 里所有反引号路径与 Markdown 链接（389 条），
+    按四类归位：应当修复的缺失 / 计划文档里的历史文件名 / 外部交付包路径 /
+    `outputs/` 下的产物路径。体检抓到并修掉 5 处真错：
+
+    | 文档 | 原写法 | 实际文件 |
+    | --- | --- | --- |
+    | `README.md` | `docs/metric_baselines.md` | `docs/theory/metric_baselines.md` |
+    | `docs/theory/current_metric_table.md` | `docs/current_metric_table_readable_zh.md` | `docs/theory/current_metric_table_readable_zh.md` |
+    | `docs/experiments/实验管理.md`（3 处） | `e25_k2_k8_k16_three_source_validation_report.md` | `e25_k8_three_source_validation_report.md` |
+    | `docs/experiments/实验管理.md`（2 处） | `e35_final_summary.md` | `e35.md` |
+
+    另有 30 条进"计划文档"桶（`docs/superpowers/plans/` 写的是当时打算创建、后来改了名的脚本，
+    例如 `run_activation_holdout.py` 最终叫 `train_activation_holdout_nb201.py`），
+    3 条进"已说明为服务器/外部文件"桶（附理由），12 条 `outputs/` 缺失属正常。
+    详见 `results/audits/doc-links-20261112.md` 与 D-018。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**

@@ -57,7 +57,7 @@ Literature baseline metrics from the Robust NAS notes are also implemented:
 
 Lower metric values should generally indicate higher robustness, but the validation target is rank correlation with RobustBench/PGD/AutoAttack-style robust accuracy.
 
-See `docs/metric_baselines.md` for the mapping from literature families to implemented columns. The current protocol is white-box per model; shared-adversarial metrics are recorded as a deferred experiment.
+See `docs/theory/metric_baselines.md` for the mapping from literature families to implemented columns. The current protocol is white-box per model; shared-adversarial metrics are recorded as a deferred experiment.
 
 ## Setup
 

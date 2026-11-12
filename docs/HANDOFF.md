@@ -163,3 +163,23 @@ python tools/verify_doc_claims.py --table <86 项总表> --json <临时 json> --
 如果你在索引里看到"⚠ 需要人看的不一致"一节，说明某个指标被资格表声明为 `implementation_error`，
 却又在发布表上有名次。当前有 3 条（TRNAS 三项），是 10-24 修复前后的口径差，已在 D-016 记录。
 **确认之前不要擅自把资格表改成 `cross_space`**，理由见 D-016。
+
+## 13. 交接前最后一分钟：文档路径体检
+
+`docs/` 里到处是「详见 `results/audits/xxx.md`」。这类承诺最容易随文件改名而失效，
+而失效时没有任何报错。交付前请跑：
+
+```powershell
+python tools/check_doc_links.py `
+  --json results/audits/doc-links-20261112.json `
+  --report results/audits/doc-links-20261112.md
+```
+
+判据只有一条：输出里的 `missing_required` 必须是 **0**。其余三桶（`planned` / `external` /
+`optional`）非零是正常的，报告里每一条都写了归入该桶的理由。
+
+新增一条豁免（`ALLOWLIST`）时**必须写 reason**，格式见
+`tools/check_doc_links.py` 顶部的字典：`(文档, 路径) -> 为什么它合理缺席`。
+没有 reason 的豁免半年后就没人知道它是不是漏了。
+
+改完文档不要忘了顺序：先跑体检 → 再跑 `tools/verify_doc_claims.py`（数字）→ 最后提交。

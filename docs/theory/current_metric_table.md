@@ -2,7 +2,7 @@
 
 Date: 2026-07-03
 
-Readable Chinese formula version: `docs/current_metric_table_readable_zh.md`
+Readable Chinese formula version: `docs/theory/current_metric_table_readable_zh.md`
 
 Browser-rendered MathJax formula version: `docs/current_metric_table_math.html`
 

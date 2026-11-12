@@ -1,0 +1,181 @@
+{
+ "schema_version": 1,
+ "docs_scanned": 88,
+ "paths_checked": 389,
+ "missing_required": [],
+ "missing_planned": [
+  {
+   "doc": "docs/superpowers/plans/2026-09-17-three-space-benchmark-implementation.md",
+   "path": "docs/experiments/e25_plus_three_space_validation.md"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-09-17-three-space-benchmark-implementation.md",
+   "path": "docs/experiments/student_benchmark_environment.md"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-09-17-three-space-benchmark-implementation.md",
+   "path": "docs/experiments/student_benchmark_smoke_report.md"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-09-17-three-space-benchmark-implementation.md",
+   "path": "docs/experiments/student_three_space_final_report.md"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-09-17-three-space-benchmark-implementation.md",
+   "path": "docs/superpowers/specs/2026-09-17-new-robust-metric-design.md"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-09-17-three-space-benchmark-implementation.md",
+   "path": "scripts/verify_student_benchmark_bundle.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-24-adversarial-excess-feature-drift-implementation.md",
+   "path": "docs/experiments/对抗超额特征漂移_严格跨空间结果_20261024.md"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-25-darts-e37-layer-diagnostic-implementation.md",
+   "path": "outputs/student_metrics/wangjiahao/e37_full_metric_design_v1/run_manifest.json"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-27-activation-sign-survival-independent-validation.md",
+   "path": "scripts/analyze_activation_holdout.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-27-activation-sign-survival-independent-validation.md",
+   "path": "scripts/run_activation_holdout.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-27-activation-sign-survival-independent-validation.md",
+   "path": "scripts/verify_activation_holdout.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-27-activation-sign-survival-independent-validation.md",
+   "path": "tests/test_activation_holdout_analysis.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-27-activation-sign-survival-independent-validation.md",
+   "path": "tests/test_activation_holdout_gate.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-27-activation-sign-survival-main-grid.md",
+   "path": "docs/experiments/activation_sign_survival_source_audit_20261027.md"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-31-darts-independent-holdout-weights-and-targets.md",
+   "path": "scripts/analyze_activation_holdout.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-31-darts-independent-holdout-weights-and-targets.md",
+   "path": "scripts/seal_activation_holdout_darts_selection.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-31-darts-independent-holdout-weights-and-targets.md",
+   "path": "scripts/train_activation_holdout_darts.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-31-darts-independent-holdout-weights-and-targets.md",
+   "path": "scripts/verify_activation_holdout_package.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-31-darts-independent-holdout-weights-and-targets.md",
+   "path": "tests/test_seal_activation_holdout_darts_selection.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-31-darts-independent-holdout-weights-and-targets.md",
+   "path": "tests/test_train_activation_holdout_darts.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-10-31-darts-independent-holdout-weights-and-targets.md",
+   "path": "tests/test_verify_holdout_targets.py"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-11-05-repository-reconciliation-implementation.md",
+   "path": "results/manifests/reconciliation-2026-11-05/README.md"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-11-05-repository-reconciliation-implementation.md",
+   "path": "results/manifests/reconciliation-2026-11-05/imported-files.json"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-11-05-repository-reconciliation-implementation.md",
+   "path": "results/manifests/reconciliation-2026-11-05/local-worktrees.json"
+  },
+  {
+   "doc": "docs/superpowers/plans/2026-11-05-repository-reconciliation-implementation.md",
+   "path": "results/manifests/reconciliation-2026-11-05/server-inventory.json"
+  }
+ ],
+ "missing_external": [
+  {
+   "doc": "docs/experiments/教师交接README服务器核对_20261031.md",
+   "path": "docs/student_robust_metric_benchmark/README.md"
+  }
+ ],
+ "missing_explained": [
+  {
+   "doc": "docs/experiments/activation_holdout_provenance_audit_20261027.md",
+   "path": "scripts/train_activation_holdout_nb201_v2.py",
+   "reason": "文档写明这是「服务器新文件」，与本地 train_activation_holdout_nb201.py 字节相同"
+  },
+  {
+   "doc": "docs/experiments/student_benchmark_issue_log.md",
+   "path": "docs/experiments/source_snapshot/verifier_after_recovery.log",
+   "reason": "文档写明日志保存在容器项目内，不是本仓库文件"
+  },
+  {
+   "doc": "docs/experiments/教师交接README服务器核对_20261031.md",
+   "path": "scripts/verify_student_benchmark_bundle.py",
+   "reason": "教师交付包内自带的验收脚本，随交付包提供，不属于本项目仓库"
+  }
+ ],
+ "missing_optional": [
+  {
+   "doc": "docs/experiments/DARTS_E37_逐层诊断结果与问题记录_20261025.md",
+   "path": "outputs/student_metrics/wangjiahao/darts_e37_layer_diagnostic_20261025T120240Z/frozen_manifest.json"
+  },
+  {
+   "doc": "docs/experiments/activation_holdout_provenance_audit_20261027.md",
+   "path": "outputs/student_metrics/wangjiahao/activation_holdout_nb201_weights_20261031/training_plan.json"
+  },
+  {
+   "doc": "docs/experiments/activation_holdout_provenance_audit_20261027.md",
+   "path": "outputs/student_metrics/wangjiahao/activation_holdout_nb201_weights_20261031_v2/training_plan.json"
+  },
+  {
+   "doc": "docs/experiments/activation_holdout_provenance_audit_20261027.md",
+   "path": "outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/darts_selection_unsealed.json"
+  },
+  {
+   "doc": "docs/experiments/activation_holdout_provenance_audit_20261027.md",
+   "path": "outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/nb201_selection_unsealed.json"
+  },
+  {
+   "doc": "docs/experiments/activation_holdout_provenance_audit_20261027.md",
+   "path": "outputs/student_metrics/wangjiahao/activation_holdout_provenance_20261031/prior_exposure_inventory.json"
+  },
+  {
+   "doc": "docs/experiments/e25_k8_three_source_validation_report.md",
+   "path": "outputs/e25_k2_k8_k16_three_source_validation/robustbench20_k8_bootstrap_ci.csv"
+  },
+  {
+   "doc": "docs/experiments/student_benchmark_issue_log.md",
+   "path": "outputs/student_metrics/wangjiahao/existing_metrics_full_v3_cpu_repair/logs/kang_trnas_diagnosis.log"
+  },
+  {
+   "doc": "docs/experiments/实验管理.md",
+   "path": "outputs/command_validation/e03_join_check.csv"
+  },
+  {
+   "doc": "docs/experiments/实验管理.md",
+   "path": "outputs/command_validation/e05_multisource_aggregate_check.csv"
+  },
+  {
+   "doc": "docs/experiments/实验管理.md",
+   "path": "outputs/command_validation/e08_fixture_search_check.csv"
+  },
+  {
+   "doc": "docs/experiments/实验管理.md",
+   "path": "outputs/e21_trnas_mmd/metrics_uniform512_step1e6.csv"
+  }
+ ]
+}

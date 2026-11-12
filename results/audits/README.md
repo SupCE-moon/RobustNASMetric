@@ -106,3 +106,25 @@ python tools/build_metric_index.py ``
 
 **已知警告**：TRNAS 三项在资格表里仍是 `implementation_error`，却被发布表排了名次（见 D-016）。
 这是**待确认**的口径问题，不是 bug，索引每次都会列出来。
+
+## 文档路径体检（2026-11-12）
+
+`tools/check_doc_links.py` 扫描 88 份 Markdown，抽出 389 条仓库内路径引用，
+确认它们指向的文件确实存在。
+
+```powershell
+python tools/check_doc_links.py `
+  --json results/audits/doc-links-20261112.json `
+  --report results/audits/doc-links-20261112.md
+```
+
+结果：`missing_required = 0`；`planned = 25`（计划文档里的历史文件名）、
+`external = 1`（教师交付包内脚本）、`explained = 3`（文档已写明是服务器/外部文件）、
+`optional = 12`（`outputs/` 产物，按策略不入库）。
+
+**修掉的 5 处真实错误**：`README.md` 的 `docs/metric_baselines.md`（实际在 `docs/theory/`）、
+`docs/theory/current_metric_table.md` 的 `docs/current_metric_table_readable_zh.md`（同上）、
+`docs/experiments/实验管理.md` 里 3 处 `e25_k2_k8_k16_three_source_validation_report.md`
+（实际 `e25_k8_three_source_validation_report.md`）与 2 处 `e35_final_summary.md`（实际 `e35.md`）。
+
+**边界**：只证明路径存在，不证明文件内容与文档描述一致。

@@ -346,3 +346,25 @@ Spearman 相关，八个设置平均后用平均连接聚类，并在报告里�
 **理由**：注册表里没有 family 字段，而这 86 个指标确实分属几大思路。完全不分组，读者要在
 86 行里自己找；硬造一个"正式分类"，又等于给数据加了一层它没有的语义。折中做法是给出**可读的
 导航**，同时明确标注它不是统计分组依据——这样它不会被误用进论文的分组统计。
+## D-018 断链检查分四桶，不把"计划里的旧文件名"当错误
+
+**选择**：`tools/check_doc_links.py` 把缺失路径分成四类，只有第一类算错误：
+1. `missing_required`——文档在 `docs/ src/ scripts/ tests/ tools/ configs/ results/` 下承诺的文件不在；
+2. `missing_planned`——缺失引用来自 `docs/superpowers/plans/` 或 `specs/`；
+3. `missing_external`——指向外部交付包（教师交付的 `docs/student_robust_metric_benchmark/`）；
+4. `missing_optional`——`outputs/` 下的产物，按策略不入库。
+另有显式 `ALLOWLIST`（目前 3 条），每条必须写原因，例如"文档写明这是服务器新文件，
+与本地 `train_activation_holdout_nb201.py` 字节相同"。
+
+**理由**：
+1. 计划文档记录的是**当时打算创建**的文件名。第一次跑出 30 条"断链"，其中 25 条是计划的
+   旧名字（`run_activation_holdout.py` 最终叫 `train_activation_holdout_nb201.py`）。
+   把历史计划改成现状文件名，等于篡改计划——计划的价值恰恰在于"当时是这么想的"。
+2. 一个把所有缺失都标红的检查，第一天就会被当成噪声关掉。分成四桶后，
+   "应当修复的缺失"保持为 0，任何一条新增都会立刻显眼。
+3. `ALLOWLIST` 必须带 reason 而不是静默豁免：半年后有人看到这条引用，能立刻知道
+   "不是漏了，是服务器上的文件"，不需要重新调查。
+
+**后果**：体检后 389 条引用中 `missing_required = 0`；修掉的 5 处真错见 `PROJECT_STATUS.md` §3 第 10 条。
+工具自己有 12 个测试，其中包括"不扫描自己生成的报告"——第一版把报告写进 `results/audits/`
+之后，下一次运行会把上一份报告里的表格当成文档再扫一遍，制造 30 条假断链。
