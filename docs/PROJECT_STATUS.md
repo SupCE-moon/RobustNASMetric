@@ -185,8 +185,17 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 
 ## 9. 下一步
 
-1. 服务器只读普查：`tools/server_inventory.py`（只 stat + sha256，不写服务器）。
-2. 内容比对：服务器源码 vs 9 个 worktree，按 SHA-256 而不是时间戳判定谁新。
-3. 确定主线分支，合并/重基于服务器主线。
-4. 服务器大结果建 manifest（绝对路径、生成脚本、日期、大小、SHA-256）。
-5. 补齐 `docs/HANDOFF.md`，并回填本文件的"已验证事实"。
+**已完成的部分**（2026-11-12 第二轮）：主线判定（893a994）、三条线合并、9 棵树对照归零、
+大型结果的 manifest 清单已写好（
+esults/manifests/server/PLAN.md + 	argets.json），
+SSH 一通就能执行。测试 477 passed / 3 skipped。
+
+**仍然按顺序剩下的事**：
+
+1. **服务器只读普查**（阻塞在 SSH）：	ools/server_inventory.py，只 stat + sha256，不写服务器。
+2. **用第 1 步的结果核对主线判定**：服务器若出现本地没有的源码文件，说明服务器更新，需要再并一轮。
+3. **服务器大结果落 manifest**：按 
+esults/manifests/server/PLAN.md 第 4 节的四条命令执行。
+4. **三空间独立留出集**：371 键验证包未冻结，这是当前最影响"结论可信度"的缺口（见第 6 节第 3 条）。
+5. **eature_activation_sign_survival_sum 终态**：560 键全网格跑完没有、发布验证过没有，只能上服务器查。
+6. **进入第二阶段研究**：主线整理完成后，才谈新指标与新实验（用户明确要求先整理、后设计）。
