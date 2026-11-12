@@ -73,7 +73,27 @@ wip 快照分支上。另有 5 个 `scripts/analyze_e2x_*.py` 引用补丁中的
 - `local-worktrees.json` 中 `adv-excess-metric` 的 4,506 个未跟踪文件绝大多数是 `node_modules`，
   已按策略标记，未导入。
 
-## 7. 复现本次盘点
+## 7. 第二批：adv-excess worktree（`f2480294`，分支 `codex/adv-excess-metric`）
+
+这一批导入的是**权威 86 项总表所在的产物目录**，以及生成它的流水线：
+
+- 36 个文件（0.26 MiB）：`outputs/strict_adv_excess_release_20261024T110422Z/` 下的
+  86 项总表 CSV、`strict_ranking.csv`、`release_verification.json`、`adv_excess_comparison.json`；
+  `src/` 的 `student_runner.py`、`student_benchmark.py`、`adv_excess_metric.py`、`adv_excess_batched.py`；
+  `tests/` 的 8 个 adv-excess 测试；`scripts/` 的 11 个生成/分析脚本；`configs/metric_eligibility.json`。
+- 4,468 项暂缓：几乎全是 `node_modules`（含 19 MiB DLL）与逐样本原始行。
+- 3 项拒绝：`node_modules/live-server` 里的 `server.key`、`htpasswd-test`、`htpasswd.js`
+  ——凭据类文件按策略拒绝，正好验证了策略生效。
+- 2 份文档（`2026-10-24-adversarial-excess-feature-drift-design.md` 与 `-implementation.md`）
+  与第一批导入的文本完全相同，仅差一个行尾空行，因此跳过。
+
+**例外处理**：这 4 个 `src/` 模块调用的 `feature_adv_excess_centered_unit_l2` 只存在于
+adv-excess worktree **未提交**的 `metric_registry.py` 里（4 行注册声明）。为了让导入的流水线自洽，
+把这 4 行作为最小补丁应用了：`patches/adv-excess-uncommitted-metric-registry.patch`。
+它只是声明"名字、方向（lower）、来源（Ours）"，指标实现本身在已导入的 `adv_excess_metric.py` 中。
+应用后 `pytest tests -q` = **103 passed**。
+
+## 8. 复现本次盘点
 
 ```bash
 python tools/inventory_worktrees.py --repo <仓库根> --output <输出.json>

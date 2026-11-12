@@ -97,3 +97,23 @@ SHA-256 `d3329f9c…`），并在 wip 目录保留两个依赖它的文件的原
 **理由**：主线尚未确定（服务器可能才是最新），此时改默认分支会把两条历史搅在一起。
 
 **后果**：主线确认后，由评审分支合并或重新基于主线整理。
+
+---
+
+## D-007 为一批导入模块应用了 4 行注册声明（有条件的例外）
+
+**背景**：从 `codex/adv-excess-metric` 导入的 `student_runner.py`、`student_benchmark.py` 等
+4 个模块，按名字调用 `feature_adv_excess_centered_unit_l2`；这个名字只存在于该 worktree
+**未提交**的 `metric_registry.py` 中。不补这 4 行，导入的模块一调用就 `KeyError`，2 个测试变红。
+
+**选择**：把该改动单独保存为 `patches/adv-excess-uncommitted-metric-registry.patch` 并**应用**
+（只加一条 `MetricSpec("feature_adv_excess_centered_unit_l2", "lower", "Ours preregistered
+adversarial-excess feature drift", "Ours")`）。
+
+**理由**：这与 D-003 的情况不同。D-003 那 571 行是**未评审的指标数学实现**，风险在"算法对不对"；
+这里是**声明**（名字、方向、归属），实现代码 `adv_excess_metric.py` 是作为新文件导入的，
+评审对象是同一份。不补声明只会留下一堆跑不起来的死代码，比补上更危险。
+
+**后果**：`pytest tests -q` 从 101 passed / 2 failed 变为 **103 passed**。
+若将来判定该指标不应入榜，删掉这条声明即可，不影响其他代码。
+

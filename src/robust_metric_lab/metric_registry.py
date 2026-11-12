@@ -88,6 +88,10 @@ METRIC_SPECS = [
     MetricSpec("trnas_activation_psi", "higher", "TRNAS activation capability", "[11,12]"),
     MetricSpec("trnas_consistency_phi", "higher", "TRNAS consistency", "[11]"),
     MetricSpec("trnas_r_score", "higher", "TRNAS R-Score", "[11]"),
+    MetricSpec(
+        "feature_adv_excess_centered_unit_l2", "lower",
+        "Ours preregistered adversarial-excess feature drift", "Ours",
+    ),
 ]
 
 

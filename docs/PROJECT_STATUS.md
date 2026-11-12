@@ -36,6 +36,14 @@
 `strict_final_release_20261008T000000Z`，80 项，当时 max/RMS 排第 3/4）。该版本已被 2026-10-24
 的 TRNAS 修复版取代。**同一篇文档里若出现两套名次，一律以 10-24 版为准。**
 
+**2026-11-12 复核（直接从 CSV 读出，不依赖报告叙述）**：`RobustMetric_严格全部指标总表_86项_三位小数.csv`
+共 86 行 = 84 条 `ranked` + 2 条 `excluded`（两条 RACL 因"空间不可比"排除，理由与文档一致）。
+前 8 名与上表逐位吻合：Φ 0.782 / R-Score 0.738 / adversarial_loss 0.614 / Ψ 0.598 /
+natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
+每条指标的 `raw_rows` 均为 560，`release_id` 均为 `strict_adv_excess_release_20261024T110422Z`。
+另注：本仓库 `outputs/strict_all_metrics_table_20261024_trnas_repaired/` 那份是**83 项**的前身快照
+（`raw_rows` 47,600），数值与总表一致但少一条指标——不要把它当成最终发布版。
+
 ## 3. 已完成的关键实验（已验证事实）
 
 1. **TRNAS 数值修复**（`docs/experiments/TRNAS_Kang直接求导补算与严格重排_20261024.md`）
