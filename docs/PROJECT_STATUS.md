@@ -402,11 +402,21 @@ weak 30 / uncovered 1**。
 与 `feature_measure_swd`，量级 +0.5。换句话说：**「早期指标能预测训练后鲁棒性」有了第一份
 正面证据，但这批证据不属于 Φ/R-Score。**
 
-**这份结果不能说明什么**（报告里逐条列出）：跨协议（e0 指标来自本仓库前向，target 来自
-RobBench 的训练协议）、单次初始化、n=64、非因果、RobBench 的 `autoattack` 不是最强评估配置。
+**target 从哪来（同源核对，2026-11-12 补做）**：仓库里 `outputs/e28_capacity_family/nb201_e0_v3.csv`
+有一列 `oracle_target`。把它与 RobBench 的 `autoattack`（threeseed）按 arch_id 对齐：64 个架构
+**64/64 匹配，秩相关 +1.000，最大绝对差 0.00e+00** → 两者是**同一份数据**。所以本报告不存在
+「两套 target 互相矛盾」的问题；真正的局限是**只有一套 target**，没有第二套独立结果可以
+交叉验证。这也意味着一开始把「跨协议」写成首要局限是把问题说反了——目标同源恰恰说明
+target 的选择没有引入额外不确定性，代价是无法做外部验证。重跑时加 `--oracle-table` 会
+自动做这项核对并写进报告与 JSON（suite 里按 `e28_capacity_family/nb201_e0_v3.csv` 是否存在
+决定是否传入）。
+
+**这份结果不能说明什么**（报告里逐条列出）：目标来自官方固定训练协议、早期指标是本仓库对
+**随机初始化**网络做的一次前向（同一份 target，但没有第二套协议可交叉验证）、单次初始化、
+n=64、非因果、RobBench 的 `autoattack` 不是最强评估配置。
 控制 clean 只排除了一条混杂路径，参数量与可训练性仍可能同时影响两者。
 
-**产出**：`results/audits/early-vs-robbench-20261112.{json,md}`、`tests/test_audit_early_metrics_vs_robbench.py`（14 个测试）。
+**产出**：`results/audits/early-vs-robbench-20261112.{json,md}`、`tests/test_audit_early_metrics_vs_robbench.py`（16 个测试）。
 
 ## 4. 可信结论（分三级）
 

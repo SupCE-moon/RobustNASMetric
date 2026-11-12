@@ -673,14 +673,30 @@ Kendall τ 也配上区间。阈值 `REPRODUCTION_TOLERANCE = 5.5e-4`：发布�
 
 **为什么不说因果、也不说「可以替代训练」**：
 
-1. 早期指标来自本仓库的 e0 前向，target 来自 RobBench 的另一套训练协议——这是**跨协议**比较，
-   只能说「架构层面的早期指标与训练后结果相关」，不能说「训练早期就能预测」。
+1. 早期指标来自本仓库的 e0 前向，target 来自 RobBench——两者的**流程**不同，但目标本身与本仓库
+   的 `oracle_target` 是同一份数据（见下面的更正）。只能说「架构层面的早期指标与训练后结果相关」，
+   不能说「训练早期就能预测」。
 2. 只有一次初始化，初始化噪声完全没估计。
 3. 只有 64 个架构，Spearman 的 95% 区间约 ±0.25。
 4. 控制 clean 只排除了一条混杂路径；参数量、可训练性、RobBench 自身协议差异都还在。
 
+**更正（2026-11-12 同日补做 target 同源核对）**：上面第 1 条最初写成「跨协议比较」，并把
+「两套 target 可能矛盾」列为首要局限——这是**说反了**。核对 `outputs/e28_capacity_family/nb201_e0_v3.csv`
+的 `oracle_target` 与 RobBench 的 `autoattack`（threeseed，按 arch_id 对齐）：64/64 匹配、
+秩相关 +1.000、最大绝对差 0.00e+00，**是同一份数据**。因此：
+
+- 不存在「两套 target 互相矛盾」，target 的选择没有引入额外不确定性；
+- 真正的局限是**只有一套 target**，没有第二套独立结果可做外部验证；
+- 需要保留的谨慎只剩「早期指标是随机初始化网络的一次前向，目标是固定训练协议的结果」，
+  这是流程差异，不是数据矛盾。
+
+脚本因此新增可选 `--oracle-table`：提供时在报告里自动做这项核对，并按结果二选一措辞
+（「同一份数据，局限是只有一套 target」/「不是同一份数据，target 选择本身是不确定性来源」）。
+`run_audit_suite` 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时自动传入，不存在时
+该步骤仍能跑，只是不报同源核对。
+
 **后果**：`scripts/audit_early_metrics_vs_robbench.py`、
-`tests/test_audit_early_metrics_vs_robbench.py`（14 个测试）、
+`tests/test_audit_early_metrics_vs_robbench.py`（16 个测试，含同源/不同源两组）、
 `results/audits/early-vs-robbench-20261112.{json,md}`、`run_audit_suite` 第 12 步、
 `docs/PROJECT_STATUS.md` §3 第 17 条与 §4、`docs/ROADMAP.md` §3.4 与 M1.5/M2。
 下一步据此从「训练 16 个架构」改为「先给更多架构算 e0 指标」——同样的钱能买到更窄的区间。

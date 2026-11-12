@@ -316,9 +316,15 @@ python tools/run_audit_suite.py
 python scripts/audit_early_metrics_vs_robbench.py `
   --rows <主工作树>\outputs\strict_all_metrics_table_20261024_trnas_repaired\sources\metric_values_original_strict.csv `
   --robbench <上面那个 json> `
+  --oracle-table <主工作树>\outputs\e28_capacity_family\nb201_e0_v3.csv `
   --json results/audits/early-vs-robbench-20261112.json `
   --report results/audits/early-vs-robbench-20261112.md
 ```
+
+`--oracle-table` 是可选的，给了就会做一次 **target 同源核对**（把本仓库的 `oracle_target`
+与 RobBench 的 `autoattack` 按 arch_id 对齐，报匹配数、秩相关、最大绝对差），并在报告里
+二选一措辞：是同一份数据（局限是「只有一套 target」），还是不是（局限是「target 选择本身
+是不确定性来源」）。**结论不同，措辞必须跟着变**——不能不做核对就沿用旧措辞。
 
 走 suite 更省事：`python tools/run_audit_suite.py --only early_vs_robbench`。
 `resolve_robbench()` 会依次找 `--robbench`、`ROBUST_METRIC_ROBBENCH` 环境变量、
@@ -331,7 +337,8 @@ python scripts/audit_early_metrics_vs_robbench.py `
 - 只看**偏相关**（控制训练后 clean 准确率），不看原始相关。原始相关在这份数据里几乎必然很高，
   因为 clean 与 AutoAttack 的秩相关是 +0.982。
 - 判定阈值写死在 `DIRECT_RHO=0.30` / `VIA_CLEAN_RHO=0.10`，改阈值等于改结论，必须走决策记录。
-- 结论措辞只能是「相关/排序」，不能写「因果」或「训练早期就能预测」（跨协议）。
+- 结论措辞只能是「相关/排序」，不能写「因果」或「训练早期就能预测」（跨流程，不是跨 target：
+  目标与本仓库同源，见 `--oracle-table` 的核对输出）。
 
 **下一步不是训练**：RobBench 有 6466 个架构，目前只有 64 个有 e0 指标。先把 e0 指标扩到
 数百个架构（每个约 4 秒），比训练 16 个架构便宜得多，且能把 ±0.25 的区间压窄。

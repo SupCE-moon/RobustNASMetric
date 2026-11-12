@@ -237,3 +237,8 @@ python tools/audit_metric_invariants.py --json results/audits/metric-invariants.
 
 重跑：`python tools/run_audit_suite.py --only early_vs_robbench`（需要 `--robbench` 或环境变量
 `ROBUST_METRIC_ROBBENCH`，文件 15.6 MiB 不入库）。判据与局限见 D-028。
+
+**target 同源核对**：加 `--oracle-table <outputs/e28_capacity_family/nb201_e0_v3.csv>` 会把本仓库
+的 `oracle_target` 与 RobBench 的 `autoattack` 对齐核对（64/64、秩相关 +1.000、最大绝对差 0），
+结论是「同一份数据」→ 局限改写为「只有一套 target，无法外部验证」，而不是「两套 target 可能矛盾」。
+suite 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时会自动传这个参数。

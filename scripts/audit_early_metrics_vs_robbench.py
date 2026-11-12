@@ -24,6 +24,11 @@ Caveats that the report states and that the numbers cannot fix: the epoch-0
 metrics come from one initialisation, the target comes from someone else's
 training protocol, the architecture sample is the 64 official ones, and the target
 is not a causal quantity.
+
+The optional --oracle-table cross-check exists because the repository's own
+nb201_e0 table carries an `oracle_target` column.  Comparing it with RobBench's
+`autoattack` decides whether the "cross-protocol" caveat means "two different
+targets disagree" or "there is only one target source".
 """
 
 from __future__ import annotations
@@ -173,6 +178,29 @@ def permutation_p(x, y, control, observed: float | None, resamples: int = RESAMP
     return (exceed + 1) / (resamples + 1)
 
 
+def target_agreement(oracle_table: Path, metrics: pd.DataFrame, robbench: pd.DataFrame) -> dict:
+    """Compare the repository's own oracle_target with RobBench's target.
+
+    If they agree, the "cross-protocol" caveat is not about two targets
+    disagreeing -- it is about having only one target source.
+    """
+    table = pd.read_csv(oracle_table)
+    if "oracle_target" not in table.columns or "arch_id" not in table.columns:
+        raise ValueError(f"{oracle_table} must have arch_id and oracle_target columns")
+    oracle = table.set_index(table["arch_id"].astype(str))["oracle_target"].astype(float)
+    joined = robbench.join(oracle.rename("oracle"), how="inner").dropna()
+    if joined.empty:
+        return {"n": 0, "rho": None, "max_abs_diff": None, "mean_abs_diff": None}
+    diff = (joined["target"] - joined["oracle"]).abs()
+    return {
+        "n": int(len(joined)),
+        "rho": _rho(joined["target"].to_numpy(float), joined["oracle"].to_numpy(float)),
+        "max_abs_diff": float(diff.max()),
+        "mean_abs_diff": float(diff.mean()),
+        "identical": bool(diff.max() <= 1e-12),
+    }
+
+
 def analyse(metrics: pd.DataFrame, robbench: pd.DataFrame, resamples: int = RESAMPLES) -> dict:
     joined = metrics.join(robbench, how="inner")
     rows = []
@@ -269,6 +297,23 @@ def render_markdown(report: dict) -> str:
             f"{_fmt(row['rho_clean'])} | {_fmt(row['partial_clean'])} | {ci} | {p} | "
             f"{row['verdict']} |"
         )
+    agreement = report.get("target_agreement")
+    if agreement and agreement.get("n"):
+        lines += [
+            "",
+            "## target 从哪来（同源核对）",
+            "",
+            f"仓库里 `nb201_e0_v3.csv` 有一列 `oracle_target`。把它与 RobBench 的 "
+            f"`{report['target_field']}` 对齐后：**{agreement['n']} 个架构**，"
+            f"秩相关 **{_fmt(agreement['rho'])}**，最大绝对差 "
+            f"**{agreement['max_abs_diff']:.2e}**，平均绝对差 **{agreement['mean_abs_diff']:.2e}**。",
+            "",
+            ("两者是**同一份数据**。所以这份报告不存在「两套 target 互相矛盾」的问题——"
+             "真正的局限是**只有一套 target**，没法和另一套独立结果交叉验证。"
+             if agreement.get("identical")
+             else "两者**不是同一份数据**，因此 target 的选择本身就是一个不确定性来源，"
+             "下面所有数字都依赖于选了哪一个。"),
+        ]
     lines += [
         "",
         "## 怎么读",
@@ -282,8 +327,8 @@ def render_markdown(report: dict) -> str:
         "",
         "## 这份报告不能说明什么",
         "",
-        "- **跨协议**：目标是别人固定训练协议下的结果，早期指标是本仓库的 e0 前向；"
-        "两者不是一个训练流程的产物，所以不能说「训练早期就能预测」，只能说"
+        "- **跨协议**：目标是官方固定训练协议下的结果，早期指标是本仓库对**随机初始化**网络"
+        "做的一次前向；两者不是一个训练流程的产物，所以不能说「训练早期就能预测」，只能说"
         "「架构层面的早期指标与训练后结果相关」。",
         "- **单次初始化**：e0 指标只有一个随机种子，初始化噪声没有估计。",
         "- **n = 64**：Spearman 的 95% 区间约 ±0.25；置换 p 只检验「不相关」这一零假设。",
@@ -302,6 +347,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", type=Path)
     parser.add_argument("--report", type=Path)
     parser.add_argument("--resamples", type=int, default=RESAMPLES)
+    parser.add_argument("--oracle-table", type=Path, help="nb201_e0_v3.csv, for the target cross-check")
     args = parser.parse_args(argv)
 
     metrics = load_rows(args.rows)
@@ -311,6 +357,12 @@ def main(argv: list[str] | None = None) -> int:
         "rows": {"path": str(args.rows), "sha256": sha256_file(args.rows)},
         "robbench": {"path": str(args.robbench), "sha256": sha256_file(args.robbench)},
     }
+    if args.oracle_table:
+        report["target_agreement"] = target_agreement(args.oracle_table, metrics, robbench)
+        report["inputs"]["oracle_table"] = {
+            "path": str(args.oracle_table),
+            "sha256": sha256_file(args.oracle_table),
+        }
 
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)

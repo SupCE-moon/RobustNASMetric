@@ -189,3 +189,34 @@ def test_render_markdown_states_the_clean_accuracy_trap():
     assert "为什么必须控制 clean 准确率" in text
     assert "这份报告不能说明什么" in text
     assert "via_clean" in text
+
+
+def test_target_agreement_detects_identical_tables(tmp_path):
+    # 25 rows because _rho refuses to report a correlation below MIN_PAIRS.
+    n = 25
+    ids = [str(i) for i in range(n)]
+    values = [20 + i for i in range(n)]  # integers, so the CSV round-trips exactly
+    oracle = tmp_path / "oracle.csv"
+    oracle.write_text(
+        "\n".join(["arch_id,oracle_target"] + [f"{i},{v}" for i, v in zip(ids, values)]) + "\n",
+        encoding="utf-8",
+    )
+    metrics = pd.DataFrame({"m": [float(i) for i in range(n)]}, index=ids)
+    robbench = pd.DataFrame({"target": values, "clean": [50] * n}, index=ids)
+
+    out = audit.target_agreement(oracle, metrics, robbench)
+    assert out["n"] == n
+    assert out["identical"] is True
+    assert out["max_abs_diff"] == 0.0
+    assert out["rho"] == pytest.approx(1.0)
+
+
+def test_target_agreement_flags_a_different_target(tmp_path):
+    oracle = tmp_path / "oracle.csv"
+    oracle.write_text("arch_id,oracle_target\n0,0.20\n1,0.60\n", encoding="utf-8")
+    metrics = pd.DataFrame({"m": [1.0, 2.0]}, index=["0", "1"])
+    robbench = pd.DataFrame({"target": [0.40, 0.35], "clean": [0.7, 0.6]}, index=["0", "1"])
+
+    out = audit.target_agreement(oracle, metrics, robbench)
+    assert out["identical"] is False
+    assert out["max_abs_diff"] > 0.0

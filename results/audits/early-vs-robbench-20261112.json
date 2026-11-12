@@ -1041,6 +1041,17 @@
     "robbench": {
       "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\activation-survival\\data\\official_nasrobbench201_source\\NAS-RobBench-201_all.json",
       "sha256": "b670b9ce5a7e6cd29735c07806efa493ba0f7023cc46940b856e214a70b3a308"
+    },
+    "oracle_table": {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\e28_capacity_family\\nb201_e0_v3.csv",
+      "sha256": "91f10d174ba59495f6f232f39ea7515574ff4772e70952f776ce27b00538de7f"
     }
+  },
+  "target_agreement": {
+    "n": 64,
+    "rho": 0.9999999999999998,
+    "max_abs_diff": 0.0,
+    "mean_abs_diff": 0.0,
+    "identical": true
   }
 }

@@ -47,6 +47,7 @@ class Inputs:
     ranking: Path
     redundancy: Path
     robbench: Path | None = None
+    oracle: Path | None = None
 
     def missing_for(self, needs: tuple[str, ...]) -> list[str]:
         missing = []
@@ -80,6 +81,9 @@ def build_steps(inputs: Inputs) -> list[Step]:
         inputs.redundancy,
         inputs.robbench,
     )
+    # The oracle cross-check is optional: without it the report still runs, it just
+    # cannot say whether the target is the same data as the repository's own table.
+    oracle_args = ("--oracle-table", str(inputs.oracle)) if inputs.oracle else ()
     return [
         Step(
             name="doc_claims",
@@ -221,6 +225,7 @@ def build_steps(inputs: Inputs) -> list[Step]:
                 "--robbench", _p(robbench) if robbench else "",
                 "--json", _p(OUT / "early-vs-robbench-20261112.json"),
                 "--report", _p(OUT / "early-vs-robbench-20261112.md"),
+                *oracle_args,
             ),
             needs=("rows", "robbench"),
             why="早期指标预测的是鲁棒性，还是只预测了 clean 准确率",
@@ -399,6 +404,9 @@ def main(argv: list[str] | None = None) -> int:
         ranking=ROOT / "outputs" / release / "strict_ranking.csv",
         redundancy=OUT / "metric-redundancy-20261112.json",
         robbench=resolve_robbench(args.robbench),
+        oracle=(rows_root / "e28_capacity_family" / "nb201_e0_v3.csv")
+        if (rows_root / "e28_capacity_family" / "nb201_e0_v3.csv").is_file()
+        else None,
     )
 
     steps = build_steps(inputs)
