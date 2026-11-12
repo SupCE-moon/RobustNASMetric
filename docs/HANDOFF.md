@@ -398,3 +398,10 @@ python scripts/audit_rq2_confounders.py `
 **参数量怎么来的**：`Nb201TinyNetwork(ops)` 的实际 `numel()` 之和（91,226–2,699,770），
 不是论文里的估计值；C=16 下它实际上是 op 组合的代理。`parse_nb201_arch` 要求恰好 6 个 op，
 测试里手写的 arch string 数错一个就会静默返回 None——`parameter_counts` 会跳过而不是抛错。
+## 23. 别让临时脚本进仓库（2026-11-12）
+
+一天里出现了三次：`.tmp_msg.txt`、`.tmp_conf.py`、`.tmp_trace.py` 都被 `git add -A` 带走。
+现在 `.gitignore` 里有 `.tmp_*`，但**根因是 `git add -A` 太顺手**。
+
+提交前先看 `git status --short`，确认没有 `.tmp_*`；如果已经提交进历史，不要 force push 改历史，
+用后续提交 `git rm --cached` 删掉（D-021 的同一条理由：不改已推送的历史）。
