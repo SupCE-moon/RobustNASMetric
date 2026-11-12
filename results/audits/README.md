@@ -21,6 +21,18 @@ python tools/verify_strict_ranking.py `
 退出码 0 表示逐值全部落在 `1e-9` 容差内；非 0 表示有不一致，报告里会指出是哪个
 `指标::设置` 差了多少。
 
+## 附带核对：指标方向（2026-11-12）
+
+计算 Spearman 之前要对 `direction == "lower"` 的指标取负号。方向一旦标反，整个名次会翻转，
+所以这条不能只写在文档里。核对方式：
+
+- 取 `metric_values_original_strict.csv` 的 `direction` 列（逐行声明）；
+- 取 `src/robust_metric_lab/metric_registry.py` 的 `METRIC_SPECS`（代码里的声明）；
+- 逐个比。
+
+**结果**：85 个指标全部出现在注册表中，方向**零冲突（85/85）**；注册表比这批原始行多 1 个
+`feature_adv_excess_centered_unit_l2`——正是第 84 名那条后加的指标。
+
 ## 为什么原始行不在仓库里
 
 `metric_values_original_strict.csv` 是 13.94 MiB 的逐模型原始表，按 `.gitignore` 与
