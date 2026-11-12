@@ -153,3 +153,13 @@ python tools/verify_doc_claims.py --table <86 项总表> --json <临时 json> --
 退出码 0 = 33 条声称仍然对得上；非 0 会直接打印 `MISMATCH <metric>.<field>: doc=... table=...`。
 如果确实要改一个数（例如发布了新版榜单），先改 `tools/verify_doc_claims.py` 里的 `expected`，
 再改文档——顺序反了就会永远红灯。
+
+## 12. 指标索引与"声明 vs 事实"的警告
+
+`docs/theory/METRIC_INDEX.md` 是自动生成的，**不要手改**——改完下次重建就没了。
+要改指标本身：改 `src/robust_metric_lab/metric_registry.py` 或 `configs/metric_eligibility.json`，
+然后重建索引。
+
+如果你在索引里看到"⚠ 需要人看的不一致"一节，说明某个指标被资格表声明为 `implementation_error`，
+却又在发布表上有名次。当前有 3 条（TRNAS 三项），是 10-24 修复前后的口径差，已在 D-016 记录。
+**确认之前不要擅自把资格表改成 `cross_space`**，理由见 D-016。

@@ -312,3 +312,37 @@ Spearman 相关，八个设置平均后用平均连接聚类，并在报告里�
 **后果**：33/33 通过、零不变量失败。这条检查的边界写在报告里：它只保证文档与表一致，
 表本身对不对由 `results/audits/strict-ranking-recompute-20261112.md` 的独立复算负责，
 两者合起来才构成"数字可信"的完整证据链。
+
+## D-016 发现配置与事实矛盾时，先记录、不擅自改语义
+
+**发现**：用 `tools/build_metric_index.py` 把注册表、资格表、发布表、原始行四方 join 时，
+发现 `configs/metric_eligibility.json` 把 `trnas_consistency_phi`、`trnas_r_score`、
+`trnas_activation_psi` 三项标为 `implementation_error`，理由写着
+"Kang2021Stable float32 step underflow is unresolved under the frozen 1e-6 definition"。
+但 2026-10-24 的 `torchdiffeq.odeint` 直接自动求导修复已经解决了这个 underflow
+（最大参数变化 1.13e-6），三项在发布表上分别排第 1 / 2 / 4。
+
+**选择**：**不改** `configs/metric_eligibility.json`，而是在索引报告里单列一节
+"⚠ 需要人看的不一致"，每次生成都提醒；同时把这件事写进 `PROJECT_STATUS.md` 与本节。
+
+**理由**：
+1. 该字段目前**不影响计算**。全仓库只有 `tests/test_metric_eligibility.py` 和
+   `eligible_cross_space_names()` 读它，生产流水线不拿它筛指标，所以不改不会让任何结果错。
+   正因为不影响，改了也"看不出效果"，反而更容易悄悄改错。
+2. 它是一条**历史声明**：写下 `implementation_error` 的那一刻，这个判断是对的。
+   把它改成 `cross_space`，等于同时宣称"修复后的数值与其他 81 个 cross_space 指标的定义完全一致"——
+   这个判断应该由看过 10-24 修复报告的人确认，而不是由我根据排名倒推。
+3. 一旦开了"顺手改配置对齐结果"的先例，下次遇到其他不一致就分不清是"修正"还是"迁就结果"。
+
+**后果**：三条警告会一直出现在 `docs/theory/METRIC_INDEX.md` 里。确认后一次性改三条、
+重跑 `build_metric_index.py`、跑 `pytest tests/test_metric_eligibility.py`，警告自然消失。
+
+## D-017 索引里的"家族"是按名字猜的，必须标明
+
+**选择**：`docs/theory/METRIC_INDEX.md` 的"家族"列由名字前缀推断（`feature_measure_*` →
+特征漂移度量家族、`trnas_*` → TRNAS 移植……），并在三个地方写明这是猜测：生成器注释、
+表格下方"怎么读这张表"、报告开头。
+
+**理由**：注册表里没有 family 字段，而这 86 个指标确实分属几大思路。完全不分组，读者要在
+86 行里自己找；硬造一个"正式分类"，又等于给数据加了一层它没有的语义。折中做法是给出**可读的
+导航**，同时明确标注它不是统计分组依据——这样它不会被误用进论文的分组统计。

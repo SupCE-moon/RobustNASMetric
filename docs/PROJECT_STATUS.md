@@ -111,6 +111,23 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
    边界：这只证明"文档与表一致"，**不证明表本身正确**——后者由第 6 条的独立复算保证。
    详见 `results/audits/doc-claims-20261112.md`。
 
+9. **指标总索引（2026-11-12 新增）：86 个指标一张表**
+   指标定义在 `src/robust_metric_lab/metric_registry.py`、三空间资格在 `configs/metric_eligibility.json`、
+   分数在发布表、原始行在 `metric_values_original_strict.csv`。回答"某个指标到底入没入榜、
+   方向是什么、属于谁、三空间通不通用"要翻四个文件。
+   `tools/build_metric_index.py` 把四者 join 成 `docs/theory/METRIC_INDEX.md`（自动生成，勿手改）：
+   名次 / 家族（**按名字前缀猜的**）/ 方向 / 归属 / 八设置均值 / 覆盖（x/8）/ 资格。
+   三份数据源的指标名集合必须完全一致，否则工具以非零退出码报 `PROBLEM`；本次 86/86 一致。
+
+   **索引顺带查出一处口径矛盾（尚未处理）**：`configs/metric_eligibility.json` 把
+   `trnas_consistency_phi` / `trnas_r_score` / `trnas_activation_psi` 标成
+   `implementation_error`，理由写着 "Kang2021Stable float32 step underflow is unresolved under the
+   frozen 1e-6 definition"；但 2026-10-24 的 `torchdiffeq.odeint` 直接求导修复已把该 underflow 解掉
+   （最大参数变化 1.13e-6），三个指标在发布表上分别排第 1 / 2 / 4。
+   即：**配置记录的是修复前的状态，发布表记录的是修复后的结果，两者都没有错，但没人写下哪条是当前口径。**
+   索引每次生成都会在"⚠ 需要人看的不一致"一节列出这三条，等确认后一次性改配置。
+   详见 `docs/theory/METRIC_INDEX.md` 与 D-016。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**
@@ -199,6 +216,10 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
    在服务器上跑完了没有，无从确认（等待 SSH）。
 5. **571 行未提交指标代码未评审**（内容与 `dc6fb9c` 逐字节相同，见第 7 节）。
 6. **教师数据包未齐**：huangyue 缺 15/45 RB40 artifact。
+7. **TRNAS 三项的资格口径待确认**（2026-11-12 新增，不影响任何已发布数字）：
+   `configs/metric_eligibility.json` 仍把 Φ/R/Ψ 标为 `implementation_error`，但它们在发布表上
+   有第 1/2/4 名。配置记录修复前、发布表记录修复后，需要有人确认后统一（见 D-016）。
+   在此之前索引会一直显示这三条警告。
 
 ## 7. 本地未提交资产（已确认为 `dc6fb9c` 与 `893a994` 的子集，不再有丢失风险）
 

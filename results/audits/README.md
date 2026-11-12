@@ -83,3 +83,26 @@ python tools/verify_doc_claims.py ``
 
 **边界**：只证明"文档与表一致"，不证明表正确。表正确性见同目录的
 `strict-ranking-recompute-20261112.md`。
+
+## 指标总索引（2026-11-12）
+
+86 个指标的定义、三空间资格、名次、方向、覆盖，全部 join 到 `docs/theory/METRIC_INDEX.md`。
+重建命令：
+
+```powershell
+python tools/build_metric_index.py ``
+  --table outputs\strict_adv_excess_release_20261024T110422Z\RobustMetric_严格全部指标总表_86项_三位小数.csv ``
+  --rows  <主工作树>\outputs\strict_all_metrics_table_20261024_trnas_repaired\sources\metric_values_original_strict.csv ``
+  --markdown docs\theory\METRIC_INDEX.md ``
+  --json results\audits\metric-index-20261112.json
+```
+
+**`--rows` 可省略**：省略时"覆盖"列显示 `—` 并注明"未提供原始行，留空（不是 0）"。
+原始行 13.94 MiB 按策略不入库，所以从 clone 出来的仓库重建索引时，覆盖列会是空的——这是**正确的**，
+不要为了填满它而把 13.94 MiB 塞进 Git。
+
+**退出码**：三份数据源的指标名集合不一致时返回 1，并打印 `PROBLEM ...`。
+这说明注册表和资格表脱节了（例如新加了指标但忘了写资格），必须修好再看索引。
+
+**已知警告**：TRNAS 三项在资格表里仍是 `implementation_error`，却被发布表排了名次（见 D-016）。
+这是**待确认**的口径问题，不是 bug，索引每次都会列出来。
