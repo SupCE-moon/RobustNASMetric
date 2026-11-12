@@ -405,3 +405,17 @@ python scripts/audit_rq2_confounders.py `
 
 提交前先看 `git status --short`，确认没有 `.tmp_*`；如果已经提交进历史，不要 force push 改历史，
 用后续提交 `git rm --cached` 删掉（D-021 的同一条理由：不改已推送的历史）。
+## 24. 引用发布表 e0 之前先跑核对（2026-11-12）
+
+```powershell
+python tools/audit_published_e0_sanity.py `
+  --published <发布表>\sources\metric_values_original_strict.csv `
+  --current <当前代码 e0 表>.csv `
+  --json results\audits\published-e0-20261112.json `
+  --report results\audits\published-e0-20261112.md
+```
+
+**判据是代码里的 `clamp_max(1e3)`，不是人挑的阈值**：超过 1e3 的值本仓库代码产不出来。
+判成 `spiked` 的列不能引用；判成 `divergent` 的列说明两个实现算的不是同一个量，引用时必须标数据源。
+
+现在的结果：70 列里 `clean` 0 个。**任何"发布表 e0 上得到 +0.5"的说法都要先重跑这个工具再写。**

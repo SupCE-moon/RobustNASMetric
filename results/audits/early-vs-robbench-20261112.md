@@ -3,38 +3,38 @@
 - 早期指标：`nb201_e0`（训练第 0 个 epoch，即随机初始化后的前向）
 - 目标：NAS-RobBench-201 的 `autoattack`（三 seed 均值，训练后的数据）
 - 控制变量：`val_acc`（同一份数据的训练后 clean 准确率）
-- 架构数：**64**；重采样 2000 次，种子 20261112
+- 架构数：**400**；重采样 2000 次，种子 20261112
 
 ## 为什么必须控制 clean 准确率
 
-在这份数据里，训练后 clean 准确率与 AutoAttack 准确率的秩相关是 **+0.982**。也就是说，任何能预测 clean 准确率的早期指标，都会看起来像在预测鲁棒性。下面的「偏相关」列把 clean 准确率的影响去掉之后再看。
+在这份数据里，训练后 clean 准确率与 AutoAttack 准确率的秩相关是 **+0.983**。也就是说，任何能预测 clean 准确率的早期指标，都会看起来像在预测鲁棒性。下面的「偏相关」列把 clean 准确率的影响去掉之后再看。
 
 ## 判定分布
 
 | 判定 | 数量 | 含义 |
 | --- | --- | --- |
-| `direct` | 28 | 控制 clean 准确率后仍有相关 |
-| `via_clean` | 17 | 与 clean 准确率高度共线，控制后基本消失 |
-| `suppressed` | 9 | 控制后符号翻转（抑制效应） |
-| `weak` | 30 | 两边都弱 |
+| `direct` | 16 | 控制 clean 准确率后仍有相关 |
+| `via_clean` | 6 | 与 clean 准确率高度共线，控制后基本消失 |
+| `suppressed` | 2 | 控制后符号翻转（抑制效应） |
+| `weak` | 45 | 两边都弱 |
 | `uncovered` | 1 | 可用样本不足 |
 
 ## 偏相关最强的 12 个指标
 
 | 指标 | n | ρ(target) | ρ(clean) | 偏相关 | 95% 区间 | 置换 p | 判定 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `feature_spectral_participation_ratio_static` | 64 | +0.202 | +0.096 | +0.575 | [+0.288, +0.696] | 0.0005 | direct |
-| `jacobian_effective_rank` | 64 | -0.487 | -0.584 | +0.565 | [+0.259, +0.696] | 0.0005 | suppressed |
-| `input_loss_delta` | 64 | +0.716 | +0.651 | +0.536 | [+0.308, +0.654] | 0.0005 | direct |
-| `jacobian_spectral_norm` | 64 | +0.727 | +0.664 | +0.527 | [+0.296, +0.648] | 0.0005 | direct |
-| `jacobian_spectral_decay` | 64 | -0.590 | -0.675 | +0.523 | [+0.217, +0.669] | 0.0005 | suppressed |
-| `input_grad_l2` | 64 | +0.709 | +0.646 | +0.522 | [+0.299, +0.645] | 0.0005 | direct |
-| `racl_input_gradient_lower` | 64 | +0.709 | +0.646 | +0.522 | [+0.299, +0.645] | 0.0005 | direct |
-| `local_logit_lipschitz` | 64 | +0.729 | +0.668 | +0.519 | [+0.292, +0.639] | 0.0005 | direct |
-| `feature_measure_swd` | 64 | +0.738 | +0.679 | +0.512 | [+0.282, +0.636] | 0.0005 | direct |
-| `feature_spectral_erank_static` | 64 | -0.128 | -0.226 | +0.508 | [+0.214, +0.634] | 0.0005 | direct |
-| `perturbation_capacity_relu_active_multiscale_delta` | 64 | -0.286 | -0.196 | -0.503 | [-0.663, -0.220] | 0.0005 | direct |
-| `perturbation_capacity_topk_delta` | 64 | -0.219 | -0.129 | -0.496 | [-0.658, -0.217] | 0.0005 | direct |
+| `perturbation_capacity_topk_delta` | 400 | +0.699 | +0.661 | +0.357 | [+0.260, +0.437] | 0.0005 | direct |
+| `perturbation_capacity_relu_active_delta` | 400 | +0.367 | +0.314 | +0.331 | [+0.242, +0.406] | 0.0005 | direct |
+| `perturbation_capacity_profile_delta` | 400 | +0.702 | +0.668 | +0.328 | [+0.221, +0.411] | 0.0005 | direct |
+| `perturbation_capacity_gini_delta` | 400 | +0.609 | +0.569 | +0.327 | [+0.229, +0.411] | 0.0005 | direct |
+| `feature_measure_robust_delta` | 400 | +0.295 | +0.241 | +0.325 | [+0.226, +0.408] | 0.0005 | direct |
+| `feature_measure_channel_gram_centered_rel_delta` | 400 | +0.669 | +0.634 | +0.324 | [+0.222, +0.409] | 0.0005 | direct |
+| `feature_measure_weighted_delta` | 400 | +0.305 | +0.252 | +0.322 | [+0.223, +0.406] | 0.0005 | direct |
+| `feature_measure_local_delta` | 400 | +0.315 | +0.262 | +0.321 | [+0.221, +0.407] | 0.0005 | direct |
+| `perturbation_capacity_channelwise_delta` | 400 | +0.612 | +0.573 | +0.321 | [+0.220, +0.406] | 0.0005 | direct |
+| `perturbation_capacity_above_mean_delta` | 400 | +0.436 | +0.388 | +0.320 | [+0.221, +0.404] | 0.0005 | direct |
+| `feature_measure_mmd` | 400 | +0.453 | +0.408 | +0.315 | [+0.220, +0.394] | 0.0005 | direct |
+| `perturbation_capacity_flow_rel_delta` | 400 | +0.616 | +0.579 | +0.311 | [+0.209, +0.394] | 0.0005 | direct |
 
 ## target 从哪来（同源核对）
 

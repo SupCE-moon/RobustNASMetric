@@ -269,3 +269,10 @@ suite 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时会自动传这
 判定分布 survives 12 / shrinks 7 / explained_by_capacity 5 / weak_before_capacity 45。
 
 **别把 `weak_before_capacity` 读成 `explained_by_capacity`**：前者的 `rho_clean` 本来就 < 0.30。
+## 发布表 e0 的逐列核对（2026-11-12）
+
+`tools/audit_published_e0_sanity.py` 按代码里的 `clamp_max(1e3)` 上界，把发布表 e0 的每个指标判成
+`clean` / `spiked` / `divergent` / `uncomparable`。产物 `results/audits/published-e0-20261112.md`。
+
+结果：70 列里 `clean` **0 个**、`spiked` 14 个、`divergent` 55 个、`uncomparable` 1 个。
+**在这张表被重算之前，不要引用它上面得到的任何幅度**（第 3 节第 17 条的更正、D-031）。

@@ -1,0 +1,714 @@
+{
+  "schema_version": 1,
+  "setting": "nb201_e0",
+  "metrics": 70,
+  "spike_ceiling": 1000.0,
+  "rho_ok": 0.8,
+  "counts": {
+    "spiked": 14,
+    "divergent": 55,
+    "uncomparable": 1
+  },
+  "columns": [
+    {
+      "n": 64,
+      "rho": 0.3164,
+      "spikes": 38,
+      "published_max_abs": 58683351040.0,
+      "current_max_abs": 4.5234694480896,
+      "median_ratio": 54641.9971,
+      "metric": "feature_measure_swd",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": -0.0908,
+      "spikes": 21,
+      "published_max_abs": 5393066491904.0,
+      "current_max_abs": 338032.375,
+      "median_ratio": 0.0059,
+      "metric": "margin_input_grad_ratio",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": 0.6031,
+      "spikes": 14,
+      "published_max_abs": 3.4735349132234326e+21,
+      "current_max_abs": 2.396063609921839e-05,
+      "median_ratio": 1087318.9006,
+      "metric": "fsp_strict_delta",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": -0.3629,
+      "spikes": 13,
+      "published_max_abs": 1023786.0625,
+      "current_max_abs": 2.314964771270752,
+      "median_ratio": 1.0051,
+      "metric": "natural_loss",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": -0.3324,
+      "spikes": 13,
+      "published_max_abs": 1362489.5,
+      "current_max_abs": 2.314964771270752,
+      "median_ratio": 1.0146,
+      "metric": "adversarial_loss",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": 0.5837,
+      "spikes": 13,
+      "published_max_abs": 423372480.0,
+      "current_max_abs": 0.0336938761174678,
+      "median_ratio": 10.4882,
+      "metric": "feature_measure_robust_delta",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": 0.5875,
+      "spikes": 13,
+      "published_max_abs": 211686240.17872053,
+      "current_max_abs": 0.0417804108801647,
+      "median_ratio": 6.9951,
+      "metric": "feature_measure_robust_hybrid_delta",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": 0.6375,
+      "spikes": 13,
+      "published_max_abs": 423372480.0,
+      "current_max_abs": 0.0001139035884989,
+      "median_ratio": 910.6969,
+      "metric": "feature_measure_flow_delta",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": 0.6502,
+      "spikes": 13,
+      "published_max_abs": 211686240.2026488,
+      "current_max_abs": 0.0464097890871926,
+      "median_ratio": 8.2646,
+      "metric": "feature_measure_relu_active_hybrid_delta",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": 0.6548,
+      "spikes": 10,
+      "published_max_abs": 503318.84375,
+      "current_max_abs": 0.0001326988858636,
+      "median_ratio": 148814.7767,
+      "metric": "jacobian_spectral_norm",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": -0.011,
+      "spikes": 6,
+      "published_max_abs": 341121.3125,
+      "current_max_abs": 1.1920928955078125e-06,
+      "median_ratio": null,
+      "metric": "input_loss_delta",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": 0.2923,
+      "spikes": 5,
+      "published_max_abs": 285514.0625,
+      "current_max_abs": 1.689725831965916e-05,
+      "median_ratio": 80564.4554,
+      "metric": "local_logit_lipschitz",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": 0.6225,
+      "spikes": 4,
+      "published_max_abs": 234196.109375,
+      "current_max_abs": 3.8870835851412266e-05,
+      "median_ratio": 171136.1621,
+      "metric": "input_grad_l2",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": 0.0674,
+      "spikes": 1,
+      "published_max_abs": 15355.1279296875,
+      "current_max_abs": 6.123445928096771e-08,
+      "median_ratio": 5580.4795,
+      "metric": "logit_kl",
+      "verdict": "spiked"
+    },
+    {
+      "n": 64,
+      "rho": -0.2286,
+      "spikes": 0,
+      "published_max_abs": 0.6319280862808228,
+      "current_max_abs": 0.2133927196264267,
+      "median_ratio": 7.4899,
+      "metric": "feature_graph_fundamental_rank_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": -0.1941,
+      "spikes": 0,
+      "published_max_abs": 0.0093450751155614,
+      "current_max_abs": 0.0009741487447172,
+      "median_ratio": 9.5874,
+      "metric": "feature_measure_spatial_gram_cosine_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": -0.16,
+      "spikes": 0,
+      "published_max_abs": 0.0270092375576496,
+      "current_max_abs": 0.0034829101059585,
+      "median_ratio": 1.4799,
+      "metric": "perturbation_capacity_layerprofile_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": -0.1265,
+      "spikes": 0,
+      "published_max_abs": 9.528863906860352,
+      "current_max_abs": 5.8097758293151855,
+      "median_ratio": 1.7997,
+      "metric": "feature_spectral_decay_exponent_static",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": -0.1223,
+      "spikes": 0,
+      "published_max_abs": 0.0037451048847287,
+      "current_max_abs": 0.0011252898257225,
+      "median_ratio": 6.7322,
+      "metric": "feature_measure_spectrum_emd_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": -0.1129,
+      "spikes": 0,
+      "published_max_abs": 0.0973429530858993,
+      "current_max_abs": 0.0323990173637867,
+      "median_ratio": 6.0928,
+      "metric": "perturbation_capacity_topk_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": -0.0991,
+      "spikes": 0,
+      "published_max_abs": 0.0931631475687027,
+      "current_max_abs": 0.0350834429264068,
+      "median_ratio": 4.5806,
+      "metric": "perturbation_capacity_relu_active_multiscale_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": -0.0746,
+      "spikes": 0,
+      "published_max_abs": 0.1195885017514228,
+      "current_max_abs": 0.0341712683439254,
+      "median_ratio": 4.5166,
+      "metric": "perturbation_capacity_iqr_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.0039,
+      "spikes": 0,
+      "published_max_abs": 0.1029001772403717,
+      "current_max_abs": 0.0356631726026535,
+      "median_ratio": 3.3431,
+      "metric": "perturbation_capacity_relu_active_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.0067,
+      "spikes": 0,
+      "published_max_abs": 0.0877145081758499,
+      "current_max_abs": 0.0263731889426708,
+      "median_ratio": 6.6459,
+      "metric": "perturbation_capacity_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.011,
+      "spikes": 0,
+      "published_max_abs": 0.138584166765213,
+      "current_max_abs": 0.0424198135733604,
+      "median_ratio": 4.2705,
+      "metric": "perturbation_capacity_above_mean_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.0148,
+      "spikes": 0,
+      "published_max_abs": 0.4688832759857178,
+      "current_max_abs": 0.440232902765274,
+      "median_ratio": 1.1261,
+      "metric": "feature_measure_mmd",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.0549,
+      "spikes": 0,
+      "published_max_abs": 0.0905720740556716,
+      "current_max_abs": 0.0274828448891639,
+      "median_ratio": 10.971,
+      "metric": "perturbation_capacity_multiscale_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.0891,
+      "spikes": 0,
+      "published_max_abs": 0.0070702899247407,
+      "current_max_abs": 0.0045390403829514,
+      "median_ratio": 2.6511,
+      "metric": "perturbation_capacity_gini_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1165,
+      "spikes": 0,
+      "published_max_abs": 0.1338758170604705,
+      "current_max_abs": 0.039376076310873,
+      "median_ratio": 3.7835,
+      "metric": "perturbation_capacity_iqr_active_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1354,
+      "spikes": 0,
+      "published_max_abs": 0.5224485993385315,
+      "current_max_abs": 0.380048006772995,
+      "median_ratio": 5.7225,
+      "metric": "feature_quantile_hausdorff_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1355,
+      "spikes": 0,
+      "published_max_abs": 0.2320558875799179,
+      "current_max_abs": 0.1881960034370422,
+      "median_ratio": 1.5213,
+      "metric": "feature_box_dimension_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1466,
+      "spikes": 0,
+      "published_max_abs": 5.299546241760254,
+      "current_max_abs": 1.6194448471069336,
+      "median_ratio": 1.9575,
+      "metric": "feature_spectral_erank_static",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1519,
+      "spikes": 0,
+      "published_max_abs": 0.2089865654706955,
+      "current_max_abs": 0.0414056181907653,
+      "median_ratio": 5.2166,
+      "metric": "feature_measure_local_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1552,
+      "spikes": 0,
+      "published_max_abs": 0.6780524253845215,
+      "current_max_abs": 0.6248024106025696,
+      "median_ratio": 5.4348,
+      "metric": "feature_hausdorff_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1564,
+      "spikes": 0,
+      "published_max_abs": 0.2491873949766159,
+      "current_max_abs": 0.0492597296833992,
+      "median_ratio": 6.4278,
+      "metric": "feature_measure_robust_spatial_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1642,
+      "spikes": 0,
+      "published_max_abs": 0.2679156959056854,
+      "current_max_abs": 0.0523606911301612,
+      "median_ratio": 6.8094,
+      "metric": "feature_measure_robust_spatial_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1698,
+      "spikes": 0,
+      "published_max_abs": 0.1967351883649826,
+      "current_max_abs": 0.0661719664931297,
+      "median_ratio": 8.526,
+      "metric": "perturbation_capacity_flow_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.1745,
+      "spikes": 0,
+      "published_max_abs": 0.0633526444435119,
+      "current_max_abs": 0.0094282925128936,
+      "median_ratio": 3.7706,
+      "metric": "perturbation_capacity_signed_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.2033,
+      "spikes": 0,
+      "published_max_abs": 0.1845985054969787,
+      "current_max_abs": 0.0342108011245727,
+      "median_ratio": 5.9061,
+      "metric": "feature_measure_weighted_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.2129,
+      "spikes": 0,
+      "published_max_abs": 2.762885808944702,
+      "current_max_abs": 1.242302656173706,
+      "median_ratio": 1.4762,
+      "metric": "feature_spectral_participation_ratio_static",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.2903,
+      "spikes": 0,
+      "published_max_abs": 0.2106697261333465,
+      "current_max_abs": 0.0384733416140079,
+      "median_ratio": 7.3263,
+      "metric": "feature_measure_relu_active_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.3375,
+      "spikes": 0,
+      "published_max_abs": 0.1792695671319961,
+      "current_max_abs": 0.0852803066372871,
+      "median_ratio": 5.3614,
+      "metric": "feature_measure_channel_gram_centered_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.3401,
+      "spikes": 0,
+      "published_max_abs": 0.0978272631764411,
+      "current_max_abs": 0.0191479139029979,
+      "median_ratio": 8.9878,
+      "metric": "feature_measure_relu_active_spatial_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.3486,
+      "spikes": 0,
+      "published_max_abs": 0.3087279498577118,
+      "current_max_abs": 0.0412845686078071,
+      "median_ratio": 8.3864,
+      "metric": "feature_measure_struct_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.3547,
+      "spikes": 0,
+      "published_max_abs": 0.071698397397995,
+      "current_max_abs": 0.0157826039940118,
+      "median_ratio": 8.3524,
+      "metric": "feature_measure_relu_active_spatial_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.3868,
+      "spikes": 0,
+      "published_max_abs": 0.0331688448786735,
+      "current_max_abs": 0.018550744280219,
+      "median_ratio": 5.0132,
+      "metric": "feature_measure_spectrum_hellinger_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.3974,
+      "spikes": 0,
+      "published_max_abs": 0.0978400483727455,
+      "current_max_abs": 0.0181498918682336,
+      "median_ratio": 10.0706,
+      "metric": "feature_measure_spatial_gram_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4278,
+      "spikes": 0,
+      "published_max_abs": 0.2572181224822998,
+      "current_max_abs": 0.0766717493534088,
+      "median_ratio": 12.132,
+      "metric": "feature_measure_cov_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4326,
+      "spikes": 0,
+      "published_max_abs": 0.6219501495361328,
+      "current_max_abs": 0.0554770343005657,
+      "median_ratio": 21.311,
+      "metric": "feature_measure_robust_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4333,
+      "spikes": 0,
+      "published_max_abs": 0.0709475725889206,
+      "current_max_abs": 0.0150489285588264,
+      "median_ratio": 9.0216,
+      "metric": "feature_measure_spatial_gram_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4614,
+      "spikes": 0,
+      "published_max_abs": 0.435960803180933,
+      "current_max_abs": 0.0542224692180752,
+      "median_ratio": 10.6824,
+      "metric": "feature_measure_robust_hybrid_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4638,
+      "spikes": 0,
+      "published_max_abs": 3.9121243953704834,
+      "current_max_abs": 0.0448512360453605,
+      "median_ratio": 80.1406,
+      "metric": "perturbation_capacity_channelwise_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4651,
+      "spikes": 0,
+      "published_max_abs": 0.2481285333633422,
+      "current_max_abs": 0.0254958197474479,
+      "median_ratio": 13.5745,
+      "metric": "feature_measure_struct01_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4767,
+      "spikes": 0,
+      "published_max_abs": 0.0538128614425659,
+      "current_max_abs": 0.0015879397979006,
+      "median_ratio": 308.1474,
+      "metric": "feature_measure_flow_corr_angular_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4899,
+      "spikes": 0,
+      "published_max_abs": 0.0021703988313674,
+      "current_max_abs": 0.0007162601104937,
+      "median_ratio": 19.0879,
+      "metric": "feature_measure_spectrum_js_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4945,
+      "spikes": 0,
+      "published_max_abs": 0.3023455739021301,
+      "current_max_abs": 0.0339009761810302,
+      "median_ratio": 26.3475,
+      "metric": "feature_measure_flow_corr_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.4949,
+      "spikes": 0,
+      "published_max_abs": 0.3024948835372925,
+      "current_max_abs": 0.0339469946920871,
+      "median_ratio": 26.1787,
+      "metric": "feature_measure_flow_corr_symmetric_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.5033,
+      "spikes": 0,
+      "published_max_abs": 0.0773340240120887,
+      "current_max_abs": 0.0333884768187999,
+      "median_ratio": 5.1096,
+      "metric": "perturbation_capacity_profile_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.5221,
+      "spikes": 0,
+      "published_max_abs": 0.2390926033258438,
+      "current_max_abs": 0.0236487966030836,
+      "median_ratio": 16.7998,
+      "metric": "fsp_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.5318,
+      "spikes": 0,
+      "published_max_abs": 0.0429621674120426,
+      "current_max_abs": 0.0007574255578219,
+      "median_ratio": 138.4157,
+      "metric": "feature_measure_channel_gram_cosine_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.5432,
+      "spikes": 0,
+      "published_max_abs": 0.3286376595497131,
+      "current_max_abs": 0.0258584097027778,
+      "median_ratio": 19.9176,
+      "metric": "feature_measure_moment_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.5635,
+      "spikes": 0,
+      "published_max_abs": 0.9423359632492064,
+      "current_max_abs": 0.0636076182126998,
+      "median_ratio": 99.1882,
+      "metric": "feature_measure_flow_rel_multiscale_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.6035,
+      "spikes": 0,
+      "published_max_abs": 0.2471927106380462,
+      "current_max_abs": 0.0248362515121698,
+      "median_ratio": 20.1768,
+      "metric": "feature_measure_fsp_rel_multiscale_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.6121,
+      "spikes": 0,
+      "published_max_abs": 0.4492539167404175,
+      "current_max_abs": 0.0218734443187713,
+      "median_ratio": 131.2449,
+      "metric": "feature_measure_flow_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.6293,
+      "spikes": 0,
+      "published_max_abs": 0.4617110975086689,
+      "current_max_abs": 0.0589840207248926,
+      "median_ratio": 12.4122,
+      "metric": "feature_measure_relu_active_hybrid_rel_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.6912,
+      "spikes": 0,
+      "published_max_abs": 9.373414993286133,
+      "current_max_abs": 9.32614040374756,
+      "median_ratio": 0.9362,
+      "metric": "jacobian_effective_rank",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.6921,
+      "spikes": 0,
+      "published_max_abs": 0.4426203668117523,
+      "current_max_abs": 0.0209121890366077,
+      "median_ratio": 107.7114,
+      "metric": "feature_measure_flow_rel_allpairs_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.695,
+      "spikes": 0,
+      "published_max_abs": 0.1985071152448654,
+      "current_max_abs": 0.0110267214477062,
+      "median_ratio": 82.7773,
+      "metric": "feature_delta",
+      "verdict": "divergent"
+    },
+    {
+      "n": 64,
+      "rho": 0.7715,
+      "spikes": 0,
+      "published_max_abs": 1.8681352138519287,
+      "current_max_abs": 3.028814554214477,
+      "median_ratio": 1.0576,
+      "metric": "jacobian_spectral_decay",
+      "verdict": "divergent"
+    },
+    {
+      "n": 0,
+      "rho": null,
+      "spikes": 0,
+      "published_max_abs": 0.0874534511822275,
+      "current_max_abs": null,
+      "median_ratio": null,
+      "metric": "perturbation_capacity_importance_delta",
+      "verdict": "uncomparable"
+    }
+  ]
+}

@@ -758,3 +758,29 @@ survives 12 / shrinks 7 / explained_by_capacity 5 / weak_before_capacity 45。
 **后果**：`scripts/audit_rq2_confounders.py`、`tests/test_audit_rq2_confounders.py`（12 个测试）、
 `results/audits/rq2-confounders-20261112.{json,md}`、`docs/PROJECT_STATUS.md` §3 第 19 条与 §4/§6 第 9 条。
 RQ2 的幅度表述从「约 +0.35」更新为「约 +0.35~+0.42，两个混杂都控过」。
+## D-031 —— 发布表 e0 的列按「代码上界」判定能否引用（2026-11-12）
+
+**背景**：D-029 记录「发布表 e0 与当前代码不一致」，当时只比了一列、只给了范围与秩相关。
+这一轮把它做成逐列核对，并且把判据从"人挑一个阈值"换成**代码自己的上界**。
+
+**判据**：`src/robust_metric_lab/metrics.py:745` 的 `... .clamp_max(1e3)` 把相对类特征指标卡在 1e3。
+这个 clamp 在 `dc6fb9c`、`410184e`、`HEAD` 三版里都有。所以发布值 **> 1e3** 就不是本仓库代码能产出的。
+这条判据可审查、可复算，不依赖任何主观口径。
+
+**结果**：70 个共有指标里 `clean` **0 个**、`spiked` 14 个、`divergent` 55 个、`uncomparable` 1 个；
+秩相关中位数只有 0.338，最高 0.772。
+
+**决定**：
+1. **第 17 条那批数字作废**（Φ 的 +0.170、`feature_spectral_participation_ratio_static` 的 +0.575、
+   `feature_measure_swd` 的 +0.512）。不是因为方向错了，而是因为**输入无法被独立验证**。
+   RQ2 的量化结论统一以第 18、19 条（当前代码重算）为准。
+2. **不改发布表、不重算它**：它是那次流水线的真实输出，`release_verification.json` 的 PASS 也是真的。
+   问题在"那一版代码不在本仓库历史里"，改表等于替别人重写历史（D-021 的同一条理由）。
+3. **判据写进工具**，以后任何人想引用发布表 e0，先跑 `tools/audit_published_e0_sanity.py`。
+
+**为什么不把 `divergent` 也叫"错"**：秩相关 < 0.8 说明的是"同名不同量"，这是两个实现之间的差异，
+不是错误。只有 `spiked` 那 14 个能确定"本仓库代码产不出来"。
+
+**后果**：`tools/audit_published_e0_sanity.py`、`tests/test_audit_published_e0_sanity.py`（9 个）、
+`results/audits/published-e0-20261112.{json,md}`、`docs/PROJECT_STATUS.md` §3 第 17 条加更正框、
+§3 第 20 条、§4 把那条从"已验证事实"降级为"作废"。

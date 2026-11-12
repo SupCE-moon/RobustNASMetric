@@ -48,6 +48,7 @@ class Inputs:
     redundancy: Path
     robbench: Path | None = None
     oracle: Path | None = None
+    e0_rows: Path | None = None
 
     def missing_for(self, needs: tuple[str, ...]) -> list[str]:
         missing = []
@@ -73,17 +74,22 @@ def _p(value: str) -> str:
 
 
 def build_steps(inputs: Inputs) -> list[Step]:
-    table, rows, repair, ranking, redundancy, robbench = (
+    table, rows, repair, ranking, redundancy, robbench, e0_rows = (
         inputs.table,
         inputs.rows,
         inputs.repair,
         inputs.ranking,
         inputs.redundancy,
         inputs.robbench,
+        inputs.e0_rows,
     )
     # The oracle cross-check is optional: without it the report still runs, it just
     # cannot say whether the target is the same data as the repository's own table.
     oracle_args = ("--oracle-table", str(inputs.oracle)) if inputs.oracle else ()
+    # Prefer the table recomputed with the code in this repository.  The published e0
+    # columns do not survive the check in audit_published_e0_sanity, so running this
+    # step on them measures a different quantity.
+    early_rows = e0_rows or rows
     return [
         Step(
             name="doc_claims",
@@ -221,7 +227,7 @@ def build_steps(inputs: Inputs) -> list[Step]:
             name="early_vs_robbench",
             script="scripts/audit_early_metrics_vs_robbench.py",
             argv=(
-                "--rows", _p(rows),
+                "--rows", _p(early_rows),
                 "--robbench", _p(robbench) if robbench else "",
                 "--json", _p(OUT / "early-vs-robbench-20261112.json"),
                 "--report", _p(OUT / "early-vs-robbench-20261112.md"),
@@ -354,6 +360,18 @@ def resolve_robbench(explicit: str | None) -> Path | None:
     return None
 
 
+def resolve_e0_rows(rows_root: Path | None) -> Path | None:
+    """The e0 table recomputed with this repository's code, if it is around.
+
+    `audit_published_e0_sanity` shows the published e0 columns cannot be reproduced
+    here, so the early-signal step prefers this file whenever it exists.
+    """
+    if rows_root is None:
+        return None
+    candidate = Path(rows_root) / "e28_capacity_family" / "nb201_e0_n400_rows_20261112.csv"
+    return candidate if candidate.is_file() else None
+
+
 def resolve_rows_root(explicit: str | None) -> Path:
     if explicit:
         return Path(explicit)
@@ -407,6 +425,7 @@ def main(argv: list[str] | None = None) -> int:
         oracle=(rows_root / "e28_capacity_family" / "nb201_e0_v3.csv")
         if (rows_root / "e28_capacity_family" / "nb201_e0_v3.csv").is_file()
         else None,
+        e0_rows=resolve_e0_rows(rows_root),
     )
 
     steps = build_steps(inputs)

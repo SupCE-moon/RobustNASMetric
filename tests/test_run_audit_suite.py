@@ -92,3 +92,29 @@ def test_python_executable_is_the_running_interpreter():
     # has torch and pandas.
     steps = suite.build_steps(_inputs(Path(".")))
     assert steps and sys.executable
+
+def test_early_step_prefers_the_current_code_e0_table(tmp_path):
+    inputs = suite.Inputs(
+        table=tmp_path / "table.csv",
+        rows=tmp_path / "rows.csv",
+        repair=tmp_path / "repair.csv",
+        ranking=tmp_path / "ranking.csv",
+        redundancy=tmp_path / "redundancy.json",
+        robbench=tmp_path / "robbench.json",
+        e0_rows=tmp_path / "e0_rows.csv",
+    )
+    step = next(s for s in suite.build_steps(inputs) if s.name == "early_vs_robbench")
+    assert step.argv[step.argv.index("--rows") + 1] == str(tmp_path / "e0_rows.csv")
+
+
+def test_early_step_falls_back_to_rows_without_the_e0_table(tmp_path):
+    inputs = suite.Inputs(
+        table=tmp_path / "table.csv",
+        rows=tmp_path / "rows.csv",
+        repair=tmp_path / "repair.csv",
+        ranking=tmp_path / "ranking.csv",
+        redundancy=tmp_path / "redundancy.json",
+        robbench=tmp_path / "robbench.json",
+    )
+    step = next(s for s in suite.build_steps(inputs) if s.name == "early_vs_robbench")
+    assert step.argv[step.argv.index("--rows") + 1] == str(tmp_path / "rows.csv")

@@ -1,6 +1,6 @@
 # 严格排名离线复算（从原始行重建）
 
-生成时间（UTC）：2026-11-12T13:46:17+00:00
+生成时间（UTC）：2026-11-12T14:28:32+00:00
 
 - 原始行：`D:\Project\RobustNAS\DynamicBN\DynamicBN20251203\robust_metric\outputs\strict_all_metrics_table_20261024_trnas_repaired\sources\metric_values_original_strict.csv`（47,600 行，sha256 `b5137e2b3fe89ce5…`）
 - 官方排名表：`D:\Project\RobustNAS\DynamicBN\DynamicBN20251203\robust_metric\.worktrees\mainline-consolidation\outputs\strict_adv_excess_release_20261024T110422Z\strict_ranking.csv`
