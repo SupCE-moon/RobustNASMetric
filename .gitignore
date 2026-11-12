@@ -130,3 +130,6 @@ node_modules/
 # Sub-agent scratch state
 /.superpowers/
 
+
+# Regenerable per-worktree inventories (see results/manifests/*/README.md)
+results/manifests/*/trees/

@@ -117,3 +117,29 @@ adversarial-excess feature drift", "Ours")`）。
 **后果**：`pytest tests -q` 从 101 passed / 2 failed 变为 **103 passed**。
 若将来判定该指标不应入榜，删掉这条声明即可，不影响其他代码。
 
+---
+
+## D-008 认定 `codex/server-mainline`（dc6fb9c）为服务器主线，并以其为基线合并
+
+**背景**：四方版本不一致，需要回答"哪个分支代表服务器"。可选做法有三种：看提交时间、
+看提交图上的领先数、看文件内容哈希。
+
+**选择**：按内容哈希。主工作树里 6 个未提交文件与 `dc6fb9c` **逐字节相同**
+（`metrics.py` 67,447 字节等），而 `main`（784fc74）里是旧版（42,297 字节）。
+
+**理由**：提交时间会被 rebase 和 checkout 污染；领先数只说明分叉了多少次，不说明谁新。
+内容哈希是唯一能直接证明"这份文件就是那一份"的证据。另有一条旁证：对账 spec 里记录的
+`recorded base = dc6fb9cf…` 与 `server-mainline` 的 tip 一致。
+
+**执行**：`git merge dc6fb9c` 到 `codex/server-mainline-merge-20261112`，三处冲突：
+
+| 文件 | 处理 | 理由 |
+| --- | --- | --- |
+| `.gitignore` | 两边都留 | 忽略规则是并集，删任何一条都会让文件重新变脏 |
+| `metric_registry.py` | 取 `--theirs` 再加回 adv-excess 声明 | 服务器版是我们的超集，但缺 adv-excess 那一条 |
+| `student_runner.py`（add/add） | 取 `--ours` | 我们的版本把 `None` 的 `checkpoint_epoch` 归一化成 `""`，服务器版保留 `None`，会让续跑键对不上而重复计算 |
+
+**后果**：`pytest tests -q` = **225 passed, 2 skipped**（合并前 103 passed）。
+合并后主线代码比 `main` 完整，`main` 不再被当作代码基线。
+
+

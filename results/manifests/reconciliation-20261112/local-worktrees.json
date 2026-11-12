@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "generated_at_utc": "2026-11-12T08:17:56.389284+00:00",
+  "generated_at_utc": "2026-11-12T08:36:21.817868+00:00",
   "repository": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric",
   "worktree_count": 9,
-  "dirty_worktrees": 4,
+  "dirty_worktrees": 3,
   "worktrees": [
     {
       "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric",
@@ -32878,58 +32878,15 @@
     },
     {
       "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\mainline-consolidation",
-      "head": "784fc74333a207020306125258085ea93e4c088e",
+      "head": "8f75a4886f0ea490edceb500fc1e8158f59abb29",
       "branch": "codex/mainline-consolidation-20261112",
-      "committed_at": "2026-09-30T00:33:31+08:00",
+      "committed_at": "2026-11-12T16:35:19+08:00",
       "detached": false,
       "locked": false,
-      "changes": [
-        {
-          "status": "??",
-          "path": "results/manifests/reconciliation-20261112/_peek.py",
-          "size": 618,
-          "sha256": "18ebf230c57093984945b3c9c7c0f3c63a326ac6175d3fdae602fd4a00e0f17d",
-          "classification": "allow"
-        },
-        {
-          "status": "??",
-          "path": "results/manifests/reconciliation-20261112/local-worktrees.json",
-          "size": 36551,
-          "sha256": "79fbc9cf7a2f50d6e0199e05b7b680cfc235220ba45e61118f12bd1077808be9",
-          "classification": "allow"
-        },
-        {
-          "status": "??",
-          "path": "tests/test_repository_policy.py",
-          "size": 3243,
-          "sha256": "e7ea4a779e2a5ec5d7240bc595c970fae7a448c5293b8c8f98df055c222bc807",
-          "classification": "allow"
-        },
-        {
-          "status": "??",
-          "path": "tools/inventory_tree.py",
-          "size": 4912,
-          "sha256": "bf4c7c11f66a579987befed2def1f15590b050ec5a8358f91c747ce7120ac957",
-          "classification": "allow"
-        },
-        {
-          "status": "??",
-          "path": "tools/inventory_worktrees.py",
-          "size": 4803,
-          "sha256": "ab4127c5ce46d8e2bae3597a82f319f0b778d5ccd06d6fdf0cae1fde3f994180",
-          "classification": "allow"
-        },
-        {
-          "status": "??",
-          "path": "tools/repository_policy.py",
-          "size": 3439,
-          "sha256": "1f02c55a7b47987e0025506af2a08ddbd2889ed8ff84cc1f83091d32325167e2",
-          "classification": "allow"
-        }
-      ],
-      "change_count": 6,
+      "changes": [],
+      "change_count": 0,
       "tracked_change_count": 0,
-      "untracked_count": 6
+      "untracked_count": 0
     },
     {
       "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\repository-reconciliation",

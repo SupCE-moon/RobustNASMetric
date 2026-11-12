@@ -91,7 +91,42 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 - 特征空间稳定性是否是**因果**因素，而不只是与鲁棒性共变的伴随现象——目前所有结果都是相关性。
 - 训练早期指标能否预测"训练完成后"的鲁棒性——需要同一协议训练到底的对照，目前尚无完整证据链。
 
-## 5. 未完成的问题（按优先级）
+## 5. 四方差异盘点结果（2026-11-12，本机可完成的部分）
+
+**结论：`codex/server-mainline`（`dc6fb9c`）就是服务器主线的本地代表。** 依据是内容哈希，不是提交图，
+也不是时间戳。
+
+决定性证据：主工作树里那 6 个"从未提交"的文件，与 `dc6fb9c` 里的版本**逐字节相同**。
+
+| 文件 | 归一化后大小 |
+| --- | --- |
+| `src/robust_metric_lab/metrics.py` | 67,447 |
+| `src/robust_metric_lab/attacks.py` | 2,628 |
+| `src/robust_metric_lab/metric_registry.py` | 5,867 |
+| `scripts/compute_metric_batch.py` | 17,579 |
+| `docs/experiments/实验管理.md` | 109,498 |
+| `docs/theory/理论管理.md` | 22,357 |
+
+含义：**那 571 行指标代码从来没有丢**，它已经提交在 `server-mainline` 上，只是没进 `main`。
+
+九棵树的横向对比（目标 = 本分支，见 `results/manifests/reconciliation-20261112/tree-comparison.md`）：
+
+| 工作树 | 独有文件 | 独有体积 | 内容不同 |
+| --- | --- | --- | --- |
+| main | 64 | 31.73 MiB | 7 |
+| adv-excess | 27 | 0.85 MiB | 4 |
+| ba02 | 391 | 14.65 MiB | 0 |
+| strict-metrics-e37 | 441 | 15.01 MiB | 0 |
+| activation-survival | 78 | 17.47 MiB | 3 |
+| repository-reconciliation | 2 | 0.01 MiB | 2 |
+| **server-mainline** | **37** | **0.62 MiB** | **56** |
+| three-space-benchmark | 51 | 0.68 MiB | 10 |
+
+**一个必须记住的陷阱**：`server-mainline` 那 56 个"内容不同"里，**46 个只是换行符不同**
+（该工作树按 CRLF 检出）。真正的差异只有 10 个文件。凡是不做换行符归一化就下结论的对比，
+都会把结果夸大 5 倍。
+
+## 6. 未完成的问题（按优先级）
 
 1. **服务器现状未知**：`/workspace/robust_metric_lab_nas` 的代码、结果、manifest 未盘点（阻塞，见第 7 节）。
 2. **主线未确认**：本地 `main`（784fc74）、`codex/server-mainline`（dc6fb9c）、
@@ -102,7 +137,7 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 5. **571 行未提交指标代码未评审**（见第 6 节）。
 6. **教师数据包未齐**：huangyue 缺 15/45 RB40 artifact。
 
-## 6. 本地未提交资产（有丢失风险，已留证）
+## 7. 本地未提交资产（已确认为 server-mainline 的子集，不再有丢失风险）
 
 主工作树 `784fc74` 有 6 个已跟踪文件被改动但从未提交，其中
 `src/robust_metric_lab/metrics.py` 新增 571 行（`perturbation_capacity_iqr/multiscale/topk`、
@@ -113,7 +148,7 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 依赖该补丁的两个文件（`e36_batched.py`、`test_e36_batched.py`）以原始字节保存在
 `results/manifests/reconciliation-20261112/held/`。
 
-## 7. 当前阻塞：服务器 SSH 不可达
+## 8. 当前阻塞：服务器 SSH 不可达
 
 2026-11-12 16:2x 实测（`socket.connect_ex`）：
 
@@ -129,7 +164,7 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 
 判断：容器（`wangjiahao`）或其端口映射已下线/重启换了端口。需要恢复端口映射或取得新端口后重试。
 
-## 8. 下一步（拿到访问权后按序执行）
+## 9. 下一步
 
 1. 服务器只读普查：`tools/server_inventory.py`（只 stat + sha256，不写服务器）。
 2. 内容比对：服务器源码 vs 9 个 worktree，按 SHA-256 而不是时间戳判定谁新。
