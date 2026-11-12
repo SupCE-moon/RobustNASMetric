@@ -163,3 +163,21 @@ RB40 只有 40 个模型，该列是点估计、没有置信区间，不能当�
 
 结论：Φ 与 `adversarial_loss` 稳定为正；`trnas_r_score` / Ψ 的区间跨 0，
 所以"在已训练模型上失效"这句话没有依据，只能说"40 个模型分辨不出来"。详见 D-022。
+## Φ 对漂移族的增量检验（`phi-incremental-20261112`）
+
+    python scripts/audit_phi_incremental.py \
+      --rows outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv \
+      --redundancy results/audits/metric-redundancy-20261112.json \
+      --json results/audits/phi-incremental-20261112.json \
+      --report results/audits/phi-incremental-20261112.md \
+      --resamples 2000
+
+基准 B 是冗余度审计里那 35 个漂移指标的组内百分位秩均值（不在这里重新聚类：
+基准可动，就能被调到"Φ 看起来有增量"）。独立单元是 204 个架构，不是 560 行。
+
+结果：Δρ = +0.695 [+0.583, +0.769]、置换 p = 0.0005（2000 次，0 次超过）、
+嵌套模型 R² 0.163→0.640、同漂移分位内秩相关 +0.637。稳健性对照：PCA 0.685、oracle 单指标 0.676。
+
+读的时候注意：Δρ 高有一半来自"B 在 RB40/DARTS 上本来就不预测 target"，
+控制无效变量等于没控制。看 `nb201_e0`（ρ(B,y)=0.831、Δρ 0.522）才是关键证据。
+详见 D-023。

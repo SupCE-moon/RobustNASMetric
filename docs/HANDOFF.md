@@ -201,3 +201,28 @@ python tools/check_doc_links.py `
 
 判据：区间覆盖 0 就是**方向不知道**，不许写成"失效"；写结论时带上区间，不要只写点估计。
 配合读：`results/audits/bootstrap-rb40-20261112.md`、D-022。
+## 15. Φ 对漂移族的增量检验（2026-11-12）
+
+`scripts/audit_phi_incremental.py` 回答的是"Φ 排第一，是不是 35 个漂移指标的另一种写法"。
+判据写在 `docs/experiments/增量检验方案_Φ对特征漂移族_20261112.md`，**先于结果定死**（D-019）。
+
+    python scripts/audit_phi_incremental.py \
+      --rows outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv \
+      --redundancy results/audits/metric-redundancy-20261112.json \
+      --json results/audits/phi-incremental-20261112.json \
+      --report results/audits/phi-incremental-20261112.md \
+      --resamples 2000
+
+三个必须记住的点：
+
+1. **架构身份是 `grid:id`**。DARTS 与 NAS-Bench-201 都把架构编号成 0..N，用裸 id 会把
+   `darts:0` 与 `nb201:0` 当成同一个网络（独立单元会从 204 掉到 203）。
+   测试 `test_build_frame_qualifies_arch_ids_by_grid` 守着。
+2. **方向按注册表翻转**。漂移族是 `lower`；不翻转时 `ρ(B,y)` 是负的，读起来像"漂移越大越鲁棒"。
+3. **Δρ 必须和 `ρ(B,y)` 一起读**。控制变量与 target 无关时，偏相关退化成 `ρ(Φ,y)`，
+   这时高 Δρ 说明的是"基准失效"，不是"Φ 增量大"。真正有说服力的是 B 也强的设置
+   （`nb201_e0`：ρ(B,y)=0.831，Δρ 仍 0.522）。
+
+结论：Δρ = +0.695 [+0.583, +0.769]、p = 0.0005、嵌套 R² 增量 +0.476。
+**可以说**"Φ 不是漂移族的重复"，**不可以说**"Φ 更好是因为它测一致性"（机制未验证）。
+配合读：`results/audits/phi-incremental-20261112.md`、D-023。
