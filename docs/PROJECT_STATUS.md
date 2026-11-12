@@ -147,13 +147,13 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 
 ## 6. 未完成的问题（按优先级）
 
-1. **服务器现状未知**：`/workspace/robust_metric_lab_nas` 的代码、结果、manifest 未盘点（阻塞，见第 7 节）。
+1. **服务器现状未知**：`/workspace/robust_metric_lab_nas` 的代码、结果、manifest 未盘点（阻塞，见第 8 节）。
 2. **服务器那一侧仍未确认**：本地已判定代码主线是 `893a994` 一线并能全部合并，
    但服务器目录 `/workspace/robust_metric_lab_nas` 究竟停在哪一版，仍要等 SSH 才能核实（见第 8 节）。
 3. **三空间独立留出集仍缺**：`三空间独立验证材料审计_20261025.md` 指出 371 键独立验证包未冻结。
 4. **激活状态保持候选结果未知**：`feature_activation_sign_survival_sum` 的 560 键全网格
    在服务器上跑完了没有，无从确认（等待 SSH）。
-5. **571 行未提交指标代码未评审**（见第 6 节）。
+5. **571 行未提交指标代码未评审**（内容与 `dc6fb9c` 逐字节相同，见第 7 节）。
 6. **教师数据包未齐**：huangyue 缺 15/45 RB40 artifact。
 
 ## 7. 本地未提交资产（已确认为 `dc6fb9c` 与 `893a994` 的子集，不再有丢失风险）

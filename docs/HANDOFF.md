@@ -110,3 +110,22 @@ python tools/server_inventory.py --host <ip> --port <port> --user <user> `
 
 还剩的活（顺序不变）：服务器 SSH 一通就跑 `server_inventory.py`，把服务器停在哪个提交、有哪些大结果落成 manifest；
 然后才谈"三空间独立留出集"和 `feature_activation_sign_survival_sum` 的终态。
+
+---
+
+## 9. 交付前自检：clone 一份再跑测试
+
+在本机跑绿**不等于** GitHub 上是完整的。本机 `.venv` 是 editable 安装、指向主工作树，
+9 个 worktree 共享它，很容易测到另一份代码（P2 坑）。交付前做这一件事：
+
+```powershell
+git clone --depth 1 --branch codex/server-mainline-merge-20261112 https://github.com/SupCE-moon/RobustNASMetric.git $env:TEMP\rm_clone
+$env:PYTHONPATH = "$env:TEMP\rm_clone\src"
+Push-Location $env:TEMP\rm_clone; pytest tests -q; Pop-Location
+```
+
+2026-11-12 实测：727 个文件 / 21.75 MiB，最大单文件 1.76 MiB，`477 passed, 3 skipped in 103.15s`。
+文件数比 `git ls-files`（738）少 11 个，是被 `.gitignore` 排除的生成物，不是缺失。
+
+配套的本地大产物清单在 `results/manifests/local/`（422 文件 / 1,107.2 MiB 全量哈希），
+它告诉你"报告里的数字对应哪个具体文件"，但文件本体不入库。
