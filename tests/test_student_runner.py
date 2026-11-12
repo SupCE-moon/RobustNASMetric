@@ -373,6 +373,39 @@ def test_resume_skips_ok_and_failed_exact_keys_without_loading_models(tmp_path: 
     assert len(_read(output)) == 2
 
 
+def test_resume_normalizes_rb40_none_epoch_before_pending_check(tmp_path: Path):
+    output = tmp_path / "metric_values.csv"
+    append_rows_atomic(
+        output,
+        [
+            _row(
+                benchmark="rb40",
+                setting="rb40_mature",
+                model_or_arch_id="rb40-id",
+                checkpoint_epoch="",
+                checkpoint_path=str((tmp_path / "rb40.pt").resolve()),
+            )
+        ],
+    )
+
+    def forbidden(_item):
+        raise AssertionError("resume must recognize the normalized RB40 empty epoch")
+
+    result = evaluate_items(
+        [_single_item(tmp_path, "rb40")],
+        forbidden,
+        object(),
+        ["feature_delta"],
+        output,
+        {"run_id": "run-1", "setting": "rb40_mature"},
+        compute_metric=lambda *_: 1.0,
+        torch_module=SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False)),
+    )
+
+    assert result.skipped == 1 and result.written == 0
+    assert len(_read(output)) == 1
+
+
 def _single_item(tmp_path: Path, benchmark: str) -> BenchmarkManifestItem:
     if benchmark == "rb40":
         epoch = None

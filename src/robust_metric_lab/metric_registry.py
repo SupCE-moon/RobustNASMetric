@@ -92,10 +92,6 @@ METRIC_SPECS = [
     # Static spectral concentration + Jacobian spectrum (zero-cost, no perturbation)
     MetricSpec("feature_spectral_erank_static", "lower", "Ours (static spectral)", "Ours"),
     MetricSpec("feature_spectral_participation_ratio_static", "lower", "Ours (static spectral)", "Ours"),
-    MetricSpec(
-        "feature_adv_excess_centered_unit_l2", "lower",
-        "Ours preregistered adversarial-excess feature drift", "Ours",
-    ),
     MetricSpec("feature_spectral_decay_exponent_static", "higher", "Ours (static spectral)", "Ours"),
     MetricSpec("jacobian_spectral_norm", "lower", "Ours (Jacobian spectrum)", "Ours"),
     MetricSpec("jacobian_effective_rank", "lower", "Ours (Jacobian spectrum)", "Ours"),
@@ -115,6 +111,24 @@ METRIC_SPECS = [
     MetricSpec("feature_measure_flow_rel_multiscale_delta", "lower", "Ours (multiscale flow)", "Ours"),
     MetricSpec("feature_measure_flow_rel_allpairs_delta", "lower", "Ours (all-pairs flow)", "Ours"),
     MetricSpec("feature_measure_flow_corr_rel_delta", "lower", "Ours (cross-layer correlation flow)", "Ours"),
+    MetricSpec("feature_measure_channel_gram_cosine_delta", "lower", "Ours E36 (channel-gram angular drift)", "Ours"),
+    MetricSpec("feature_measure_channel_gram_centered_rel_delta", "lower", "Ours E36 (centered channel-gram drift)", "Ours"),
+    MetricSpec("feature_measure_spatial_gram_cosine_delta", "lower", "Ours E36 (spatial-gram angular drift)", "Ours"),
+    MetricSpec("feature_measure_spectrum_js_delta", "lower", "Ours E36 (spectrum JS drift)", "Ours"),
+    MetricSpec("feature_measure_spectrum_emd_delta", "lower", "Ours E36 (spectrum EMD drift)", "Ours"),
+    MetricSpec("feature_measure_spectrum_hellinger_delta", "lower", "Ours E36 (spectrum Hellinger drift)", "Ours"),
+    MetricSpec("feature_measure_flow_corr_angular_delta", "lower", "Ours E36 (flow-correlation angular drift)", "Ours"),
+    MetricSpec("feature_measure_flow_corr_symmetric_rel_delta", "lower", "Ours E36 (flow-correlation symmetric drift)", "Ours"),
+    MetricSpec("feature_measure_flow_corr_worst_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_flow_corr_rms_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_flow_corr_tophalf_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_spectrum_fisher_rao_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_spectrum_triangular_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_spectrum_ks_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_multiview_geometric_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_multiview_max_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_measure_multiview_rms_delta", "lower", "Ours E37 preregistered", "Ours"),
+    MetricSpec("feature_adv_excess_centered_unit_l2", "lower", "Ours preregistered adversarial-excess feature drift", "Ours"),
 ]
 
 

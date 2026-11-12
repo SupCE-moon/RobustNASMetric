@@ -70,6 +70,14 @@ class MetricResult:
     fsp_strict_delta: float
     fsp_delta: float
     feature_measure_fsp_rel_multiscale_delta: float
+    feature_measure_channel_gram_cosine_delta: float
+    feature_measure_channel_gram_centered_rel_delta: float
+    feature_measure_spatial_gram_cosine_delta: float
+    feature_measure_spectrum_js_delta: float
+    feature_measure_spectrum_emd_delta: float
+    feature_measure_spectrum_hellinger_delta: float
+    feature_measure_flow_corr_angular_delta: float
+    feature_measure_flow_corr_symmetric_rel_delta: float
     clean_acc: float
     adv_acc: float
     num_layers: int
@@ -738,6 +746,24 @@ def _perturbation_capacity_channelwise(clean: torch.Tensor, adv: torch.Tensor) -
     return rel.mean(dim=1).mean()
 
 
+def _symmetric_eigvalsh_stable(matrix: torch.Tensor) -> torch.Tensor:
+    """Compute symmetric eigenvalues, retrying CUDA float32 failures in float64.
+
+    Some large, rank-deficient feature covariances make CUDA's float32
+    ``eigvalsh`` fail to converge even though every entry is finite.  Preserve
+    the original fast path, then retry a failed decomposition after explicit
+    symmetrisation in float64.  Returning the original dtype keeps downstream
+    metric arithmetic unchanged.
+    """
+    try:
+        return torch.linalg.eigvalsh(matrix)
+    except RuntimeError:
+        if not matrix.is_floating_point() or matrix.dtype == torch.float64:
+            raise
+        symmetric = 0.5 * (matrix + matrix.transpose(-1, -2))
+        return torch.linalg.eigvalsh(symmetric.to(torch.float64)).to(matrix.dtype)
+
+
 def _spectral_static_stats(
     feature: torch.Tensor,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -756,7 +782,7 @@ def _spectral_static_stats(
     flat = feature.reshape(B, C, S)
     centered = flat - flat.mean(dim=1, keepdim=True)
     cov = centered @ centered.transpose(1, 2) / S  # [B, C, C]
-    eigvals = torch.clamp(torch.linalg.eigvalsh(cov), min=0.0)  # [B, C] ascending
+    eigvals = torch.clamp(_symmetric_eigvalsh_stable(cov), min=0.0)  # [B, C] ascending
     total = eigvals.sum(dim=1)  # [B]
 
     probs = (eigvals / total.clamp_min(1e-12).unsqueeze(1)).clamp_min(1e-12)
@@ -798,7 +824,7 @@ def _jacobian_spectral_stats(
         per_class.append(g.reshape(B, -1))
     grads = torch.stack(per_class, dim=0)  # [K, B, d]
     gram = torch.einsum("kbd,lbd->bkl", grads, grads)  # [B, K, K]
-    eigvals = torch.clamp(torch.linalg.eigvalsh(gram), min=0.0)  # [B, K] ascending
+    eigvals = torch.clamp(_symmetric_eigvalsh_stable(gram), min=0.0)  # [B, K] ascending
     s = torch.sqrt(eigvals)  # singular values, ascending
     s_desc = torch.flip(s, dims=[1])  # descending
 
@@ -930,6 +956,120 @@ def _fsp_corr_matrix(input_feature: torch.Tensor, output_feature: torch.Tensor) 
     return torch.bmm(input_atoms, output_atoms.transpose(1, 2)) / input_atoms.shape[2]
 
 
+def _safe_cosine_distance(
+    clean_value: torch.Tensor,
+    adv_value: torch.Tensor,
+    eps: float = 1e-12,
+) -> torch.Tensor:
+    """Per-sample cosine distance with an exact zero for two zero vectors."""
+    clean_flat = clean_value.flatten(1)
+    adv_flat = adv_value.flatten(1)
+    clean_norm = clean_flat.norm(p=2, dim=1)
+    adv_norm = adv_flat.norm(p=2, dim=1)
+    denom = clean_norm * adv_norm
+    cosine = (clean_flat * adv_flat).sum(dim=1) / denom.clamp_min(eps)
+    distance = (1.0 - cosine.clamp(-1.0, 1.0)).clamp_min(0.0)
+    distance = torch.where(distance <= 1e-6, torch.zeros_like(distance), distance)
+    both_zero = (clean_norm <= eps) & (adv_norm <= eps)
+    return torch.where(both_zero, torch.zeros_like(distance), distance)
+
+
+def _e36_spectrum_probabilities(
+    feature: torch.Tensor,
+    max_positions: int = 64,
+) -> torch.Tensor:
+    """Scale-free singular-energy distribution of centered spatial features."""
+    spatial_size = feature.shape[2] * feature.shape[3]
+    if spatial_size > max_positions:
+        side = max(1, int(max_positions**0.5))
+        feature = F.adaptive_avg_pool2d(feature, (side, side))
+    atoms = _spatial_atoms(feature)
+    atoms = atoms - atoms.mean(dim=1, keepdim=True)
+    singular_values = torch.linalg.svdvals(atoms)
+    energy = singular_values.square().clamp_min(1e-12)
+    return energy / energy.sum(dim=1, keepdim=True).clamp_min(1e-12)
+
+
+def _e36_within_layer_stats(
+    clean: torch.Tensor,
+    adv: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Eight-setting E36 candidates derived from scale-free within-layer structure."""
+    clean_channel_gram = _channel_gram(clean)
+    adv_channel_gram = _channel_gram(adv)
+    channel_gram_cosine = _safe_cosine_distance(
+        clean_channel_gram, adv_channel_gram
+    ).mean()
+
+    clean_centered = clean - clean.mean(dim=(2, 3), keepdim=True)
+    adv_centered = adv - adv.mean(dim=(2, 3), keepdim=True)
+    clean_centered_gram = _channel_gram(clean_centered)
+    adv_centered_gram = _channel_gram(adv_centered)
+    centered_diff = (adv_centered_gram - clean_centered_gram).flatten(1)
+    channel_gram_centered_rel = (
+        centered_diff.norm(p=2, dim=1)
+        / clean_centered_gram.flatten(1).norm(p=2, dim=1).clamp_min(1e-8)
+    ).mean()
+
+    clean_spatial_atoms = F.normalize(_spatial_atoms(clean), p=2, dim=2, eps=1e-12)
+    adv_spatial_atoms = F.normalize(_spatial_atoms(adv), p=2, dim=2, eps=1e-12)
+    clean_spatial_gram = torch.bmm(
+        clean_spatial_atoms, clean_spatial_atoms.transpose(1, 2)
+    )
+    adv_spatial_gram = torch.bmm(
+        adv_spatial_atoms, adv_spatial_atoms.transpose(1, 2)
+    )
+    spatial_gram_cosine = _safe_cosine_distance(
+        clean_spatial_gram, adv_spatial_gram
+    ).mean()
+
+    clean_spectrum = _e36_spectrum_probabilities(clean)
+    adv_spectrum = _e36_spectrum_probabilities(adv)
+    midpoint = 0.5 * (clean_spectrum + adv_spectrum)
+    spectrum_js = 0.5 * (
+        (clean_spectrum * (clean_spectrum / midpoint.clamp_min(1e-12)).log()).sum(dim=1)
+        + (adv_spectrum * (adv_spectrum / midpoint.clamp_min(1e-12)).log()).sum(dim=1)
+    ).mean()
+    spectrum_emd = (
+        (clean_spectrum - adv_spectrum).cumsum(dim=1).abs().mean(dim=1)
+    ).mean()
+    spectrum_hellinger = torch.sqrt(
+        0.5
+        * (clean_spectrum.sqrt() - adv_spectrum.sqrt())
+        .square()
+        .sum(dim=1)
+        .clamp_min(0.0)
+    ).mean()
+
+    return (
+        channel_gram_cosine,
+        channel_gram_centered_rel,
+        spatial_gram_cosine,
+        spectrum_js,
+        spectrum_emd,
+        spectrum_hellinger,
+    )
+
+
+def _e36_cross_layer_stats(
+    clean_input: torch.Tensor,
+    clean_output: torch.Tensor,
+    adv_input: torch.Tensor,
+    adv_output: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Scale-free angular and symmetric-relative cross-layer correlation drift."""
+    clean_corr = _fsp_corr_matrix(clean_input, clean_output)
+    adv_corr = _fsp_corr_matrix(adv_input, adv_output)
+    angular = _safe_cosine_distance(clean_corr, adv_corr).mean()
+    diff_norm = (adv_corr - clean_corr).flatten(1).norm(p=2, dim=1)
+    clean_norm = clean_corr.flatten(1).norm(p=2, dim=1)
+    adv_norm = adv_corr.flatten(1).norm(p=2, dim=1)
+    symmetric_rel = (
+        diff_norm / (0.5 * (clean_norm + adv_norm)).clamp_min(1e-8)
+    ).mean()
+    return angular, symmetric_rel
+
+
 def _fsp_strict_stats(
     clean_input: torch.Tensor,
     clean_output: torch.Tensor,
@@ -1037,10 +1177,10 @@ def compute_feature_metrics(
     geometry_indices, _ = _geometry_anchor_indices(
         clean_features[:n], max_layers=max_layers
     )
-    # M1 (importance-gated capacity) is disabled here: its extra grad-enabled
-    # forward hangs/OOMs on some RobustBench models, and it showed no benefit on
-    # NB201 (partial 0.280 vs base capacity 0.283). M1 stays nan via the None
-    # guard in _perturbation_capacity_importance; M2/M3/M4/M5 are unaffected.
+    # M1 is intentionally not computed in this one-pass metric bundle.  Its
+    # frozen definition uses one global importance vector over all 64 samples;
+    # the exact memory-bounded two-pass implementation lives in
+    # importance_batched.py and is run by evaluate_importance_student.py.
     importance_by_layer = {}
 
     feature_deltas = []
@@ -1083,6 +1223,12 @@ def compute_feature_metrics(
     spectral_decay_statics = []
     fsp_deltas = []
     fsp_rel_multiscale_deltas = []
+    e36_channel_gram_cosine_deltas = []
+    e36_channel_gram_centered_rel_deltas = []
+    e36_spatial_gram_cosine_deltas = []
+    e36_spectrum_js_deltas = []
+    e36_spectrum_emd_deltas = []
+    e36_spectrum_hellinger_deltas = []
     layer_weighted_by_idx = {}
 
     for idx in indices:
@@ -1195,6 +1341,14 @@ def compute_feature_metrics(
         fsp_deltas.append(layer_fsp_delta)
         fsp_rel_multiscale_deltas.append(_channel_gram_rel_multiscale(clean, adv))
 
+        e36_layer_values = _e36_within_layer_stats(clean, adv)
+        e36_channel_gram_cosine_deltas.append(e36_layer_values[0])
+        e36_channel_gram_centered_rel_deltas.append(e36_layer_values[1])
+        e36_spatial_gram_cosine_deltas.append(e36_layer_values[2])
+        e36_spectrum_js_deltas.append(e36_layer_values[3])
+        e36_spectrum_emd_deltas.append(e36_layer_values[4])
+        e36_spectrum_hellinger_deltas.append(e36_layer_values[5])
+
         # 
         feature_measure_moment_deltas.append((layer_feature_delta.pow(2) + layer_fsp_delta.pow(2)).sqrt())
         feature_measure_struct_deltas.append((layer_weighted_delta.pow(2) + layer_fsp_delta.pow(2)).sqrt())
@@ -1212,6 +1366,8 @@ def compute_feature_metrics(
     feature_measure_flow_rel_deltas = []
     feature_measure_flow_rel_multiscale_deltas = []
     feature_measure_flow_corr_rel_deltas = []
+    e36_flow_corr_angular_deltas = []
+    e36_flow_corr_symmetric_rel_deltas = []
     capacity_flow_rel_deltas = []
     feature_measure_robust_deltas = []
     feature_measure_robust_rel_deltas = []
@@ -1231,6 +1387,12 @@ def compute_feature_metrics(
                 adv_features[left_idx], adv_features[right_idx],
             )
         )
+        e36_pair_values = _e36_cross_layer_stats(
+            clean_features[left_idx], clean_features[right_idx],
+            adv_features[left_idx], adv_features[right_idx],
+        )
+        e36_flow_corr_angular_deltas.append(e36_pair_values[0])
+        e36_flow_corr_symmetric_rel_deltas.append(e36_pair_values[1])
         feature_measure_flow_rel_multiscale_deltas.append(
             _fsp_rel_multiscale(
                 clean_features[left_idx], clean_features[right_idx],
@@ -1329,12 +1491,36 @@ def compute_feature_metrics(
         feature_spectral_decay_exponent_static = torch.stack(decay_vals).mean().item() if decay_vals else float("nan")
         fsp_delta = torch.stack(fsp_deltas).mean().item()
         feature_measure_fsp_rel_multiscale_delta = torch.stack(fsp_rel_multiscale_deltas).mean().item()
+        feature_measure_channel_gram_cosine_delta = torch.stack(
+            e36_channel_gram_cosine_deltas
+        ).mean().item()
+        feature_measure_channel_gram_centered_rel_delta = torch.stack(
+            e36_channel_gram_centered_rel_deltas
+        ).mean().item()
+        feature_measure_spatial_gram_cosine_delta = torch.stack(
+            e36_spatial_gram_cosine_deltas
+        ).mean().item()
+        feature_measure_spectrum_js_delta = torch.stack(
+            e36_spectrum_js_deltas
+        ).mean().item()
+        feature_measure_spectrum_emd_delta = torch.stack(
+            e36_spectrum_emd_deltas
+        ).mean().item()
+        feature_measure_spectrum_hellinger_delta = torch.stack(
+            e36_spectrum_hellinger_deltas
+        ).mean().item()
         if fsp_strict_deltas:
             fsp_strict_delta = torch.stack(fsp_strict_deltas).mean().item()
             feature_measure_flow_delta = torch.stack(feature_measure_flow_deltas).mean().item()
             feature_measure_flow_rel_delta = torch.stack(feature_measure_flow_rel_deltas).mean().item()
             feature_measure_flow_rel_multiscale_delta = torch.stack(feature_measure_flow_rel_multiscale_deltas).mean().item()
             feature_measure_flow_corr_rel_delta = torch.stack(feature_measure_flow_corr_rel_deltas).mean().item()
+            feature_measure_flow_corr_angular_delta = torch.stack(
+                e36_flow_corr_angular_deltas
+            ).mean().item()
+            feature_measure_flow_corr_symmetric_rel_delta = torch.stack(
+                e36_flow_corr_symmetric_rel_deltas
+            ).mean().item()
             feature_measure_flow_rel_allpairs_delta = _flow_rel_allpairs_stats(
                 clean_features, adv_features, indices
             ).item()
@@ -1367,6 +1553,8 @@ def compute_feature_metrics(
             feature_measure_flow_rel_delta = float("nan")
             feature_measure_flow_rel_multiscale_delta = float("nan")
             feature_measure_flow_corr_rel_delta = float("nan")
+            feature_measure_flow_corr_angular_delta = float("nan")
+            feature_measure_flow_corr_symmetric_rel_delta = float("nan")
             feature_measure_flow_rel_allpairs_delta = float("nan")
             capacity_flow_rel_delta = float("nan")
             feature_measure_robust_delta = float("nan")
@@ -1416,10 +1604,18 @@ def compute_feature_metrics(
         feature_spectral_decay_exponent_static = float("nan")
         fsp_delta = float("nan")
         feature_measure_fsp_rel_multiscale_delta = float("nan")
+        feature_measure_channel_gram_cosine_delta = float("nan")
+        feature_measure_channel_gram_centered_rel_delta = float("nan")
+        feature_measure_spatial_gram_cosine_delta = float("nan")
+        feature_measure_spectrum_js_delta = float("nan")
+        feature_measure_spectrum_emd_delta = float("nan")
+        feature_measure_spectrum_hellinger_delta = float("nan")
         fsp_strict_delta = float("nan")
         feature_measure_flow_delta = float("nan")
         feature_measure_flow_rel_delta = float("nan")
         feature_measure_flow_corr_rel_delta = float("nan")
+        feature_measure_flow_corr_angular_delta = float("nan")
+        feature_measure_flow_corr_symmetric_rel_delta = float("nan")
         feature_measure_flow_rel_allpairs_delta = float("nan")
         feature_measure_robust_delta = float("nan")
         feature_measure_robust_rel_delta = float("nan")
@@ -1491,6 +1687,14 @@ def compute_feature_metrics(
         fsp_strict_delta=fsp_strict_delta,
         fsp_delta=fsp_delta,
         feature_measure_fsp_rel_multiscale_delta=feature_measure_fsp_rel_multiscale_delta,
+        feature_measure_channel_gram_cosine_delta=feature_measure_channel_gram_cosine_delta,
+        feature_measure_channel_gram_centered_rel_delta=feature_measure_channel_gram_centered_rel_delta,
+        feature_measure_spatial_gram_cosine_delta=feature_measure_spatial_gram_cosine_delta,
+        feature_measure_spectrum_js_delta=feature_measure_spectrum_js_delta,
+        feature_measure_spectrum_emd_delta=feature_measure_spectrum_emd_delta,
+        feature_measure_spectrum_hellinger_delta=feature_measure_spectrum_hellinger_delta,
+        feature_measure_flow_corr_angular_delta=feature_measure_flow_corr_angular_delta,
+        feature_measure_flow_corr_symmetric_rel_delta=feature_measure_flow_corr_symmetric_rel_delta,
         clean_acc=_accuracy(clean_logits, labels),
         adv_acc=_accuracy(adv_logits, labels),
         num_layers=len(indices),

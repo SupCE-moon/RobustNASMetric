@@ -2,8 +2,8 @@
 | --- | --- | --- | --- | --- | --- |
 | main | 64 | 31.73 MiB | 7 | 0 | 64 |
 | adv-excess | 27 | 0.85 MiB | 4 | 0 | 151 |
-| ba02 | 391 | 14.65 MiB | 0 | 0 | 583 |
-| strict-metrics-e37 | 441 | 15.01 MiB | 0 | 0 | 583 |
+| ba02 | 0 | 0.00 MiB | 2 | 0 | 192 |
+| strict-metrics-e37 | 39 | 0.19 MiB | 6 | 0 | 182 |
 | activation-survival | 78 | 17.47 MiB | 3 | 0 | 183 |
 | repository-reconciliation | 2 | 0.01 MiB | 2 | 0 | 188 |
 | server-mainline | 37 | 0.62 MiB | 56 | 0 | 107 |

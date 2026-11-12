@@ -130,20 +130,13 @@ def _feature_parameter_consistency(
     return float(torch.stack(terms).sum().item()), len(terms)
 
 
-def compute_trnas_metrics(
+def _run_trnas_once(
     model: nn.Module,
     clean_inputs: torch.Tensor,
     adversarial_inputs: torch.Tensor,
     labels: torch.Tensor,
     weight_step_size: float = 1e-6,
 ) -> TrnasMetricResult:
-    """Compute the two TRNAS components and their Eq. (6) R-Score.
-
-    The ICCV 2025 paper does not release code or specify its parameter-update
-    magnitude. The default uses the largest small step that remained finite in
-    the E21 sensitivity audit. The chosen value is always emitted in result
-    metadata and must be treated as an implementation hyperparameter.
-    """
     psi, num_relu_units = _sample_wise_activation_score(model, clean_inputs)
     perturbed_model = _adversarial_weight_update(
         model, clean_inputs, labels, step_size=weight_step_size
@@ -159,4 +152,58 @@ def compute_trnas_metrics(
         r_score=r_score,
         num_relu_units=num_relu_units,
         num_consistency_layers=num_consistency_layers,
+    )
+
+
+def compute_trnas_metrics_stable(
+    model: nn.Module,
+    clean_inputs: torch.Tensor,
+    adversarial_inputs: torch.Tensor,
+    labels: torch.Tensor,
+    weight_step_size: float = 1e-6,
+) -> TrnasMetricResult:
+    """Run TRNAS once, retrying only the known float32 step underflow in float64."""
+    try:
+        return _run_trnas_once(
+            model,
+            clean_inputs,
+            adversarial_inputs,
+            labels,
+            weight_step_size=weight_step_size,
+        )
+    except AssertionError as exc:
+        if str(exc) != "underflow in dt 0.0":
+            raise
+        retry_model = copy.deepcopy(model).double()
+        try:
+            return _run_trnas_once(
+                retry_model,
+                clean_inputs.double(),
+                adversarial_inputs.double(),
+                labels,
+                weight_step_size=weight_step_size,
+            )
+        finally:
+            del retry_model
+
+
+def compute_trnas_metrics(
+    model: nn.Module,
+    clean_inputs: torch.Tensor,
+    adversarial_inputs: torch.Tensor,
+    labels: torch.Tensor,
+    weight_step_size: float = 1e-6,
+) -> TrnasMetricResult:
+    """Compute the two TRNAS components and their Eq. (6) R-Score.
+
+    The ICCV 2025 paper does not release code or specify its parameter-update
+    magnitude. The frozen default remains 1e-6. A known float32 scalar-step
+    underflow is retried without changing that value, using float64 arithmetic.
+    """
+    return compute_trnas_metrics_stable(
+        model,
+        clean_inputs,
+        adversarial_inputs,
+        labels,
+        weight_step_size=weight_step_size,
     )

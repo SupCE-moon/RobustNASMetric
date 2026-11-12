@@ -3,8 +3,10 @@ import torch
 import torch.nn as nn
 
 from robust_metric_lab.trnas import (
+    _run_trnas_once,
     _sample_wise_activation_score,
     compute_trnas_metrics,
+    compute_trnas_metrics_stable,
 )
 
 
@@ -71,3 +73,46 @@ def test_trnas_metrics_are_finite_after_weight_and_input_perturbation():
     assert result.activation_psi >= 0
     assert 0 <= result.consistency_phi <= 4 * result.num_consistency_layers
     assert torch.isfinite(torch.tensor(result.r_score))
+
+
+class Float32UnderflowNet(TinyNet):
+    def forward(self, x):
+        if next(self.parameters()).dtype == torch.float32:
+            raise AssertionError("underflow in dt 0.0")
+        return super().forward(x)
+
+
+class DifferentAssertionNet(TinyNet):
+    def forward(self, x):
+        raise AssertionError("different assertion")
+
+
+def test_exact_underflow_retries_float64_and_matches_direct_float64():
+    torch.manual_seed(29)
+    model = Float32UnderflowNet()
+    inputs = torch.rand(4, 2)
+    labels = torch.tensor([0, 1, 0, 1])
+    adversarial = (inputs + 0.01).clamp(0, 1)
+
+    actual = compute_trnas_metrics_stable(model, inputs, adversarial, labels)
+    expected = _run_trnas_once(
+        model.double(),
+        inputs.double(),
+        adversarial.double(),
+        labels,
+        weight_step_size=1e-6,
+    )
+
+    assert actual == expected
+
+
+def test_non_underflow_assertion_is_not_swallowed():
+    model = DifferentAssertionNet()
+    inputs = torch.rand(2, 2)
+    with pytest.raises(AssertionError, match="different assertion"):
+        compute_trnas_metrics_stable(
+            model,
+            inputs,
+            inputs.clone(),
+            torch.tensor([0, 1]),
+        )

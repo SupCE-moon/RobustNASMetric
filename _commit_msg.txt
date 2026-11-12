@@ -1,0 +1,21 @@
+Merge the strict-e37 line (893a994) into the consolidation branch
+
+metrics.py at 893a994 is a strict superset of the server-mainline copy:
+56 functions vs 51, adding the _e36_* helpers and two numerically safe
+primitives. Byte size alone (76,626 vs 67,447) does not prove that, so
+the function sets were compared with ast before choosing a side.
+
+Conflict resolutions
+- src/robust_metric_lab/metrics.py: theirs (superset).
+- src/robust_metric_lab/metric_registry.py: theirs, then re-add the
+  adv-excess declaration from patch adv-excess-uncommitted-metric-registry.
+- configs/metric_eligibility.json: theirs, then add the matching entry for
+  feature_adv_excess_centered_unit_l2. metric_eligibility.py rejects a
+  registry metric that has no eligibility row, and three tests failed
+  until the row existed.
+- tests/test_student_runner.py: theirs; its student_runner already carries
+  the _requested_key normalisation that was the reason to keep ours in
+  the previous merge.
+
+pytest tests -q: 284 passed, 2 skipped (symlinks unavailable on Windows).
+Before this merge: 225 passed, 2 skipped.
