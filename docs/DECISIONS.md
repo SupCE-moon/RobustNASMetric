@@ -506,3 +506,40 @@ Kendall τ 也配上区间。阈值 `REPRODUCTION_TOLERANCE = 5.5e-4`：发布�
 **后果**：`docs/PROJECT_STATUS.md` §3 第 12 条、§4 合理推断段更新；
 `docs/ROADMAP.md` 的 RQ1 证据状态升级；第 6 轮汇报里"Φ 可能只是漂移族变体"的猜测被否定，
 这一点要明确告诉用户。
+
+---
+
+## D-024 —— 注册表与实现之间要有一条可执行的对应关系（2026-11-12）
+
+**背景**：`metric_registry.py` 声称有 86 个指标，发布表也有 86 行，索引也列了 86 条。
+但"注册了"和"有代码把它算出来"是两件事，此前没有任何检查把两者对上。
+一个名字写错，只会在一次几小时的任务跑完后表现为"少一列"。
+
+**决定**：新增 `tools/audit_metric_implementation.py`，把每个注册名解析到具体模块，
+并区分三种结果——`one-pass bundle`（70 个）、`other module`（15 个）、`registry only`（1 个）。
+
+**三条实现选择与理由**：
+
+1. **用 AST 静态解析，不 import 模块**。审计的价值之一是能在只有 pandas 的机器上跑
+   （读发布 CSV 的那台机器），而 `metrics.py` 一 import 就要 torch。
+   代价是必须处理注册表的两种写法：直接 `MetricSpec(...)` 和 `_specs((...), ...)` 批量声明；
+   只扫字面量会漏掉 39 个（首版就漏了，86 报成 47）。
+2. **NaN 要分两类**。`perturbation_capacity_importance_delta` 在 bundle 里是 `float("nan")`，
+   这是**设计**：它需要两遍法的重要性向量，入口在 `importance_batched.py`。
+   另一类"非有限且没有任何其他入口"才是缺陷。两者混在一起报，会让真正的缺陷淹在噪声里。
+3. **`registry only` 必须返回退出码 1**。这条检查的全部价值在于它会失败；
+   一个永远返回 0 的审计等于没有审计。
+
+**已知的 1 个 `registry only`**：`feature_adv_excess_centered_unit_l2`。
+它的公式在 `adv_excess_metric.py` 里（`_unit_centered` + `adv_excess_per_sample`），
+但**没有任何代码把这个字符串写成输出键**。这与"它的原始行只存在于服务器、
+离线无法复算"互相印证：生产它的脚本大概率留在了服务器上，没有进仓库。
+**不擅自补一个实现**：那等于在没有原始行的情况下编造一个可能与被发布数字不同的算法。
+
+**测试里为什么留了一条绑定真实数据的断言**：`test_real_registry_has_no_unimplemented_metric`
+断言 `registry_only == ["feature_adv_excess_centered_unit_l2"]`。这看起来脆弱，
+但它的作用是让"这个洞被补上了"这件事必须显式改测试——而不是悄悄消失。
+注释里写了补上之后该删哪一条断言。
+
+**后果**：`docs/PROJECT_STATUS.md` §3 第 13 条、§6 第 5 条更新；
+`results/audits/metric-implementation-20261112.{json,md}` 可随时重建。

@@ -247,6 +247,18 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
     语义不同，混平均是对齐冻结协议而非自然选择；B 的成员来自一次 ρ≥0.5 的冻结聚类，
     换阈值会变。详见 `results/audits/phi-incremental-20261112.md` 与 D-023。
 
+13. **注册表 ↔ 实现入口对照审计**（2026-11-12，`tools/audit_metric_implementation.py`）：
+    86 个注册指标里，**70 个**由一次性 bundle `compute_feature_metrics` 直接返回，
+    **15 个**由专门模块计算（`e37_metrics.py` 的多视图/谱/流相关 9 个、
+    `student_runner.py` 的 RACL 3 个与 TRNAS 3 个），**0 个**在仓库里完全没有实现痕迹。
+    唯一例外：`feature_adv_excess_centered_unit_l2` 只在 `metric_registry.py` 出现——
+    它的漂移公式在 `adv_excess_metric.py`（`_unit_centered`）里，但**没有任何代码把这个名字写成输出键**；
+    这与"它的原始行只存在于服务器、离线无法复算"是同一件事的两面。
+    另一个记录：`perturbation_capacity_importance_delta` 在 bundle 里被刻意写成 `float("nan")`，
+    真正计算在 `importance_batched.py` / `evaluate_importance_student.py`（两遍法），
+    所以"NaN"在这里表示"不在这个入口算"，不是"算失败"——与 D-014 的"缺失不是零"是同一条原则。
+    静态解析（不 import torch）保证在只有 pandas 的机器上也能跑；`--dynamic` 才真的前向一次小 ResNet。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**
@@ -339,6 +351,8 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 4. **激活状态保持候选结果未知**：`feature_activation_sign_survival_sum` 的 560 键全网格
    在服务器上跑完了没有，无从确认（等待 SSH）。
 5. **571 行未提交指标代码未评审**（内容与 `dc6fb9c` 逐字节相同，见第 7 节）。
+   2026-11-12 的对照审计（第 3 节第 13 条）已确认这些名字都有实现入口，
+   但"哪个函数用哪个入口"的逐行数学评审仍未做。
 6. **教师数据包未齐**：huangyue 缺 15/45 RB40 artifact。
 7. **TRNAS 三项的资格口径待确认**（2026-11-12 新增，不影响任何已发布数字）：
    `configs/metric_eligibility.json` 仍把 Φ/R/Ψ 标为 `implementation_error`，但它们在发布表上

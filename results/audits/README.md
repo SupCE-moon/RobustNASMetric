@@ -181,3 +181,16 @@ RB40 只有 40 个模型，该列是点估计、没有置信区间，不能当�
 读的时候注意：Δρ 高有一半来自"B 在 RB40/DARTS 上本来就不预测 target"，
 控制无效变量等于没控制。看 `nb201_e0`（ρ(B,y)=0.831、Δρ 0.522）才是关键证据。
 详见 D-023。
+
+## 注册表 ↔ 实现入口
+
+`tools/audit_metric_implementation.py` 把 86 个注册名解析到具体模块：70 个在一次性 bundle、
+15 个在专门模块、1 个（`feature_adv_excess_centered_unit_l2`）只有声明。
+它的静态模式只读源码（AST），不需要 torch，所以可以在读 CSV 的机器上跑。
+
+```
+python tools/audit_metric_implementation.py --json results/audits/metric-implementation.json --report results/audits/metric-implementation.md
+```
+
+退出码 1 表示存在 "只有声明、没有实现" 的名字——这是需要人看的结果，不是工具故障。
+`--dynamic` 会额外前向一次小 ResNet，用来确认 bundle 的字段真的被填上（NaN 除外）。

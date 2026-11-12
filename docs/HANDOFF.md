@@ -226,3 +226,19 @@ python tools/check_doc_links.py `
 结论：Δρ = +0.695 [+0.583, +0.769]、p = 0.0005、嵌套 R² 增量 +0.476。
 **可以说**"Φ 不是漂移族的重复"，**不可以说**"Φ 更好是因为它测一致性"（机制未验证）。
 配合读：`results/audits/phi-incremental-20261112.md`、D-023。
+
+## 16. 注册指标 ↔ 实现入口审计
+
+`tools/audit_metric_implementation.py` 回答"每个注册指标到底在哪算出来"。
+
+```
+python tools/audit_metric_implementation.py --json out.json --report out.md            # 静态，秒级，只需 pandas
+python tools/audit_metric_implementation.py --dynamic --json out.json --report out.md # 额外前向一次小 ResNet
+```
+
+- 输出三档：`one-pass bundle`（70）/ `other module`（15）/ `registry only`（1）。
+- **退出码 1 是有效结果**：当前就有 1 个 `registry only`（`feature_adv_excess_centered_unit_l2`），
+  这意味着注册表和实现之间有一个真实缺口，不要把它当成"工具坏了"。
+- 新增指标时：先写进 `metric_registry.py`，再确认它出现在某一档里，然后跑这个工具。
+- 看见 `perturbation_capacity_importance_delta` 是 NaN 不要慌，那是 bundle 的占位，
+  真值在 `evaluate_importance_student.py`。

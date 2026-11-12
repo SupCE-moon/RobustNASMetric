@@ -1,0 +1,886 @@
+{
+  "registered": 86,
+  "bundle_fields": 75,
+  "in_bundle": 70,
+  "other_module": 15,
+  "registry_only": [
+    "feature_adv_excess_centered_unit_l2"
+  ],
+  "missing": [],
+  "nan_placeholders": [
+    "perturbation_capacity_importance_delta"
+  ],
+  "unexplained_nonfinite": [],
+  "unknown_bundle_fields": [],
+  "dynamic": true,
+  "rows": [
+    {
+      "name": "adversarial_loss",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_adv_excess_centered_unit_l2",
+      "status": "registry only",
+      "in_bundle": false,
+      "files": [
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_box_dimension_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_graph_fundamental_rank_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_hausdorff_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_channel_gram_centered_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "e36_batched.py",
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_channel_gram_cosine_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "e36_batched.py",
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_cov_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_flow_corr_angular_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "e36_batched.py",
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_flow_corr_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_flow_corr_rms_delta",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "e37_metrics.py",
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_measure_flow_corr_symmetric_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "e36_batched.py",
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_flow_corr_tophalf_delta",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "e37_metrics.py",
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_measure_flow_corr_worst_delta",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "e37_metrics.py",
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_measure_flow_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_flow_rel_allpairs_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_flow_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_flow_rel_multiscale_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_fsp_rel_multiscale_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_local_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_mmd",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_moment_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_multiview_geometric_delta",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "e37_metrics.py",
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_measure_multiview_max_delta",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "e37_metrics.py",
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_measure_multiview_rms_delta",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "e37_metrics.py",
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_measure_relu_active_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_relu_active_hybrid_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_relu_active_hybrid_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_relu_active_spatial_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_relu_active_spatial_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_robust_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_robust_hybrid_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_robust_hybrid_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_robust_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_robust_spatial_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_robust_spatial_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_spatial_gram_cosine_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "e36_batched.py",
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_spatial_gram_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_spatial_gram_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_spectrum_emd_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "e36_batched.py",
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_spectrum_fisher_rao_delta",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "e37_metrics.py",
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_measure_spectrum_hellinger_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "e36_batched.py",
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_spectrum_js_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "e36_batched.py",
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_spectrum_ks_delta",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "e37_metrics.py",
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_measure_spectrum_triangular_delta",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "e37_metrics.py",
+        "metric_registry.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "feature_measure_struct01_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_struct_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_swd",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_measure_weighted_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_quantile_hausdorff_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_spectral_decay_exponent_static",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_spectral_erank_static",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "feature_spectral_participation_ratio_static",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "fsp_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "fsp_strict_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "input_grad_l2",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py",
+        "student_runner.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "input_loss_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "jacobian_effective_rank",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "jacobian_spectral_decay",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "jacobian_spectral_norm",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "local_logit_lipschitz",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "logit_kl",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "margin_input_grad_ratio",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "natural_loss",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_above_mean_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_channelwise_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_flow_rel_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_gini_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_importance_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": false
+    },
+    {
+      "name": "perturbation_capacity_iqr_active_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_iqr_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_layerprofile_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_multiscale_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_profile_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_relu_active_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_relu_active_multiscale_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_signed_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "perturbation_capacity_topk_delta",
+      "status": "one-pass bundle",
+      "in_bundle": true,
+      "files": [
+        "metric_registry.py",
+        "metrics.py"
+      ],
+      "emitted_finite": true
+    },
+    {
+      "name": "racl_arch_lipschitz_log_upper",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "metric_registry.py",
+        "student_runner.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "racl_fixed_network_log_upper_proxy",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "metric_registry.py",
+        "student_runner.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "racl_input_gradient_lower",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "metric_registry.py",
+        "student_runner.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "trnas_activation_psi",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "metric_registry.py",
+        "student_runner.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "trnas_consistency_phi",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "metric_registry.py",
+        "student_runner.py"
+      ],
+      "emitted_finite": null
+    },
+    {
+      "name": "trnas_r_score",
+      "status": "other module",
+      "in_bundle": false,
+      "files": [
+        "metric_registry.py",
+        "student_runner.py"
+      ],
+      "emitted_finite": null
+    }
+  ]
+}
