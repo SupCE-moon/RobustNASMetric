@@ -41,8 +41,14 @@
 前 8 名与上表逐位吻合：Φ 0.782 / R-Score 0.738 / adversarial_loss 0.614 / Ψ 0.598 /
 natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 每条指标的 `raw_rows` 均为 560，`release_id` 均为 `strict_adv_excess_release_20261024T110422Z`。
-另注：本仓库 `outputs/strict_all_metrics_table_20261024_trnas_repaired/` 那份是**83 项**的前身快照
-（`raw_rows` 47,600），数值与总表一致但少一条指标——不要把它当成最终发布版。
+另注：本仓库 `outputs/strict_all_metrics_table_20261024_trnas_repaired/` 是**前身快照**，
+文件名写着 85 项：85 行 = 83 条有 `strict_rank` + 2 条空（排除），`raw_rows` 47,600 = 85 × 560。
+**报数规则**：说"多少项"必须连 `release_id` 一起说。本仓库有三个入榜数，按时间：
+**80**（`outputs/strict_all_metrics_table_20261024/`，85 行；无名次的 5 项实测为
+`racl_arch_lipschitz_log_upper`、`racl_fixed_network_log_upper_proxy`、`trnas_activation_psi`、
+`trnas_consistency_phi`、`trnas_r_score`，后三者正是 Kang 求导失败拖垮的）→
+**83**（`..._trnas_repaired/`，85 行，修复后 3 项恢复名次）→ **84**（最终榜，86 行 = 84 + 2 条排除）。
+三者用的是同一批原始记录，差别只在"哪几项算进了榜"。
 
 ## 3. 已完成的关键实验（已验证事实）
 

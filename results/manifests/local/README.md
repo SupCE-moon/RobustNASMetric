@@ -48,9 +48,10 @@ GitHub 只保存代码、文档和小结果；数据集、权重、缓存、合�
 ## 已知的口径问题（不要被清单误导）
 
 1. **清单只证明"文件在、哈希是这个"**，不证明内容正确。数值对不对要看对应的 `release_verification.json`。
-2. `strict_all_metrics_table_20261024/` 是 **83 项**前身快照，`..._trnas_repaired/` 也是 83 项；权威版是
-   `outputs/strict_adv_excess_release_20261024T110422Z/` 的 **86 项**总表（84 入榜 + 2 排除）。三者数值一致，
-   但引用排名只能用 86 项那份。
+2. 三份总表的行数关系容易记混，按时间顺序是：`strict_all_metrics_table_20261024/` = 85 行 / **80 入榜**
+   （TRNAS 的 Kang 求导还失败，5 项无名次）→ `..._trnas_repaired/` = 85 行 / **83 入榜**（修复后 3 项恢复名次）
+   → `strict_adv_excess_release_20261024T110422Z/` = 86 行 / **84 入榜**（多一条 adv-excess 指标）。
+   引用排名只能用最后那份 86 行总表。
 3. `pytest_temp_*` 是测试残留目录，`outputs/` 里的测试产物不代表实验结果，清理前请确认没有脚本依赖。
 4. 本清单**不含**主工作树之外的 8 个 worktree 里的 `outputs/`；那些已按九树对照表逐文件核过
    （见 `results/manifests/reconciliation-20261112/tree-comparison.md`）。
