@@ -133,3 +133,9 @@ node_modules/
 
 # Regenerable per-worktree inventories (see results/manifests/*/README.md)
 results/manifests/*/trees/
+
+# Generated interactive diagrams (archify output, re-creatable)
+/.archify/
+
+# Full per-file worktree inventory (1.5 MB, regenerate on demand; summary is committed)
+results/manifests/reconciliation-20261112/worktrees.json

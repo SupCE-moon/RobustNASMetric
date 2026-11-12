@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-11-12T09:04:13.863360+00:00",
+  "repository": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric",
+  "worktree_count": 9,
+  "dirty_worktrees": 3,
+  "note": "Summary of worktrees.json (per-file change lists omitted; regenerate with tools/inventory_worktrees.py).",
+  "worktrees": [
+    {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric",
+      "branch": "main",
+      "head": "784fc74333a207020306125258085ea93e4c088e",
+      "committed_at": "2026-09-30T00:33:31+08:00",
+      "detached": false,
+      "dirty_count": 180,
+      "status_breakdown": {
+        "??": 174,
+        "M": 6
+      }
+    },
+    {
+      "path": "C:\\Users\\22465\\.codex\\worktrees\\adv-excess-metric\\robust_metric",
+      "branch": "codex/adv-excess-metric",
+      "head": "f24802949562a8f4df005afbafd0eb0afab06694",
+      "committed_at": "2026-10-26T20:03:53+08:00",
+      "detached": false,
+      "dirty_count": 4507,
+      "status_breakdown": {
+        "??": 4506,
+        "M": 1
+      }
+    },
+    {
+      "path": "C:\\Users\\22465\\.codex\\worktrees\\ba02\\robust_metric",
+      "branch": "HEAD",
+      "head": "1e3831b17ea1c7d0253e0616d5a929e6d7602b60",
+      "committed_at": "2026-07-25T12:31:11+08:00",
+      "detached": false,
+      "dirty_count": 0,
+      "status_breakdown": {}
+    },
+    {
+      "path": "C:\\Users\\22465\\.codex\\worktrees\\strict-metrics-e37\\robust_metric",
+      "branch": "HEAD",
+      "head": "893a99492dcacb77a35cf320b3a737c6949bb10c",
+      "committed_at": "2026-10-09T00:56:04+08:00",
+      "detached": false,
+      "dirty_count": 0,
+      "status_breakdown": {}
+    },
+    {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\activation-survival",
+      "branch": "codex/activation-survival",
+      "head": "dfc67f296cefecb103f036ca45e414d107169d82",
+      "committed_at": "2026-10-31T12:52:11+08:00",
+      "detached": false,
+      "dirty_count": 0,
+      "status_breakdown": {}
+    },
+    {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\mainline-consolidation",
+      "branch": "codex/server-mainline-merge-20261112",
+      "head": "3b0d4a1cac673b213023e76b3152f50c71603823",
+      "committed_at": "2026-11-12T17:03:31+08:00",
+      "detached": false,
+      "dirty_count": 0,
+      "status_breakdown": {}
+    },
+    {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\repository-reconciliation",
+      "branch": "codex/repository-reconciliation",
+      "head": "ddad19d96f4aec1a9c7ca8dffdaa9ca423abb15a",
+      "committed_at": "2026-11-05T18:35:13+08:00",
+      "detached": false,
+      "dirty_count": 0,
+      "status_breakdown": {}
+    },
+    {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\server-mainline",
+      "branch": "codex/server-mainline",
+      "head": "dc6fb9cfb2f6bd95dcb43acaf01d7161d92fc3e5",
+      "committed_at": "2026-09-18T18:08:18+08:00",
+      "detached": false,
+      "dirty_count": 0,
+      "status_breakdown": {}
+    },
+    {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\three-space-benchmark",
+      "branch": "codex/three-space-benchmark",
+      "head": "2bcb95c5333c33ea54c41053bfe1174ccbbff03e",
+      "committed_at": "2026-09-22T17:42:50+08:00",
+      "detached": false,
+      "dirty_count": 5,
+      "status_breakdown": {
+        "??": 3,
+        "M": 2
+      }
+    }
+  ]
+}
