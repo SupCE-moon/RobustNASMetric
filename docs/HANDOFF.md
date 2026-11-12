@@ -166,7 +166,7 @@ python tools/verify_doc_claims.py --table <86 项总表> --json <临时 json> --
 
 ## 13. 交接前最后一分钟：文档路径体检
 
-`docs/` 里到处是「详见 `results/audits/xxx.md`」。这类承诺最容易随文件改名而失效，
+`docs/` 里到处是「详见 `results/audits/<报告名>.md`」。这类承诺最容易随文件改名而失效，
 而失效时没有任何报错。交付前请跑：
 
 ```powershell

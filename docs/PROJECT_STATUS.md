@@ -129,17 +129,17 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
    详见 `docs/theory/METRIC_INDEX.md` 与 D-016。
 
 10. **文档路径引用体检（2026-11-12 新增）：389 条路径、0 条断链**
-    "详见 `results/audits/xxx.md`" 是项目对可追溯性的承诺，文件不在就等于承诺落空。
+    「详见某份审计报告」是项目对可追溯性的承诺，文件不在就等于承诺落空。
     `tools/check_doc_links.py` 扫 88 份 Markdown 里所有反引号路径与 Markdown 链接（389 条），
     按四类归位：应当修复的缺失 / 计划文档里的历史文件名 / 外部交付包路径 /
     `outputs/` 下的产物路径。体检抓到并修掉 5 处真错：
 
     | 文档 | 原写法 | 实际文件 |
     | --- | --- | --- |
-    | `README.md` | `docs/metric_baselines.md` | `docs/theory/metric_baselines.md` |
-    | `docs/theory/current_metric_table.md` | `docs/current_metric_table_readable_zh.md` | `docs/theory/current_metric_table_readable_zh.md` |
-    | `docs/experiments/实验管理.md`（3 处） | `e25_k2_k8_k16_three_source_validation_report.md` | `e25_k8_three_source_validation_report.md` |
-    | `docs/experiments/实验管理.md`（2 处） | `e35_final_summary.md` | `e35.md` |
+    | `README.md` | 少了 `theory/` 一层的相对路径 | `docs/theory/metric_baselines.md` |
+    | `docs/theory/current_metric_table.md` | 同目录文件却写成 `docs/` 下 | `docs/theory/current_metric_table_readable_zh.md` |
+    | `docs/experiments/实验管理.md`（3 处） | 写成了 `e25_k2_k8_k16_three_source_validation_report.md` | `e25_k8_three_source_validation_report.md` |
+    | `docs/experiments/实验管理.md`（2 处） | 写成了 `e35_final_summary.md` | `e35.md` |
 
     另有 30 条进"计划文档"桶（`docs/superpowers/plans/` 写的是当时打算创建、后来改了名的脚本，
     例如 `run_activation_holdout.py` 最终叫 `train_activation_holdout_nb201.py`），
@@ -163,7 +163,10 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 - Φ 的优势部分来自其结构与模型容量/家族无关，但这只是推断，尚未做消融验证。
 - Φ 之所以能排第 1，一个**待检验**的解释是：它测的是"表示的一致性/平滑度"，而 35 个
   `feature_measure_*` 测的是"扰动后特征漂移的幅度"。两者不同族，所以 Φ 提供的排序信息是互补的；
-  但这需要"只保留 35 个漂移类指标、再用 Φ 做增量检验"才能验证，目前只是从聚类结构推出的合理猜测。
+  但这需要"只保留漂移类指标、再用 Φ 做增量检验"才能验证，目前只是从聚类结构推出的合理猜测。
+  检验方案已写好（`docs/experiments/增量检验方案_Φ对特征漂移族_20261112.md`），尚未执行。
+  已知的定量线索：Φ 与 44 个 `feature_measure_*` 的平均相关只有 **0.258**（与 `feature_delta` 0.410、
+  与 `fsp_delta` 0.439），而漂移族内部最高达 0.447——中间值，既非独立也非重复。
 
 **尚待验证的假设**
 
@@ -238,6 +241,11 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
    `configs/metric_eligibility.json` 仍把 Φ/R/Ψ 标为 `implementation_error`，但它们在发布表上
    有第 1/2/4 名。配置记录修复前、发布表记录修复后，需要有人确认后统一（见 D-016）。
    在此之前索引会一直显示这三条警告。
+8. **Φ 的增量检验只有方案、还没跑**（2026-11-12 新增）：
+   `docs/experiments/增量检验方案_Φ对特征漂移族_20261112.md` 写清了三个检验、按 204 个架构聚类的
+   置信区间、预先写死的判定表和执行清单，但**尚未写代码、尚未出数字**，等批准。
+   它要回答的是：Φ 与漂移族的平均相关只有 0.258，那扣掉漂移族能解释的部分之后，
+   Φ 还剩多少排序能力。做与不做都不影响已发布的 84 项榜单。
 
 ## 7. 本地未提交资产（已确认为 `dc6fb9c` 与 `893a994` 的子集，不再有丢失风险）
 

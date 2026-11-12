@@ -122,8 +122,8 @@ python tools/check_doc_links.py `
 `external = 1`（教师交付包内脚本）、`explained = 3`（文档已写明是服务器/外部文件）、
 `optional = 12`（`outputs/` 产物，按策略不入库）。
 
-**修掉的 5 处真实错误**：`README.md` 的 `docs/metric_baselines.md`（实际在 `docs/theory/`）、
-`docs/theory/current_metric_table.md` 的 `docs/current_metric_table_readable_zh.md`（同上）、
+**修掉的 5 处真实错误**：`README.md` 里指向 `metric_baselines.md` 的路径少了 `theory/` 一层、
+`docs/theory/current_metric_table.md` 里指向 `current_metric_table_readable_zh.md` 的路径同样少了 `theory/`、
 `docs/experiments/实验管理.md` 里 3 处 `e25_k2_k8_k16_three_source_validation_report.md`
 （实际 `e25_k8_three_source_validation_report.md`）与 2 处 `e35_final_summary.md`（实际 `e35.md`）。
 

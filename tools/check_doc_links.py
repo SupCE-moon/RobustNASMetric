@@ -76,6 +76,14 @@ ALLOWLIST: dict[tuple[str, str], str] = {
         "docs/experiments/教师交接README服务器核对_20261031.md",
         "scripts/verify_student_benchmark_bundle.py",
     ): "教师交付包内自带的验收脚本，随交付包提供，不属于本项目仓库",
+    (
+        "docs/experiments/增量检验方案_Φ对特征漂移族_20261112.md",
+        "scripts/audit_phi_incremental.py",
+    ): "方案文档里计划创建的脚本，批准并创建后这条自动失效",
+    (
+        "docs/experiments/增量检验方案_Φ对特征漂移族_20261112.md",
+        "tests/test_audit_phi_incremental.py",
+    ): "方案文档里计划创建的测试，批准并创建后这条自动失效",
 }
 
 

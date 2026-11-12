@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
- "docs_scanned": 88,
- "paths_checked": 389,
+ "docs_scanned": 89,
+ "paths_checked": 411,
  "missing_required": [],
  "missing_planned": [
   {
@@ -123,6 +123,16 @@
    "reason": "文档写明日志保存在容器项目内，不是本仓库文件"
   },
   {
+   "doc": "docs/experiments/增量检验方案_Φ对特征漂移族_20261112.md",
+   "path": "scripts/audit_phi_incremental.py",
+   "reason": "方案文档里计划创建的脚本，批准并创建后这条自动失效"
+  },
+  {
+   "doc": "docs/experiments/增量检验方案_Φ对特征漂移族_20261112.md",
+   "path": "tests/test_audit_phi_incremental.py",
+   "reason": "方案文档里计划创建的测试，批准并创建后这条自动失效"
+  },
+  {
    "doc": "docs/experiments/教师交接README服务器核对_20261031.md",
    "path": "scripts/verify_student_benchmark_bundle.py",
    "reason": "教师交付包内自带的验收脚本，随交付包提供，不属于本项目仓库"
@@ -160,6 +170,10 @@
   {
    "doc": "docs/experiments/student_benchmark_issue_log.md",
    "path": "outputs/student_metrics/wangjiahao/existing_metrics_full_v3_cpu_repair/logs/kang_trnas_diagnosis.log"
+  },
+  {
+   "doc": "docs/experiments/增量检验方案_Φ对特征漂移族_20261112.md",
+   "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv"
   },
   {
    "doc": "docs/experiments/实验管理.md",
