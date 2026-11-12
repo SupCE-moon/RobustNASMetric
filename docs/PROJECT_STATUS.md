@@ -78,6 +78,15 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
    RB40 `5b519799…`、NB201 `a158c609…`、DARTS `7761b4a4…`。
    **结论：教师数据包尚未齐备，不能宣称已交付。**
 
+6. **严格排名离线复算（2026-11-12 新增，服务器不可达时做的独立验证）**
+   不从报告抄名次，而是用 `tools/verify_strict_ranking.py` 从 47,600 行原始记录重算一遍：
+   逐 metric × 逐 setting 算 Spearman、按 `direction` 定向、八设置平均、再排序。
+   **结果：83 项逐值最大绝对误差 0.000e+00，名次顺序完全一致**；2 项 RACL 的 `ok` 行数为 0（全是 failed），
+   因此被排除——与官方"证据不足"的排除理由精确对应。
+   边界：官方 84 项里那 1 项 `feature_adv_excess_centered_unit_l2` 的原始行只在服务器，
+   本地这批行冻结在它加入之前，**离线无法复算**，只能等 SSH。
+   详见 `results/audits/strict-ranking-recompute-20261112.md`。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**

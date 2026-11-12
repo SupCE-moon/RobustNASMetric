@@ -70,6 +70,10 @@ python tools/import_worktree.py --source <源> --dest . --plan <plan.json> [--ap
 $env:ROBUST_METRIC_SSH_PASSWORD = "..."
 python tools/server_inventory.py --host <ip> --port <port> --user <user> `
     --docker wangjiahao --output results/manifests/server.json
+
+# 不信任报告里的名次时：从原始行重算严格排名，与官方表逐值比
+python tools/verify_strict_ranking.py --rows <原始行.csv> [--repair <repair_rows.csv>] `
+    --ranking <strict_ranking.csv> --output results/audits/recompute.json --report results/audits/recompute.md
 ```
 
 ## 6. 现在该做什么（恢复访问后）

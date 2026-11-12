@@ -1,0 +1,47 @@
+{
+  "generated_at_utc": "2026-11-12T09:34:23+00:00",
+  "inputs": {
+    "rows": {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\strict_all_metrics_table_20261024_trnas_repaired\\sources\\metric_values_original_strict.csv",
+      "sha256": "b5137e2b3fe89ce5a99a99ea94bafa48d1abb81c45837551e5b1a54fe42ac92d",
+      "data_rows": 47600
+    },
+    "repair": {
+      "path": "outputs\\strict_all_metrics_table_20261024_trnas_repaired\\sources\\repair_rows.csv",
+      "sha256": "91eaa8dae95082b6b042b943cbcb58dc44e10da9aa7a5ffd1b9e5a6ad74ad0eb"
+    },
+    "ranking": {
+      "path": "outputs\\strict_adv_excess_release_20261024T110422Z\\strict_ranking.csv",
+      "sha256": "fc6ff6bc995e80cd3bf3516506b483c3d48f69b11afa6fe10ca0be36f372ec3e"
+    }
+  },
+  "protocol": {
+    "settings": [
+      "rb40_mature",
+      "nb201_e0",
+      "nb201_e5",
+      "nb201_e10",
+      "nb201_e25",
+      "nb201_e50",
+      "darts_e0",
+      "darts_e100"
+    ],
+    "direction": "negate Spearman when direction == lower",
+    "aggregate": "mean over the eight settings",
+    "rank": "all_setting_mean desc, metric_name asc"
+  },
+  "recomputed_metrics": 83,
+  "rejected_metrics": {
+    "racl_arch_lipschitz_log_upper": "missing or degenerate settings: rb40_mature (0/40 ok rows)",
+    "racl_fixed_network_log_upper_proxy": "missing or degenerate settings: nb201_e0 (0/64 ok rows), nb201_e5 (0/64 ok rows), nb201_e10 (0/64 ok rows), nb201_e25 (0/64 ok rows), nb201_e50 (0/64 ok rows), darts_e0 (0/100 ok rows), darts_e100 (0/100 ok rows)"
+  },
+  "metrics_compared": 83,
+  "metrics_official_only": [
+    "feature_adv_excess_centered_unit_l2"
+  ],
+  "metrics_recomputed_only": [],
+  "max_abs_error": 0.0,
+  "max_abs_error_at": "trnas_activation_psi::all_setting_mean",
+  "exact_match": true,
+  "rank_order_identical": true
+}
