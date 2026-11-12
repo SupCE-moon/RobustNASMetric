@@ -15,6 +15,17 @@ Yes, it is worth starting with about 20 public CIFAR-10 defense models.
 
 The project is intentionally not a NAS project. It is a metric validation harness.
 
+## Where To Start Reading
+
+| If you want to know… | Read |
+| --- | --- |
+| What is true today, and what is already verified | `docs/PROJECT_STATUS.md` |
+| What to do next, with compute budget and failure modes | `docs/ROADMAP.md` |
+| Why a decision was made that way | `docs/DECISIONS.md` |
+| How to pick this up cold (three known traps included) | `docs/HANDOFF.md` |
+| Every experiment, E21–E37, with its conclusion | `docs/experiments/实验管理.md` |
+| All 86 metrics in one table | `docs/theory/METRIC_INDEX.md` |
+
 ## Project Layout
 
 ```text
