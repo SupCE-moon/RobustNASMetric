@@ -31,141 +31,6 @@
           "sha256": "4156e97721677a12d392c322daddfec3d2618b7a89a6154e11f4db57d88eb14c"
         },
         {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k16_seed20260704.csv",
-          "size": 20403,
-          "sha256": "5e2a525c8ae018de8c3d668f56fb596611830a64dd783ad68ed14fd95ea55bf8"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k2_seed20260704.csv",
-          "size": 20319,
-          "sha256": "4b8ae7fc1827bc13ee455bde6830290d6d4c4cc0e2561a26c30b7edd197bf67e"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k4_seed20260704.csv",
-          "size": 20339,
-          "sha256": "1e9d8bed988d1efa559775e5dfc1c9715a148823464aa36bbb6a779d847f899a"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260704.csv",
-          "size": 20371,
-          "sha256": "b7c2c187198df1b79ccbdb188252a6f9e47b9587121bcd68624d463f35f8e9b1"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k16_seed20260704.csv",
-          "size": 20335,
-          "sha256": "35c7b214f9baa36aa927cfd058764945b1a346cb1ac5947300d91f8ad6e69ec8"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k2_seed20260704.csv",
-          "size": 20350,
-          "sha256": "59d2860784807b565c5f7f75c187b34747ab23b9542e831ffbfe8b1e0befb507"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k4_seed20260704.csv",
-          "size": 20337,
-          "sha256": "11c696064ede907b8c8a1c0c38859661b52adf2f64205fddbbad0df7d0b5faf0"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260704.csv",
-          "size": 20334,
-          "sha256": "bd3b8302f2fbdef729da120bf93b1b1afc4eeae45c791f4228eced1021fb175a"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k16_seed20260704.csv",
-          "size": 20422,
-          "sha256": "dfee0667869c81862ba5d29c78a41725362f351312649c1d1a30af4bfb1ad5f7"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k2_seed20260704.csv",
-          "size": 20357,
-          "sha256": "e332b2f642b1f3c6045fd9296fb6222bd33bbc43f1ca6dac3d67b4390e0de9c8"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k4_seed20260704.csv",
-          "size": 20387,
-          "sha256": "c298c85e78d56a3246623bd796ad5361ffd8e9b5ce67954e6c49ca75d0ad4a48"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260704.csv",
-          "size": 20387,
-          "sha256": "ef4939ad6cffd8cdb0d71a62c854f7b1418dc107ee69a364c4873b559aa2146e"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n32_k8_seed20260704.csv",
-          "size": 20235,
-          "sha256": "2854b0f4318c72b6ce5ed0abc7b309fabc93e05d13c60b8f200fc076d2c8c233"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n64_k8_seed20260704.csv",
-          "size": 20284,
-          "sha256": "719fcd78d5d407241668cece8082dc724fab0b127a921682fe414b60ebfe0a78"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n32_k8_seed20260704.csv",
-          "size": 20238,
-          "sha256": "dde7e29a781627a86b70a6539cdf7e2f9dea3be8c9b94bec187dc1bbd4f64a86"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n64_k8_seed20260704.csv",
-          "size": 20248,
-          "sha256": "1eb200c3d45755d6789f2038715f7f998c91486c7a388f26f08b789e38528d39"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n32_k8_seed20260704.csv",
-          "size": 20265,
-          "sha256": "3c2b52d4af416669ffbdcc3cbe18a732b586124c1840835ef702776972392368"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n64_k8_seed20260704.csv",
-          "size": 20349,
-          "sha256": "60e49b3f9cd9a2b24e59defa8e9628cc3146ffa34cca5ce56cd4a1fd2ccd69a5"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260731.csv",
-          "size": 20349,
-          "sha256": "6b5f1dc83359647b6f086e6e3ef6549aaa16af53540f0d45bd89ecf93adaaaf3"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260801.csv",
-          "size": 20367,
-          "sha256": "da2b6b1c2dce686f4cd99bfda33a7db1111ac00950163b4dbf4e6c58822b85b1"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260802.csv",
-          "size": 20359,
-          "sha256": "e1b493fd8b9c676ff05bab001676cd2b03e476bf87c749725c517860128725de"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260731.csv",
-          "size": 20327,
-          "sha256": "07e470e3e4b8d67ccc38b05344480b9713250ce3c3149e17925922f1e9c9f1ee"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260801.csv",
-          "size": 20335,
-          "sha256": "8de568460a116b016b63930231763e1f25f4ebc7b1557ffaf77483cae32442fb"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260802.csv",
-          "size": 20355,
-          "sha256": "2f8b09a41cc54bad0cf25a060120ef4aea6694aba38a75651a9e07e8cd1c755a"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260731.csv",
-          "size": 20382,
-          "sha256": "cee7582e9f866b98fbb47a020aab08982759bed32fadc747ba92343dc0d1e1b4"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260801.csv",
-          "size": 20395,
-          "sha256": "b1581e597bdf68a0fa5a94adc1c170085dde9d097abaa9c4f5a7a4e7648a90c1"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260802.csv",
-          "size": 20372,
-          "sha256": "a6c2326b996319fd3ec169504d0c36f789031ec0f2c874c2def7c29f2d903aa4"
-        },
-        {
           "path": "outputs/e28_capacity_family/rb20_run.log",
           "size": 1383,
           "sha256": "19d7806361ea72fead9e9816a248f24fe2fc3923e33178f4f9a40f95461a884f"
@@ -314,72 +179,251 @@
           "path": "src/robust_metric_lab.egg-info/top_level.txt",
           "size": 18,
           "sha256": "7bc7aad0b7a808d58383d492491e121557ee78a5d2a714ec3cfc96a673589354"
-        },
-        {
-          "path": "src/robust_metric_lab/e36_batched.py",
-          "size": 3748,
-          "sha256": "594d5693f0b50967ccccfa6e9e7e3039d85caf3d017b755ff815d3010da1df98"
-        },
-        {
-          "path": "tests/test_e36_batched.py",
-          "size": 2449,
-          "sha256": "19a57ac8f45ee16056be002b8e35ad4f0fd792711152361209a79939d910a938"
         }
       ],
       "differs": [
         {
           "path": ".gitignore",
           "other_sha256": "62635c7d760915e92ec4209000e31b65de63bed304fcb323fb8da29ca1395a28",
-          "target_sha256": "a3fc2b124b1f67dbba32f6cdce4d8d81b138785e3fb0292f0854ebbea482d084",
+          "target_sha256": "14eac227dffc4bcf804530c6f5291fe6f6ed0ddf0bbcf1dc4a41b48e3667fd29",
           "other_size": 1486,
-          "target_size": 1615
+          "target_size": 1762
         },
         {
-          "path": "docs/experiments/实验管理.md",
-          "other_sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
-          "target_sha256": "461f30cb2c8be197f7aca3104193f1c1cde3d8b65d632a38b3c5390047109fdc",
-          "other_size": 109498,
-          "target_size": 82875
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k16_seed20260704.csv",
+          "other_sha256": "5e2a525c8ae018de8c3d668f56fb596611830a64dd783ad68ed14fd95ea55bf8",
+          "target_sha256": "b494a9ed0fd606c560e41b8fa9d05f90c32ccc6fb2f8d2e786bc429aed3336dd",
+          "other_size": 20403,
+          "target_size": 20382
         },
         {
-          "path": "docs/theory/理论管理.md",
-          "other_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
-          "target_sha256": "1bde4744f058d3a053076e8e44ac68ffc01084b108a3183e92637c5ae6b82e2d",
-          "other_size": 22357,
-          "target_size": 19656
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k2_seed20260704.csv",
+          "other_sha256": "4b8ae7fc1827bc13ee455bde6830290d6d4c4cc0e2561a26c30b7edd197bf67e",
+          "target_sha256": "522ee117572fbd5869903da55201e8e041aa67e0fa626bc23230a09eb0f581ca",
+          "other_size": 20319,
+          "target_size": 20298
         },
         {
-          "path": "scripts/compute_metric_batch.py",
-          "other_sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61",
-          "target_sha256": "d235c24f0af171eddc22511c4e8ba61ec629eccc96cb1a6784c971cc6e015eaa",
-          "other_size": 17579,
-          "target_size": 14390
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k4_seed20260704.csv",
+          "other_sha256": "1e9d8bed988d1efa559775e5dfc1c9715a148823464aa36bbb6a779d847f899a",
+          "target_sha256": "b387f989ae31a4135d55aa3d1f777d6311753851913ed537e307f9e47ce8ed90",
+          "other_size": 20339,
+          "target_size": 20318
         },
         {
-          "path": "src/robust_metric_lab/attacks.py",
-          "other_sha256": "65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13",
-          "target_sha256": "2ced02cbc4f2fad9d7c057bb878b695998cfcb80a34dfb3665ee724b1bfed925",
-          "other_size": 2628,
-          "target_size": 1746
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260704.csv",
+          "other_sha256": "b7c2c187198df1b79ccbdb188252a6f9e47b9587121bcd68624d463f35f8e9b1",
+          "target_sha256": "63415b2461faf626257531907649537f1370cee5ef05a5cd23875951c08852e5",
+          "other_size": 20371,
+          "target_size": 20350
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k16_seed20260704.csv",
+          "other_sha256": "35c7b214f9baa36aa927cfd058764945b1a346cb1ac5947300d91f8ad6e69ec8",
+          "target_sha256": "145619c6f600c23e6c162b676d02267d3b6c37e89ec53e68dc65593ff9ba66b8",
+          "other_size": 20335,
+          "target_size": 20314
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k2_seed20260704.csv",
+          "other_sha256": "59d2860784807b565c5f7f75c187b34747ab23b9542e831ffbfe8b1e0befb507",
+          "target_sha256": "d14292425fd001dd9582ade1f463ececbf9fab8733f7eea0ff9874f8bfb4eb37",
+          "other_size": 20350,
+          "target_size": 20329
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k4_seed20260704.csv",
+          "other_sha256": "11c696064ede907b8c8a1c0c38859661b52adf2f64205fddbbad0df7d0b5faf0",
+          "target_sha256": "7f94e4b0a838a8902c2fea939007d12452aa40cafa0bac991d5a3a85c3d10114",
+          "other_size": 20337,
+          "target_size": 20316
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260704.csv",
+          "other_sha256": "bd3b8302f2fbdef729da120bf93b1b1afc4eeae45c791f4228eced1021fb175a",
+          "target_sha256": "f9fb1ed2c0476b1fcb08b5ffcecf0579cf38b7ab02c7e289968d11b073114661",
+          "other_size": 20334,
+          "target_size": 20313
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k16_seed20260704.csv",
+          "other_sha256": "dfee0667869c81862ba5d29c78a41725362f351312649c1d1a30af4bfb1ad5f7",
+          "target_sha256": "7a492686c605f2c06d32e312040df4fa0e8d099a6b7dd442c3c9fc46640c3854",
+          "other_size": 20422,
+          "target_size": 20401
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k2_seed20260704.csv",
+          "other_sha256": "e332b2f642b1f3c6045fd9296fb6222bd33bbc43f1ca6dac3d67b4390e0de9c8",
+          "target_sha256": "401495caf03bb3bcbf55b8af53951318bdb77ef5e8c57391fc679817616f8ff2",
+          "other_size": 20357,
+          "target_size": 20336
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k4_seed20260704.csv",
+          "other_sha256": "c298c85e78d56a3246623bd796ad5361ffd8e9b5ce67954e6c49ca75d0ad4a48",
+          "target_sha256": "8681b260dee079a5bcbd2a170028491dacb09b0a50a15d75ed6e8a4e222e75ec",
+          "other_size": 20387,
+          "target_size": 20366
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260704.csv",
+          "other_sha256": "ef4939ad6cffd8cdb0d71a62c854f7b1418dc107ee69a364c4873b559aa2146e",
+          "target_sha256": "b00c2e64acd3e4ae864dc511507bb7f778c19d651b65b13d253663c9a9071421",
+          "other_size": 20387,
+          "target_size": 20366
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n32_k8_seed20260704.csv",
+          "other_sha256": "2854b0f4318c72b6ce5ed0abc7b309fabc93e05d13c60b8f200fc076d2c8c233",
+          "target_sha256": "f11331bc28235deaf5796628b3356b2f058ff56a6f2fbd3af036a25bfacb5998",
+          "other_size": 20235,
+          "target_size": 20214
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n64_k8_seed20260704.csv",
+          "other_sha256": "719fcd78d5d407241668cece8082dc724fab0b127a921682fe414b60ebfe0a78",
+          "target_sha256": "5b51cac6d79cb2362af8372ac84c11b84b53e3f9dbb0caed7e09f326b2fb5205",
+          "other_size": 20284,
+          "target_size": 20263
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n32_k8_seed20260704.csv",
+          "other_sha256": "dde7e29a781627a86b70a6539cdf7e2f9dea3be8c9b94bec187dc1bbd4f64a86",
+          "target_sha256": "23cc46a04abf0097ffb3cbab6cb2688d45bdb6e6a1aff8b8f1bbd51bace7c5be",
+          "other_size": 20238,
+          "target_size": 20217
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n64_k8_seed20260704.csv",
+          "other_sha256": "1eb200c3d45755d6789f2038715f7f998c91486c7a388f26f08b789e38528d39",
+          "target_sha256": "1f6a72fb71ad2409cdcc88453262fbfd5fcfa26696d0de0ff18cccd59c812613",
+          "other_size": 20248,
+          "target_size": 20227
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n32_k8_seed20260704.csv",
+          "other_sha256": "3c2b52d4af416669ffbdcc3cbe18a732b586124c1840835ef702776972392368",
+          "target_sha256": "bf4eb6e508ca8ab4d640c2831aba4aa1c7d5a2baf5b39ebe197052b6852e7f82",
+          "other_size": 20265,
+          "target_size": 20244
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n64_k8_seed20260704.csv",
+          "other_sha256": "60e49b3f9cd9a2b24e59defa8e9628cc3146ffa34cca5ce56cd4a1fd2ccd69a5",
+          "target_sha256": "701d222fdb60b54861d283b4445fab80105a056808d2efb1cfea9f589bbb2e18",
+          "other_size": 20349,
+          "target_size": 20328
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260731.csv",
+          "other_sha256": "6b5f1dc83359647b6f086e6e3ef6549aaa16af53540f0d45bd89ecf93adaaaf3",
+          "target_sha256": "6b645cc12dadc28234d0c3dba321ab3c6b0b0dc9497ebc1e1dab14af5136bee3",
+          "other_size": 20349,
+          "target_size": 20328
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260801.csv",
+          "other_sha256": "da2b6b1c2dce686f4cd99bfda33a7db1111ac00950163b4dbf4e6c58822b85b1",
+          "target_sha256": "987bc06e043c40302e296e6b8663d722f4671ed0ce932ef1db3f577a3592813d",
+          "other_size": 20367,
+          "target_size": 20346
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260802.csv",
+          "other_sha256": "e1b493fd8b9c676ff05bab001676cd2b03e476bf87c749725c517860128725de",
+          "target_sha256": "65207e94b843c6647ff8c2a3066cb8f184cd2cbf640722e629590b3ced1ca160",
+          "other_size": 20359,
+          "target_size": 20338
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260731.csv",
+          "other_sha256": "07e470e3e4b8d67ccc38b05344480b9713250ce3c3149e17925922f1e9c9f1ee",
+          "target_sha256": "99f01cd583a7f5d66fc1cf4b8e6c007ad1ac77725bae3797930e0c946e42bf41",
+          "other_size": 20327,
+          "target_size": 20306
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260801.csv",
+          "other_sha256": "8de568460a116b016b63930231763e1f25f4ebc7b1557ffaf77483cae32442fb",
+          "target_sha256": "4ee8e5fab3c25ca07c2ab64f8897bf2e8a5e9c0d5c3d96dbc6987be50f5ce538",
+          "other_size": 20335,
+          "target_size": 20314
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260802.csv",
+          "other_sha256": "2f8b09a41cc54bad0cf25a060120ef4aea6694aba38a75651a9e07e8cd1c755a",
+          "target_sha256": "058d08396684122da99904ae64dc0cf1c50da151480c0efebc31a14352f595c2",
+          "other_size": 20355,
+          "target_size": 20334
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260731.csv",
+          "other_sha256": "cee7582e9f866b98fbb47a020aab08982759bed32fadc747ba92343dc0d1e1b4",
+          "target_sha256": "084177583b66332d01bd74023e9121c82bec117d64e8d272e3d4e46858c7afb3",
+          "other_size": 20382,
+          "target_size": 20361
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260801.csv",
+          "other_sha256": "b1581e597bdf68a0fa5a94adc1c170085dde9d097abaa9c4f5a7a4e7648a90c1",
+          "target_sha256": "10f066d339826e13f845fca6a7ce60b22be3c3794feef5ef3089db4a678f4b58",
+          "other_size": 20395,
+          "target_size": 20374
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260802.csv",
+          "other_sha256": "a6c2326b996319fd3ec169504d0c36f789031ec0f2c874c2def7c29f2d903aa4",
+          "target_sha256": "9a405744500c0733f8879c1096708ceb40f2efc84f8d835d029a88c100a061f0",
+          "other_size": 20372,
+          "target_size": 20351
         },
         {
           "path": "src/robust_metric_lab/metric_registry.py",
           "other_sha256": "c6af465bbe952bbe279387fc32601a73c6c546b8c1bd6659be323c1b09cf4be3",
-          "target_sha256": "36a3819d2f84e177bc412c169cfbde2a5acaba9a668a1d616dd4dafad718ebf5",
+          "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
           "other_size": 5867,
-          "target_size": 3640
+          "target_size": 7835
         },
         {
           "path": "src/robust_metric_lab/metrics.py",
           "other_sha256": "5b18c5cf28fede3575d1aedcae7949f7bc0491bca4dcc160bdc619159fe119da",
-          "target_sha256": "16c884ca139c8af1ee554b0b9c3fbbd74424f25cb7d44035c09972b5624978da",
+          "target_sha256": "0db1761404f6176a8882ef60037568dc7df5ab933f7070dbbbe18b708fb9bae1",
           "other_size": 67447,
-          "target_size": 42297
+          "target_size": 76626
+        },
+        {
+          "path": "src/robust_metric_lab/nasrobbench201.py",
+          "other_sha256": "22dea77c8b0a4ef1e0510373c6f0b725212dab7046897da14dec833d639836c2",
+          "target_sha256": "4fe8b20dd23d6fa4bab67b12c8147f130e7111e0728df3b68599de366fcb1c17",
+          "other_size": 10716,
+          "target_size": 11020
+        },
+        {
+          "path": "src/robust_metric_lab/trnas.py",
+          "other_sha256": "d11569314cce0af5b9e006772a9a10ffa9c5300585f44cd2d8087324afb5af77",
+          "target_sha256": "a6ddd5bb9b5ccaa539e3b180e6ae2dcf15415a1058e347fbd1eb8163a0a6db95",
+          "other_size": 5889,
+          "target_size": 7132
+        },
+        {
+          "path": "tests/test_racl_lipschitz_metric.py",
+          "other_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
+          "target_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
+          "other_size": 1735,
+          "target_size": 2127
+        },
+        {
+          "path": "tests/test_trnas_metrics.py",
+          "other_sha256": "983f4ba83082bff53b11cbef150b8d22697d66bb1a59f617ea45e99de20b021c",
+          "target_sha256": "b03494421ef9126fd2bcfd34353d2085ca5d3cd8a744708a601746e6ce26bed5",
+          "other_size": 2186,
+          "target_size": 3434
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 64,
-      "only_in_other_bytes": 33270782
+      "only_in_target_count": 109,
+      "only_in_other_bytes": 32715384
     },
     {
       "label": "adv-excess",
@@ -446,11 +490,6 @@
           "sha256": "4e82cccfb8438cb56933730d99773acb60573d17ef74f612b54942a4a208b0ce"
         },
         {
-          "path": "scripts/evaluate_e37_student.py",
-          "size": 5400,
-          "sha256": "a524a2222b4ec95a70cea52e781cbe42dc294812815a99eaff0af1ac7dde13a7"
-        },
-        {
           "path": "scripts/plot_e37_layer_diagnostic.py",
           "size": 3903,
           "sha256": "32b3ea7c25c32df6880130b82297b308b253d52cecd184f470693bd7dfb2dc43"
@@ -466,24 +505,9 @@
           "sha256": "520aa74d7b43b17f55e3279680d7647f573204852b9bb8b0dc92bb57c5174dad"
         },
         {
-          "path": "src/robust_metric_lab/e37_batched.py",
-          "size": 3063,
-          "sha256": "b6ce6ad06873a9994dc08c8def5a3bae3f8787864fc3bc8e07c9b382a85a202d"
-        },
-        {
           "path": "src/robust_metric_lab/e37_layer_diagnostic.py",
           "size": 6168,
           "sha256": "bde0fdba9e8fe6dbdc7c6d99781ec55e6b7d34a484baf842a39757ea5afbd946"
-        },
-        {
-          "path": "src/robust_metric_lab/e37_metrics.py",
-          "size": 6627,
-          "sha256": "2ea0b641eac5be0c3f16ea9ccc67433adea940becc795179b787520f8c0b85cf"
-        },
-        {
-          "path": "tests/test_e37_batched.py",
-          "size": 3613,
-          "sha256": "345142785019b05bdb5bf19620ad2501cff128f4f6bd677bf38d52da5a0aabfb"
         },
         {
           "path": "tests/test_e37_diagnostic_analysis.py",
@@ -525,9 +549,23 @@
         {
           "path": ".gitignore",
           "other_sha256": "62635c7d760915e92ec4209000e31b65de63bed304fcb323fb8da29ca1395a28",
-          "target_sha256": "a3fc2b124b1f67dbba32f6cdce4d8d81b138785e3fb0292f0854ebbea482d084",
+          "target_sha256": "14eac227dffc4bcf804530c6f5291fe6f6ed0ddf0bbcf1dc4a41b48e3667fd29",
           "other_size": 1486,
-          "target_size": 1615
+          "target_size": 1762
+        },
+        {
+          "path": "configs/metric_eligibility.json",
+          "other_sha256": "31bf4cd43b8a69073d34c3cad14b47af06ca3276f40a7667ea73d6dc25ea33ff",
+          "target_sha256": "3165a5affddce0fcf901264cd5b17eda578b5ed76aec53db6ddfb1409dc6914b",
+          "other_size": 24366,
+          "target_size": 24420
+        },
+        {
+          "path": "docs/experiments/实验管理.md",
+          "other_sha256": "461f30cb2c8be197f7aca3104193f1c1cde3d8b65d632a38b3c5390047109fdc",
+          "target_sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
+          "other_size": 82875,
+          "target_size": 109498
         },
         {
           "path": "docs/superpowers/plans/2026-10-24-adversarial-excess-feature-drift-implementation.md",
@@ -544,16 +582,72 @@
           "target_size": 9405
         },
         {
+          "path": "docs/theory/理论管理.md",
+          "other_sha256": "1bde4744f058d3a053076e8e44ac68ffc01084b108a3183e92637c5ae6b82e2d",
+          "target_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
+          "other_size": 19656,
+          "target_size": 22357
+        },
+        {
+          "path": "scripts/compute_metric_batch.py",
+          "other_sha256": "d235c24f0af171eddc22511c4e8ba61ec629eccc96cb1a6784c971cc6e015eaa",
+          "target_sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61",
+          "other_size": 14390,
+          "target_size": 17579
+        },
+        {
+          "path": "src/robust_metric_lab/attacks.py",
+          "other_sha256": "2ced02cbc4f2fad9d7c057bb878b695998cfcb80a34dfb3665ee724b1bfed925",
+          "target_sha256": "65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13",
+          "other_size": 1746,
+          "target_size": 2628
+        },
+        {
+          "path": "src/robust_metric_lab/metric_registry.py",
+          "other_sha256": "36a3819d2f84e177bc412c169cfbde2a5acaba9a668a1d616dd4dafad718ebf5",
+          "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
+          "other_size": 3640,
+          "target_size": 7835
+        },
+        {
           "path": "src/robust_metric_lab/metrics.py",
           "other_sha256": "72d1e55a050d76ea8f28dce74e991b38ce70538a2b93d55c3dcd3247b47612fe",
-          "target_sha256": "16c884ca139c8af1ee554b0b9c3fbbd74424f25cb7d44035c09972b5624978da",
+          "target_sha256": "0db1761404f6176a8882ef60037568dc7df5ab933f7070dbbbe18b708fb9bae1",
           "other_size": 43562,
-          "target_size": 42297
+          "target_size": 76626
+        },
+        {
+          "path": "src/robust_metric_lab/nasrobbench201.py",
+          "other_sha256": "22dea77c8b0a4ef1e0510373c6f0b725212dab7046897da14dec833d639836c2",
+          "target_sha256": "4fe8b20dd23d6fa4bab67b12c8147f130e7111e0728df3b68599de366fcb1c17",
+          "other_size": 10716,
+          "target_size": 11020
+        },
+        {
+          "path": "src/robust_metric_lab/trnas.py",
+          "other_sha256": "d11569314cce0af5b9e006772a9a10ffa9c5300585f44cd2d8087324afb5af77",
+          "target_sha256": "a6ddd5bb9b5ccaa539e3b180e6ae2dcf15415a1058e347fbd1eb8163a0a6db95",
+          "other_size": 5889,
+          "target_size": 7132
+        },
+        {
+          "path": "tests/test_racl_lipschitz_metric.py",
+          "other_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
+          "target_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
+          "other_size": 1735,
+          "target_size": 2127
+        },
+        {
+          "path": "tests/test_trnas_metrics.py",
+          "other_sha256": "983f4ba83082bff53b11cbef150b8d22697d66bb1a59f617ea45e99de20b021c",
+          "target_sha256": "b03494421ef9126fd2bcfd34353d2085ca5d3cd8a744708a601746e6ce26bed5",
+          "other_size": 2186,
+          "target_size": 3434
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 151,
-      "only_in_other_bytes": 891774
+      "only_in_target_count": 221,
+      "only_in_other_bytes": 873071
     },
     {
       "label": "ba02",
@@ -563,269 +657,157 @@
         {
           "path": ".gitignore",
           "other_sha256": "fee1c49a56d4bf374dd2879eddd4b9094e33c1cb193b84ae7f48280710e9a204",
-          "target_sha256": "a3fc2b124b1f67dbba32f6cdce4d8d81b138785e3fb0292f0854ebbea482d084",
+          "target_sha256": "14eac227dffc4bcf804530c6f5291fe6f6ed0ddf0bbcf1dc4a41b48e3667fd29",
           "other_size": 1433,
-          "target_size": 1615
+          "target_size": 1762
+        },
+        {
+          "path": "docs/experiments/实验管理.md",
+          "other_sha256": "461f30cb2c8be197f7aca3104193f1c1cde3d8b65d632a38b3c5390047109fdc",
+          "target_sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
+          "other_size": 82875,
+          "target_size": 109498
+        },
+        {
+          "path": "docs/theory/理论管理.md",
+          "other_sha256": "1bde4744f058d3a053076e8e44ac68ffc01084b108a3183e92637c5ae6b82e2d",
+          "target_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
+          "other_size": 19656,
+          "target_size": 22357
+        },
+        {
+          "path": "scripts/compute_metric_batch.py",
+          "other_sha256": "d235c24f0af171eddc22511c4e8ba61ec629eccc96cb1a6784c971cc6e015eaa",
+          "target_sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61",
+          "other_size": 14390,
+          "target_size": 17579
+        },
+        {
+          "path": "src/robust_metric_lab/attacks.py",
+          "other_sha256": "2ced02cbc4f2fad9d7c057bb878b695998cfcb80a34dfb3665ee724b1bfed925",
+          "target_sha256": "65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13",
+          "other_size": 1746,
+          "target_size": 2628
         },
         {
           "path": "src/robust_metric_lab/metric_registry.py",
           "other_sha256": "33c5b9f7fa190177726733282935b97008c59551dc84da0026ecaf354d1ad4c2",
-          "target_sha256": "36a3819d2f84e177bc412c169cfbde2a5acaba9a668a1d616dd4dafad718ebf5",
+          "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
           "other_size": 3490,
-          "target_size": 3640
+          "target_size": 7835
+        },
+        {
+          "path": "src/robust_metric_lab/metrics.py",
+          "other_sha256": "16c884ca139c8af1ee554b0b9c3fbbd74424f25cb7d44035c09972b5624978da",
+          "target_sha256": "0db1761404f6176a8882ef60037568dc7df5ab933f7070dbbbe18b708fb9bae1",
+          "other_size": 42297,
+          "target_size": 76626
+        },
+        {
+          "path": "src/robust_metric_lab/nasrobbench201.py",
+          "other_sha256": "22dea77c8b0a4ef1e0510373c6f0b725212dab7046897da14dec833d639836c2",
+          "target_sha256": "4fe8b20dd23d6fa4bab67b12c8147f130e7111e0728df3b68599de366fcb1c17",
+          "other_size": 10716,
+          "target_size": 11020
+        },
+        {
+          "path": "src/robust_metric_lab/trnas.py",
+          "other_sha256": "d11569314cce0af5b9e006772a9a10ffa9c5300585f44cd2d8087324afb5af77",
+          "target_sha256": "a6ddd5bb9b5ccaa539e3b180e6ae2dcf15415a1058e347fbd1eb8163a0a6db95",
+          "other_size": 5889,
+          "target_size": 7132
+        },
+        {
+          "path": "tests/test_racl_lipschitz_metric.py",
+          "other_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
+          "target_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
+          "other_size": 1735,
+          "target_size": 2127
+        },
+        {
+          "path": "tests/test_trnas_metrics.py",
+          "other_sha256": "983f4ba83082bff53b11cbef150b8d22697d66bb1a59f617ea45e99de20b021c",
+          "target_sha256": "b03494421ef9126fd2bcfd34353d2085ca5d3cd8a744708a601746e6ce26bed5",
+          "other_size": 2186,
+          "target_size": 3434
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 192,
+      "only_in_target_count": 266,
       "only_in_other_bytes": 0
     },
     {
       "label": "strict-metrics-e37",
       "other_file_count": 440,
-      "only_in_other": [
-        {
-          "path": "docs/experiments/strict_all_metrics_final_report.md",
-          "size": 4998,
-          "sha256": "18265c6beb3883865f2e1bb80553dd08ca3939f30883ff4e21674d657c08523e"
-        },
-        {
-          "path": "docs/experiments/strict_all_metrics_problem_log.md",
-          "size": 2303,
-          "sha256": "b1c9875de2b17dc866ba38562a120012fb3698d64e032e5fee383cf78efb06d0"
-        },
-        {
-          "path": "docs/experiments/strict_all_metrics_runbook.md",
-          "size": 2479,
-          "sha256": "07072c43f58895a241db7c1a62491ac5df68d1e34801e831555ad416f2e98dea"
-        },
-        {
-          "path": "docs/experiments/strict_benchmark_source_sha256.txt",
-          "size": 1647,
-          "sha256": "363602d1aa759840c4b1f26394dd49ee4de75bc61545e1afe9920ecff9af66d1"
-        },
-        {
-          "path": "scripts/analyze_student_benchmark.py",
-          "size": 2840,
-          "sha256": "e341f775aa58641020f2e72044b657d718b25e1aca66a315327be7716582438b"
-        },
-        {
-          "path": "scripts/analyze_student_confound.py",
-          "size": 1369,
-          "sha256": "93789c6bfea553a09309eed13fff21e552d94e08e88cb0eb1fbe9cd720985593"
-        },
-        {
-          "path": "scripts/audit_metric_eligibility.py",
-          "size": 1177,
-          "sha256": "a6a7d7b9e78e8d322c21fc53da5fa43f544e9b1c74b1a34ea3a402154a6259ec"
-        },
-        {
-          "path": "scripts/audit_student_benchmark.py",
-          "size": 7139,
-          "sha256": "6e2e363ccc60da576b3b057cbc8a23f3db42dc4c03ab82d973d0c2bf4c6f96a1"
-        },
-        {
-          "path": "scripts/build_strict_metric_ranking.py",
-          "size": 1920,
-          "sha256": "1b01e216c9c773c7e6654eb458dd0a57244a31d73a58df1705affb08f7e2f975"
-        },
-        {
-          "path": "scripts/diagnose_kang_trnas.py",
-          "size": 3835,
-          "sha256": "25c5bad3764931548b0fdbf0a416f7fb2207033bd26004462a53a74dd691c1f5"
-        },
-        {
-          "path": "scripts/evaluate_e37_student.py",
-          "size": 5400,
-          "sha256": "a524a2222b4ec95a70cea52e781cbe42dc294812815a99eaff0af1ac7dde13a7"
-        },
-        {
-          "path": "scripts/evaluate_importance_student.py",
-          "size": 5027,
-          "sha256": "0d2c41da250dbf078e828592b462a4491f542f7bed62bb64241a0f389397a26a"
-        },
-        {
-          "path": "scripts/repair_existing_metric_grid.py",
-          "size": 712,
-          "sha256": "7566130db28482400e703fd776a5c220ce633355a240231663ac9fc0bceeced0"
-        },
-        {
-          "path": "scripts/run_e37_full.sh",
-          "size": 5394,
-          "sha256": "1887668eaeb6c95b741568d58260a002f5c3e361065b4d4c2d0d72b5f403afc6"
-        },
-        {
-          "path": "scripts/run_strict_all_metrics.sh",
-          "size": 5145,
-          "sha256": "ce0a871f4d19af860bd9c026b859fb164620e04888f76019124bb43168f7d833"
-        },
-        {
-          "path": "scripts/verify_strict_release.py",
-          "size": 1955,
-          "sha256": "4d6e603a3eccc2bb61360b43e38fe4083088663a3d8829585e81f300df35de6e"
-        },
-        {
-          "path": "scripts/wait_and_run_strict_smoke.sh",
-          "size": 1356,
-          "sha256": "2867c08c32aaa1cbe3c8e41ed02762fab91c9e71be22c7f61fdd88a7e2d437f5"
-        },
-        {
-          "path": "src/robust_metric_lab/e36_batched.py",
-          "size": 3748,
-          "sha256": "594d5693f0b50967ccccfa6e9e7e3039d85caf3d017b755ff815d3010da1df98"
-        },
-        {
-          "path": "src/robust_metric_lab/e37_batched.py",
-          "size": 3063,
-          "sha256": "b6ce6ad06873a9994dc08c8def5a3bae3f8787864fc3bc8e07c9b382a85a202d"
-        },
-        {
-          "path": "src/robust_metric_lab/e37_metrics.py",
-          "size": 6627,
-          "sha256": "2ea0b641eac5be0c3f16ea9ccc67433adea940becc795179b787520f8c0b85cf"
-        },
-        {
-          "path": "src/robust_metric_lab/importance_batched.py",
-          "size": 4571,
-          "sha256": "f77a643010ce70c2c267fd067a7fe1740aa05959c2079f04c15dbbbf1fbd890d"
-        },
-        {
-          "path": "src/robust_metric_lab/metric_eligibility.py",
-          "size": 4254,
-          "sha256": "e03131838aec842ae8edde806b07df50b59cac4b8d788c80975b23a6f8a972a8"
-        },
-        {
-          "path": "src/robust_metric_lab/release.py",
-          "size": 9044,
-          "sha256": "e71b51684bee6837b5b7f790efe797f07a8f387772b2c9bbf07f45cbe660d2eb"
-        },
-        {
-          "path": "src/robust_metric_lab/strict_ranking.py",
-          "size": 9408,
-          "sha256": "ab1cff50f13fcfc536258ca73717614ab2cf7e21c1715243dc0fabd4b83a04c1"
-        },
-        {
-          "path": "src/robust_metric_lab/student_analysis.py",
-          "size": 14707,
-          "sha256": "e765d50d10c77ca77a4d462d81960c25170029e2dad0ede34239080861152b1f"
-        },
-        {
-          "path": "src/robust_metric_lab/student_confound.py",
-          "size": 6389,
-          "sha256": "787f1088c76009dd558cec5fc8f96fc2d92033c36fba5de1d3a90501b6702481"
-        },
-        {
-          "path": "tests/test_e36_batched.py",
-          "size": 2449,
-          "sha256": "19a57ac8f45ee16056be002b8e35ad4f0fd792711152361209a79939d910a938"
-        },
-        {
-          "path": "tests/test_e37_batched.py",
-          "size": 3613,
-          "sha256": "345142785019b05bdb5bf19620ad2501cff128f4f6bd677bf38d52da5a0aabfb"
-        },
-        {
-          "path": "tests/test_e37_metrics.py",
-          "size": 2758,
-          "sha256": "18f2a5412ccd369b1036614beadb60b5cb5d21c19c0703ef082e828d114a70bf"
-        },
-        {
-          "path": "tests/test_importance_batched.py",
-          "size": 3490,
-          "sha256": "ded068f5d66d51155fa0810a9397c6c2c084eb5b83d6077f251b65d498cc43f3"
-        },
-        {
-          "path": "tests/test_metric_eligibility.py",
-          "size": 3009,
-          "sha256": "0bfa80cb1db6462b91fb778819e0e047c7b77df08129e1011ec828926b7e83ee"
-        },
-        {
-          "path": "tests/test_repair_existing_metric_grid.py",
-          "size": 2449,
-          "sha256": "f2b608d1466ebf95d0af9840b3f1ea47442c7ce665680090de1b55630ff11afb"
-        },
-        {
-          "path": "tests/test_strict_ranking.py",
-          "size": 5413,
-          "sha256": "88fb834ef5e5de6b825b69aed2b80c033c7e4d6c133a5e23b96be7e2645d09e1"
-        },
-        {
-          "path": "tests/test_student_benchmark_analysis.py",
-          "size": 11751,
-          "sha256": "6b2cc81f499d8da310b534ff2d8df53c746676ba5c56c137df250e9ac2e2dcb1"
-        },
-        {
-          "path": "tests/test_student_benchmark_manifests.py",
-          "size": 8103,
-          "sha256": "5fbc6132700c9c26e652a5e29de95dec4ca940a8bf064b6db954895490054cd7"
-        },
-        {
-          "path": "tests/test_student_benchmark_protocol.py",
-          "size": 3104,
-          "sha256": "9ad4384a6bf02812e757a4a1dd257d84cd57752d69e9de3b60258138f1dd06e5"
-        },
-        {
-          "path": "tests/test_student_confound.py",
-          "size": 2686,
-          "sha256": "03bd1679724b23d696b695ea1bb67d3bca96223ee4a8e6a389fb28df8328b243"
-        },
-        {
-          "path": "tests/test_student_runner.py",
-          "size": 27317,
-          "sha256": "e4b6ab6a1630f63322acccd67845a6de1585e9b34e3f806ac8e6d1af54c6f72c"
-        },
-        {
-          "path": "tests/test_verify_strict_release.py",
-          "size": 2599,
-          "sha256": "ad00c6ed7c25e24637d552605366b6be8a5051394b02ba30d21268c838b7abcb"
-        }
-      ],
+      "only_in_other": [],
       "differs": [
         {
           "path": ".gitignore",
           "other_sha256": "62635c7d760915e92ec4209000e31b65de63bed304fcb323fb8da29ca1395a28",
-          "target_sha256": "a3fc2b124b1f67dbba32f6cdce4d8d81b138785e3fb0292f0854ebbea482d084",
+          "target_sha256": "14eac227dffc4bcf804530c6f5291fe6f6ed0ddf0bbcf1dc4a41b48e3667fd29",
           "other_size": 1486,
-          "target_size": 1615
+          "target_size": 1762
         },
         {
           "path": "configs/metric_eligibility.json",
           "other_sha256": "fb4b03d6602b031768d2b5872da300a64b2f4256425d5f146f428e9121ed4c72",
-          "target_sha256": "31bf4cd43b8a69073d34c3cad14b47af06ca3276f40a7667ea73d6dc25ea33ff",
+          "target_sha256": "3165a5affddce0fcf901264cd5b17eda578b5ed76aec53db6ddfb1409dc6914b",
           "other_size": 24025,
-          "target_size": 24366
+          "target_size": 24420
+        },
+        {
+          "path": "docs/experiments/实验管理.md",
+          "other_sha256": "461f30cb2c8be197f7aca3104193f1c1cde3d8b65d632a38b3c5390047109fdc",
+          "target_sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
+          "other_size": 82875,
+          "target_size": 109498
+        },
+        {
+          "path": "docs/theory/理论管理.md",
+          "other_sha256": "1bde4744f058d3a053076e8e44ac68ffc01084b108a3183e92637c5ae6b82e2d",
+          "target_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
+          "other_size": 19656,
+          "target_size": 22357
+        },
+        {
+          "path": "scripts/compute_metric_batch.py",
+          "other_sha256": "d235c24f0af171eddc22511c4e8ba61ec629eccc96cb1a6784c971cc6e015eaa",
+          "target_sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61",
+          "other_size": 14390,
+          "target_size": 17579
+        },
+        {
+          "path": "src/robust_metric_lab/attacks.py",
+          "other_sha256": "2ced02cbc4f2fad9d7c057bb878b695998cfcb80a34dfb3665ee724b1bfed925",
+          "target_sha256": "65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13",
+          "other_size": 1746,
+          "target_size": 2628
         },
         {
           "path": "src/robust_metric_lab/metric_registry.py",
           "other_sha256": "cb12c7f26cc067c07d49a4b5fae53968301b6146d9d90a1972e56fcf54197cb7",
-          "target_sha256": "36a3819d2f84e177bc412c169cfbde2a5acaba9a668a1d616dd4dafad718ebf5",
+          "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
           "other_size": 7707,
-          "target_size": 3640
+          "target_size": 7835
         },
         {
-          "path": "src/robust_metric_lab/metrics.py",
-          "other_sha256": "0db1761404f6176a8882ef60037568dc7df5ab933f7070dbbbe18b708fb9bae1",
-          "target_sha256": "16c884ca139c8af1ee554b0b9c3fbbd74424f25cb7d44035c09972b5624978da",
-          "other_size": 76626,
-          "target_size": 42297
+          "path": "src/robust_metric_lab/nasrobbench201.py",
+          "other_sha256": "22dea77c8b0a4ef1e0510373c6f0b725212dab7046897da14dec833d639836c2",
+          "target_sha256": "4fe8b20dd23d6fa4bab67b12c8147f130e7111e0728df3b68599de366fcb1c17",
+          "other_size": 10716,
+          "target_size": 11020
         },
         {
-          "path": "src/robust_metric_lab/trnas.py",
-          "other_sha256": "a6ddd5bb9b5ccaa539e3b180e6ae2dcf15415a1058e347fbd1eb8163a0a6db95",
-          "target_sha256": "d11569314cce0af5b9e006772a9a10ffa9c5300585f44cd2d8087324afb5af77",
-          "other_size": 7132,
-          "target_size": 5889
-        },
-        {
-          "path": "tests/test_trnas_metrics.py",
-          "other_sha256": "b03494421ef9126fd2bcfd34353d2085ca5d3cd8a744708a601746e6ce26bed5",
-          "target_sha256": "983f4ba83082bff53b11cbef150b8d22697d66bb1a59f617ea45e99de20b021c",
-          "other_size": 3434,
-          "target_size": 2186
+          "path": "tests/test_racl_lipschitz_metric.py",
+          "other_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
+          "target_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
+          "other_size": 1735,
+          "target_size": 2127
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 182,
-      "only_in_other_bytes": 195248
+      "only_in_target_count": 217,
+      "only_in_other_bytes": 0
     },
     {
       "label": "activation-survival",
@@ -962,11 +944,6 @@
           "sha256": "1d3b709686df1faff392f7f41e3afcc88bea99ec7bf12d093187bc22c986bbd8"
         },
         {
-          "path": "scripts/evaluate_e37_student.py",
-          "size": 5400,
-          "sha256": "a524a2222b4ec95a70cea52e781cbe42dc294812815a99eaff0af1ac7dde13a7"
-        },
-        {
           "path": "scripts/holdout_exposure_inventory.py",
           "size": 5152,
           "sha256": "c4d352765f66a89622594ce9a2acb04ceca7cdc3b7671e69e1f4eb11acebbe79"
@@ -1057,39 +1034,9 @@
           "sha256": "d7a415a3f9f253148dc389b5a447b7aec165575ea6344e3169ee2ac368837bf8"
         },
         {
-          "path": "src/robust_metric_lab/e37_batched.py",
-          "size": 3063,
-          "sha256": "b6ce6ad06873a9994dc08c8def5a3bae3f8787864fc3bc8e07c9b382a85a202d"
-        },
-        {
           "path": "src/robust_metric_lab/e37_layer_diagnostic.py",
           "size": 6168,
           "sha256": "bde0fdba9e8fe6dbdc7c6d99781ec55e6b7d34a484baf842a39757ea5afbd946"
-        },
-        {
-          "path": "src/robust_metric_lab/e37_metrics.py",
-          "size": 6627,
-          "sha256": "2ea0b641eac5be0c3f16ea9ccc67433adea940becc795179b787520f8c0b85cf"
-        },
-        {
-          "path": "src/robust_metric_lab/metric_eligibility.py",
-          "size": 4254,
-          "sha256": "e03131838aec842ae8edde806b07df50b59cac4b8d788c80975b23a6f8a972a8"
-        },
-        {
-          "path": "src/robust_metric_lab/release.py",
-          "size": 9044,
-          "sha256": "e71b51684bee6837b5b7f790efe797f07a8f387772b2c9bbf07f45cbe660d2eb"
-        },
-        {
-          "path": "src/robust_metric_lab/strict_ranking.py",
-          "size": 9408,
-          "sha256": "ab1cff50f13fcfc536258ca73717614ab2cf7e21c1715243dc0fabd4b83a04c1"
-        },
-        {
-          "path": "src/robust_metric_lab/student_analysis.py",
-          "size": 14707,
-          "sha256": "e765d50d10c77ca77a4d462d81960c25170029e2dad0ede34239080861152b1f"
         },
         {
           "path": "tests/test_activation_holdout_manifest.py",
@@ -1140,11 +1087,6 @@
           "path": "tests/test_activation_survival_verification.py",
           "size": 5348,
           "sha256": "4fb5bf15a10499d509173aa1fd489d2fd8ce1b3826ea1df13dff008c1f65ac10"
-        },
-        {
-          "path": "tests/test_e37_batched.py",
-          "size": 3613,
-          "sha256": "345142785019b05bdb5bf19620ad2501cff128f4f6bd677bf38d52da5a0aabfb"
         },
         {
           "path": "tests/test_e37_diagnostic_analysis.py",
@@ -1226,28 +1168,84 @@
         {
           "path": ".gitignore",
           "other_sha256": "62635c7d760915e92ec4209000e31b65de63bed304fcb323fb8da29ca1395a28",
-          "target_sha256": "a3fc2b124b1f67dbba32f6cdce4d8d81b138785e3fb0292f0854ebbea482d084",
+          "target_sha256": "14eac227dffc4bcf804530c6f5291fe6f6ed0ddf0bbcf1dc4a41b48e3667fd29",
           "other_size": 1486,
-          "target_size": 1615
+          "target_size": 1762
+        },
+        {
+          "path": "docs/experiments/实验管理.md",
+          "other_sha256": "461f30cb2c8be197f7aca3104193f1c1cde3d8b65d632a38b3c5390047109fdc",
+          "target_sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
+          "other_size": 82875,
+          "target_size": 109498
+        },
+        {
+          "path": "docs/theory/理论管理.md",
+          "other_sha256": "1bde4744f058d3a053076e8e44ac68ffc01084b108a3183e92637c5ae6b82e2d",
+          "target_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
+          "other_size": 19656,
+          "target_size": 22357
+        },
+        {
+          "path": "scripts/compute_metric_batch.py",
+          "other_sha256": "d235c24f0af171eddc22511c4e8ba61ec629eccc96cb1a6784c971cc6e015eaa",
+          "target_sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61",
+          "other_size": 14390,
+          "target_size": 17579
+        },
+        {
+          "path": "src/robust_metric_lab/attacks.py",
+          "other_sha256": "2ced02cbc4f2fad9d7c057bb878b695998cfcb80a34dfb3665ee724b1bfed925",
+          "target_sha256": "65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13",
+          "other_size": 1746,
+          "target_size": 2628
         },
         {
           "path": "src/robust_metric_lab/metric_registry.py",
           "other_sha256": "1aab7d25894de7cc77c24effda8f9e669bfc8a61c373839a04ba7c316e6a63db",
-          "target_sha256": "36a3819d2f84e177bc412c169cfbde2a5acaba9a668a1d616dd4dafad718ebf5",
+          "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
           "other_size": 7857,
-          "target_size": 3640
+          "target_size": 7835
         },
         {
           "path": "src/robust_metric_lab/metrics.py",
           "other_sha256": "72d1e55a050d76ea8f28dce74e991b38ce70538a2b93d55c3dcd3247b47612fe",
-          "target_sha256": "16c884ca139c8af1ee554b0b9c3fbbd74424f25cb7d44035c09972b5624978da",
+          "target_sha256": "0db1761404f6176a8882ef60037568dc7df5ab933f7070dbbbe18b708fb9bae1",
           "other_size": 43562,
-          "target_size": 42297
+          "target_size": 76626
+        },
+        {
+          "path": "src/robust_metric_lab/nasrobbench201.py",
+          "other_sha256": "22dea77c8b0a4ef1e0510373c6f0b725212dab7046897da14dec833d639836c2",
+          "target_sha256": "4fe8b20dd23d6fa4bab67b12c8147f130e7111e0728df3b68599de366fcb1c17",
+          "other_size": 10716,
+          "target_size": 11020
+        },
+        {
+          "path": "src/robust_metric_lab/trnas.py",
+          "other_sha256": "d11569314cce0af5b9e006772a9a10ffa9c5300585f44cd2d8087324afb5af77",
+          "target_sha256": "a6ddd5bb9b5ccaa539e3b180e6ae2dcf15415a1058e347fbd1eb8163a0a6db95",
+          "other_size": 5889,
+          "target_size": 7132
+        },
+        {
+          "path": "tests/test_racl_lipschitz_metric.py",
+          "other_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
+          "target_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
+          "other_size": 1735,
+          "target_size": 2127
+        },
+        {
+          "path": "tests/test_trnas_metrics.py",
+          "other_sha256": "983f4ba83082bff53b11cbef150b8d22697d66bb1a59f617ea45e99de20b021c",
+          "target_sha256": "b03494421ef9126fd2bcfd34353d2085ca5d3cd8a744708a601746e6ce26bed5",
+          "other_size": 2186,
+          "target_size": 3434
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 183,
-      "only_in_other_bytes": 18317972
+      "only_in_target_count": 249,
+      "only_in_other_bytes": 18261856
     },
     {
       "label": "repository-reconciliation",
@@ -1268,233 +1266,96 @@
         {
           "path": ".gitignore",
           "other_sha256": "bd65f2c2368f0c7cf6358736f7144db6317f0f26b19abf8b246147352cc190e6",
-          "target_sha256": "a3fc2b124b1f67dbba32f6cdce4d8d81b138785e3fb0292f0854ebbea482d084",
+          "target_sha256": "14eac227dffc4bcf804530c6f5291fe6f6ed0ddf0bbcf1dc4a41b48e3667fd29",
           "other_size": 1548,
-          "target_size": 1615
+          "target_size": 1762
+        },
+        {
+          "path": "docs/experiments/实验管理.md",
+          "other_sha256": "461f30cb2c8be197f7aca3104193f1c1cde3d8b65d632a38b3c5390047109fdc",
+          "target_sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
+          "other_size": 82875,
+          "target_size": 109498
+        },
+        {
+          "path": "docs/theory/理论管理.md",
+          "other_sha256": "1bde4744f058d3a053076e8e44ac68ffc01084b108a3183e92637c5ae6b82e2d",
+          "target_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
+          "other_size": 19656,
+          "target_size": 22357
+        },
+        {
+          "path": "scripts/compute_metric_batch.py",
+          "other_sha256": "d235c24f0af171eddc22511c4e8ba61ec629eccc96cb1a6784c971cc6e015eaa",
+          "target_sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61",
+          "other_size": 14390,
+          "target_size": 17579
+        },
+        {
+          "path": "src/robust_metric_lab/attacks.py",
+          "other_sha256": "2ced02cbc4f2fad9d7c057bb878b695998cfcb80a34dfb3665ee724b1bfed925",
+          "target_sha256": "65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13",
+          "other_size": 1746,
+          "target_size": 2628
         },
         {
           "path": "src/robust_metric_lab/metric_registry.py",
           "other_sha256": "33c5b9f7fa190177726733282935b97008c59551dc84da0026ecaf354d1ad4c2",
-          "target_sha256": "36a3819d2f84e177bc412c169cfbde2a5acaba9a668a1d616dd4dafad718ebf5",
+          "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
           "other_size": 3490,
-          "target_size": 3640
+          "target_size": 7835
+        },
+        {
+          "path": "src/robust_metric_lab/metrics.py",
+          "other_sha256": "16c884ca139c8af1ee554b0b9c3fbbd74424f25cb7d44035c09972b5624978da",
+          "target_sha256": "0db1761404f6176a8882ef60037568dc7df5ab933f7070dbbbe18b708fb9bae1",
+          "other_size": 42297,
+          "target_size": 76626
+        },
+        {
+          "path": "src/robust_metric_lab/nasrobbench201.py",
+          "other_sha256": "22dea77c8b0a4ef1e0510373c6f0b725212dab7046897da14dec833d639836c2",
+          "target_sha256": "4fe8b20dd23d6fa4bab67b12c8147f130e7111e0728df3b68599de366fcb1c17",
+          "other_size": 10716,
+          "target_size": 11020
+        },
+        {
+          "path": "src/robust_metric_lab/trnas.py",
+          "other_sha256": "d11569314cce0af5b9e006772a9a10ffa9c5300585f44cd2d8087324afb5af77",
+          "target_sha256": "a6ddd5bb9b5ccaa539e3b180e6ae2dcf15415a1058e347fbd1eb8163a0a6db95",
+          "other_size": 5889,
+          "target_size": 7132
+        },
+        {
+          "path": "tests/test_racl_lipschitz_metric.py",
+          "other_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
+          "target_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
+          "other_size": 1735,
+          "target_size": 2127
+        },
+        {
+          "path": "tests/test_trnas_metrics.py",
+          "other_sha256": "983f4ba83082bff53b11cbef150b8d22697d66bb1a59f617ea45e99de20b021c",
+          "target_sha256": "b03494421ef9126fd2bcfd34353d2085ca5d3cd8a744708a601746e6ce26bed5",
+          "other_size": 2186,
+          "target_size": 3434
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 188,
+      "only_in_target_count": 262,
       "only_in_other_bytes": 12916
     },
     {
       "label": "server-mainline",
       "other_file_count": 513,
-      "only_in_other": [
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k16_seed20260704.csv",
-          "size": 20382,
-          "sha256": "b494a9ed0fd606c560e41b8fa9d05f90c32ccc6fb2f8d2e786bc429aed3336dd"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k2_seed20260704.csv",
-          "size": 20298,
-          "sha256": "522ee117572fbd5869903da55201e8e041aa67e0fa626bc23230a09eb0f581ca"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k4_seed20260704.csv",
-          "size": 20318,
-          "sha256": "b387f989ae31a4135d55aa3d1f777d6311753851913ed537e307f9e47ce8ed90"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260704.csv",
-          "size": 20350,
-          "sha256": "63415b2461faf626257531907649537f1370cee5ef05a5cd23875951c08852e5"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k16_seed20260704.csv",
-          "size": 20314,
-          "sha256": "145619c6f600c23e6c162b676d02267d3b6c37e89ec53e68dc65593ff9ba66b8"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k2_seed20260704.csv",
-          "size": 20329,
-          "sha256": "d14292425fd001dd9582ade1f463ececbf9fab8733f7eea0ff9874f8bfb4eb37"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k4_seed20260704.csv",
-          "size": 20316,
-          "sha256": "7f94e4b0a838a8902c2fea939007d12452aa40cafa0bac991d5a3a85c3d10114"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260704.csv",
-          "size": 20313,
-          "sha256": "f9fb1ed2c0476b1fcb08b5ffcecf0579cf38b7ab02c7e289968d11b073114661"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k16_seed20260704.csv",
-          "size": 20401,
-          "sha256": "7a492686c605f2c06d32e312040df4fa0e8d099a6b7dd442c3c9fc46640c3854"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k2_seed20260704.csv",
-          "size": 20336,
-          "sha256": "401495caf03bb3bcbf55b8af53951318bdb77ef5e8c57391fc679817616f8ff2"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k4_seed20260704.csv",
-          "size": 20366,
-          "sha256": "8681b260dee079a5bcbd2a170028491dacb09b0a50a15d75ed6e8a4e222e75ec"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260704.csv",
-          "size": 20366,
-          "sha256": "b00c2e64acd3e4ae864dc511507bb7f778c19d651b65b13d253663c9a9071421"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n32_k8_seed20260704.csv",
-          "size": 20214,
-          "sha256": "f11331bc28235deaf5796628b3356b2f058ff56a6f2fbd3af036a25bfacb5998"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n64_k8_seed20260704.csv",
-          "size": 20263,
-          "sha256": "5b51cac6d79cb2362af8372ac84c11b84b53e3f9dbb0caed7e09f326b2fb5205"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n32_k8_seed20260704.csv",
-          "size": 20217,
-          "sha256": "23cc46a04abf0097ffb3cbab6cb2688d45bdb6e6a1aff8b8f1bbd51bace7c5be"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n64_k8_seed20260704.csv",
-          "size": 20227,
-          "sha256": "1f6a72fb71ad2409cdcc88453262fbfd5fcfa26696d0de0ff18cccd59c812613"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n32_k8_seed20260704.csv",
-          "size": 20244,
-          "sha256": "bf4eb6e508ca8ab4d640c2831aba4aa1c7d5a2baf5b39ebe197052b6852e7f82"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n64_k8_seed20260704.csv",
-          "size": 20328,
-          "sha256": "701d222fdb60b54861d283b4445fab80105a056808d2efb1cfea9f589bbb2e18"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260731.csv",
-          "size": 20328,
-          "sha256": "6b645cc12dadc28234d0c3dba321ab3c6b0b0dc9497ebc1e1dab14af5136bee3"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260801.csv",
-          "size": 20346,
-          "sha256": "987bc06e043c40302e296e6b8663d722f4671ed0ce932ef1db3f577a3592813d"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260802.csv",
-          "size": 20338,
-          "sha256": "65207e94b843c6647ff8c2a3066cb8f184cd2cbf640722e629590b3ced1ca160"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260731.csv",
-          "size": 20306,
-          "sha256": "99f01cd583a7f5d66fc1cf4b8e6c007ad1ac77725bae3797930e0c946e42bf41"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260801.csv",
-          "size": 20314,
-          "sha256": "4ee8e5fab3c25ca07c2ab64f8897bf2e8a5e9c0d5c3d96dbc6987be50f5ce538"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260802.csv",
-          "size": 20334,
-          "sha256": "058d08396684122da99904ae64dc0cf1c50da151480c0efebc31a14352f595c2"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260731.csv",
-          "size": 20361,
-          "sha256": "084177583b66332d01bd74023e9121c82bec117d64e8d272e3d4e46858c7afb3"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260801.csv",
-          "size": 20374,
-          "sha256": "10f066d339826e13f845fca6a7ce60b22be3c3794feef5ef3089db4a678f4b58"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260802.csv",
-          "size": 20351,
-          "sha256": "9a405744500c0733f8879c1096708ceb40f2efc84f8d835d029a88c100a061f0"
-        },
-        {
-          "path": "scripts/analyze_student_benchmark.py",
-          "size": 2840,
-          "sha256": "e341f775aa58641020f2e72044b657d718b25e1aca66a315327be7716582438b"
-        },
-        {
-          "path": "scripts/audit_student_benchmark.py",
-          "size": 7139,
-          "sha256": "6e2e363ccc60da576b3b057cbc8a23f3db42dc4c03ab82d973d0c2bf4c6f96a1"
-        },
-        {
-          "path": "scripts/build_e25_coverage_matrix.py",
-          "size": 9255,
-          "sha256": "7053443308cd9040a718eb71d2cb168f3adf187520533b416a1089c0b500e030"
-        },
-        {
-          "path": "src/robust_metric_lab/student_analysis.py",
-          "size": 14707,
-          "sha256": "e765d50d10c77ca77a4d462d81960c25170029e2dad0ede34239080861152b1f"
-        },
-        {
-          "path": "tests/test_audit_student_benchmark.py",
-          "size": 9849,
-          "sha256": "4e3d87d2230504c70bdda5dcc960f75ae7d6970985cfa22bd035bd4a39ce9c00"
-        },
-        {
-          "path": "tests/test_e25_coverage_matrix.py",
-          "size": 7652,
-          "sha256": "1e8e92d978028736b2bc1dfc791b974c7447cdeaf9e7fbd51fe30239fe1bfa0f"
-        },
-        {
-          "path": "tests/test_student_benchmark_analysis.py",
-          "size": 11751,
-          "sha256": "6b2cc81f499d8da310b534ff2d8df53c746676ba5c56c137df250e9ac2e2dcb1"
-        },
-        {
-          "path": "tests/test_student_benchmark_manifests.py",
-          "size": 8103,
-          "sha256": "5fbc6132700c9c26e652a5e29de95dec4ca940a8bf064b6db954895490054cd7"
-        },
-        {
-          "path": "tests/test_student_benchmark_protocol.py",
-          "size": 3104,
-          "sha256": "9ad4384a6bf02812e757a4a1dd257d84cd57752d69e9de3b60258138f1dd06e5"
-        },
-        {
-          "path": "tests/test_student_runner.py",
-          "size": 26322,
-          "sha256": "860e4444c5f263b473794f4811bc8ed030f0225299d581e9588a188849de87f9"
-        }
-      ],
+      "only_in_other": [],
       "differs": [
         {
           "path": ".gitignore",
           "other_sha256": "258db1d575044a9c4fcaf98e927e9ffbd73484c8a3cb2384043add2c163286d1",
-          "target_sha256": "a3fc2b124b1f67dbba32f6cdce4d8d81b138785e3fb0292f0854ebbea482d084",
+          "target_sha256": "14eac227dffc4bcf804530c6f5291fe6f6ed0ddf0bbcf1dc4a41b48e3667fd29",
           "other_size": 1501,
-          "target_size": 1615
-        },
-        {
-          "path": "docs/experiments/实验管理.md",
-          "other_sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
-          "target_sha256": "461f30cb2c8be197f7aca3104193f1c1cde3d8b65d632a38b3c5390047109fdc",
-          "other_size": 109498,
-          "target_size": 82875
-        },
-        {
-          "path": "docs/theory/理论管理.md",
-          "other_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
-          "target_sha256": "1bde4744f058d3a053076e8e44ac68ffc01084b108a3183e92637c5ae6b82e2d",
-          "other_size": 22357,
-          "target_size": 19656
+          "target_size": 1762
         },
         {
           "path": "outputs/e25_k8_three_source_validation/robustbench20_k16_3source_avg_seed20260704.csv",
@@ -1819,39 +1680,18 @@
           "target_size": 2939
         },
         {
-          "path": "scripts/compute_metric_batch.py",
-          "other_sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61",
-          "target_sha256": "d235c24f0af171eddc22511c4e8ba61ec629eccc96cb1a6784c971cc6e015eaa",
-          "other_size": 17579,
-          "target_size": 14390
-        },
-        {
-          "path": "src/robust_metric_lab/attacks.py",
-          "other_sha256": "65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13",
-          "target_sha256": "2ced02cbc4f2fad9d7c057bb878b695998cfcb80a34dfb3665ee724b1bfed925",
-          "other_size": 2628,
-          "target_size": 1746
-        },
-        {
           "path": "src/robust_metric_lab/metric_registry.py",
           "other_sha256": "c6af465bbe952bbe279387fc32601a73c6c546b8c1bd6659be323c1b09cf4be3",
-          "target_sha256": "36a3819d2f84e177bc412c169cfbde2a5acaba9a668a1d616dd4dafad718ebf5",
+          "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
           "other_size": 5867,
-          "target_size": 3640
+          "target_size": 7835
         },
         {
           "path": "src/robust_metric_lab/metrics.py",
           "other_sha256": "5b18c5cf28fede3575d1aedcae7949f7bc0491bca4dcc160bdc619159fe119da",
-          "target_sha256": "16c884ca139c8af1ee554b0b9c3fbbd74424f25cb7d44035c09972b5624978da",
+          "target_sha256": "0db1761404f6176a8882ef60037568dc7df5ab933f7070dbbbe18b708fb9bae1",
           "other_size": 67447,
-          "target_size": 42297
-        },
-        {
-          "path": "src/robust_metric_lab/nasrobbench201.py",
-          "other_sha256": "4fe8b20dd23d6fa4bab67b12c8147f130e7111e0728df3b68599de366fcb1c17",
-          "target_sha256": "22dea77c8b0a4ef1e0510373c6f0b725212dab7046897da14dec833d639836c2",
-          "other_size": 11020,
-          "target_size": 10716
+          "target_size": 76626
         },
         {
           "path": "src/robust_metric_lab/student_runner.py",
@@ -1861,16 +1701,30 @@
           "target_size": 25194
         },
         {
-          "path": "tests/test_racl_lipschitz_metric.py",
-          "other_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
-          "target_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
-          "other_size": 2127,
-          "target_size": 1735
+          "path": "src/robust_metric_lab/trnas.py",
+          "other_sha256": "d11569314cce0af5b9e006772a9a10ffa9c5300585f44cd2d8087324afb5af77",
+          "target_sha256": "a6ddd5bb9b5ccaa539e3b180e6ae2dcf15415a1058e347fbd1eb8163a0a6db95",
+          "other_size": 5889,
+          "target_size": 7132
+        },
+        {
+          "path": "tests/test_student_runner.py",
+          "other_sha256": "860e4444c5f263b473794f4811bc8ed030f0225299d581e9588a188849de87f9",
+          "target_sha256": "e4b6ab6a1630f63322acccd67845a6de1585e9b34e3f806ac8e6d1af54c6f72c",
+          "other_size": 26322,
+          "target_size": 27317
+        },
+        {
+          "path": "tests/test_trnas_metrics.py",
+          "other_sha256": "983f4ba83082bff53b11cbef150b8d22697d66bb1a59f617ea45e99de20b021c",
+          "target_sha256": "b03494421ef9126fd2bcfd34353d2085ca5d3cd8a744708a601746e6ce26bed5",
+          "other_size": 2186,
+          "target_size": 3434
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 107,
-      "only_in_other_bytes": 649356
+      "only_in_target_count": 144,
+      "only_in_other_bytes": 0
     },
     {
       "label": "three-space-benchmark",
@@ -1885,141 +1739,6 @@
           "path": "docs/experiments/student_three_space_sensitivity_20260922.md",
           "size": 7364,
           "sha256": "f121a55b45c5e5c980e206dfc8818f923b6ebe9ab0e8fd5d36413209421d2d6d"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k16_seed20260704.csv",
-          "size": 20403,
-          "sha256": "5e2a525c8ae018de8c3d668f56fb596611830a64dd783ad68ed14fd95ea55bf8"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k2_seed20260704.csv",
-          "size": 20319,
-          "sha256": "4b8ae7fc1827bc13ee455bde6830290d6d4c4cc0e2561a26c30b7edd197bf67e"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k4_seed20260704.csv",
-          "size": 20339,
-          "sha256": "1e9d8bed988d1efa559775e5dfc1c9715a148823464aa36bbb6a779d847f899a"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260704.csv",
-          "size": 20371,
-          "sha256": "b7c2c187198df1b79ccbdb188252a6f9e47b9587121bcd68624d463f35f8e9b1"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k16_seed20260704.csv",
-          "size": 20335,
-          "sha256": "35c7b214f9baa36aa927cfd058764945b1a346cb1ac5947300d91f8ad6e69ec8"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k2_seed20260704.csv",
-          "size": 20350,
-          "sha256": "59d2860784807b565c5f7f75c187b34747ab23b9542e831ffbfe8b1e0befb507"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k4_seed20260704.csv",
-          "size": 20337,
-          "sha256": "11c696064ede907b8c8a1c0c38859661b52adf2f64205fddbbad0df7d0b5faf0"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260704.csv",
-          "size": 20334,
-          "sha256": "bd3b8302f2fbdef729da120bf93b1b1afc4eeae45c791f4228eced1021fb175a"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k16_seed20260704.csv",
-          "size": 20422,
-          "sha256": "dfee0667869c81862ba5d29c78a41725362f351312649c1d1a30af4bfb1ad5f7"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k2_seed20260704.csv",
-          "size": 20357,
-          "sha256": "e332b2f642b1f3c6045fd9296fb6222bd33bbc43f1ca6dac3d67b4390e0de9c8"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k4_seed20260704.csv",
-          "size": 20387,
-          "sha256": "c298c85e78d56a3246623bd796ad5361ffd8e9b5ce67954e6c49ca75d0ad4a48"
-        },
-        {
-          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260704.csv",
-          "size": 20387,
-          "sha256": "ef4939ad6cffd8cdb0d71a62c854f7b1418dc107ee69a364c4873b559aa2146e"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n32_k8_seed20260704.csv",
-          "size": 20235,
-          "sha256": "2854b0f4318c72b6ce5ed0abc7b309fabc93e05d13c60b8f200fc076d2c8c233"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n64_k8_seed20260704.csv",
-          "size": 20284,
-          "sha256": "719fcd78d5d407241668cece8082dc724fab0b127a921682fe414b60ebfe0a78"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n32_k8_seed20260704.csv",
-          "size": 20238,
-          "sha256": "dde7e29a781627a86b70a6539cdf7e2f9dea3be8c9b94bec187dc1bbd4f64a86"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n64_k8_seed20260704.csv",
-          "size": 20248,
-          "sha256": "1eb200c3d45755d6789f2038715f7f998c91486c7a388f26f08b789e38528d39"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n32_k8_seed20260704.csv",
-          "size": 20265,
-          "sha256": "3c2b52d4af416669ffbdcc3cbe18a732b586124c1840835ef702776972392368"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n64_k8_seed20260704.csv",
-          "size": 20349,
-          "sha256": "60e49b3f9cd9a2b24e59defa8e9628cc3146ffa34cca5ce56cd4a1fd2ccd69a5"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260731.csv",
-          "size": 20349,
-          "sha256": "6b5f1dc83359647b6f086e6e3ef6549aaa16af53540f0d45bd89ecf93adaaaf3"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260801.csv",
-          "size": 20367,
-          "sha256": "da2b6b1c2dce686f4cd99bfda33a7db1111ac00950163b4dbf4e6c58822b85b1"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260802.csv",
-          "size": 20359,
-          "sha256": "e1b493fd8b9c676ff05bab001676cd2b03e476bf87c749725c517860128725de"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260731.csv",
-          "size": 20327,
-          "sha256": "07e470e3e4b8d67ccc38b05344480b9713250ce3c3149e17925922f1e9c9f1ee"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260801.csv",
-          "size": 20335,
-          "sha256": "8de568460a116b016b63930231763e1f25f4ebc7b1557ffaf77483cae32442fb"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260802.csv",
-          "size": 20355,
-          "sha256": "2f8b09a41cc54bad0cf25a060120ef4aea6694aba38a75651a9e07e8cd1c755a"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260731.csv",
-          "size": 20382,
-          "sha256": "cee7582e9f866b98fbb47a020aab08982759bed32fadc747ba92343dc0d1e1b4"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260801.csv",
-          "size": 20395,
-          "sha256": "b1581e597bdf68a0fa5a94adc1c170085dde9d097abaa9c4f5a7a4e7648a90c1"
-        },
-        {
-          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260802.csv",
-          "size": 20372,
-          "sha256": "a6c2326b996319fd3ec169504d0c36f789031ec0f2c874c2def7c29f2d903aa4"
         },
         {
           "path": "outputs/e28_capacity_family/rb20_run.log",
@@ -2040,21 +1759,6 @@
           "path": "outputs/e34_nb201_pgd1_run.log",
           "size": 12896,
           "sha256": "3981f933123b4669e8309ebae8b585822eae50433b3520f68b20980100674577"
-        },
-        {
-          "path": "scripts/analyze_student_benchmark.py",
-          "size": 2840,
-          "sha256": "e341f775aa58641020f2e72044b657d718b25e1aca66a315327be7716582438b"
-        },
-        {
-          "path": "scripts/audit_student_benchmark.py",
-          "size": 7139,
-          "sha256": "6e2e363ccc60da576b3b057cbc8a23f3db42dc4c03ab82d973d0c2bf4c6f96a1"
-        },
-        {
-          "path": "scripts/build_e25_coverage_matrix.py",
-          "size": 9255,
-          "sha256": "7053443308cd9040a718eb71d2cb168f3adf187520533b416a1089c0b500e030"
         },
         {
           "path": "scripts/run_e36_full_metric_design.sh",
@@ -2087,21 +1791,6 @@
           "sha256": "7bc7aad0b7a808d58383d492491e121557ee78a5d2a714ec3cfc96a673589354"
         },
         {
-          "path": "src/robust_metric_lab/student_analysis.py",
-          "size": 14707,
-          "sha256": "e765d50d10c77ca77a4d462d81960c25170029e2dad0ede34239080861152b1f"
-        },
-        {
-          "path": "tests/test_audit_student_benchmark.py",
-          "size": 9849,
-          "sha256": "4e3d87d2230504c70bdda5dcc960f75ae7d6970985cfa22bd035bd4a39ce9c00"
-        },
-        {
-          "path": "tests/test_e25_coverage_matrix.py",
-          "size": 7652,
-          "sha256": "1e8e92d978028736b2bc1dfc791b974c7447cdeaf9e7fbd51fe30239fe1bfa0f"
-        },
-        {
           "path": "tests/test_e36_relative_structure_metrics.py",
           "size": 2867,
           "sha256": "58d324af82244f2e9f668d19832328ee2aa805bd9b7ffb36e81494ea0e4e5387"
@@ -2110,49 +1799,204 @@
           "path": "tests/test_spectral_stability.py",
           "size": 897,
           "sha256": "cb9b4a5e1bfa3e2c232ce24dd6c090283977e9ade24d187a490f1636cb60f88d"
-        },
-        {
-          "path": "tests/test_student_benchmark_analysis.py",
-          "size": 11751,
-          "sha256": "6b2cc81f499d8da310b534ff2d8df53c746676ba5c56c137df250e9ac2e2dcb1"
-        },
-        {
-          "path": "tests/test_student_benchmark_manifests.py",
-          "size": 8103,
-          "sha256": "5fbc6132700c9c26e652a5e29de95dec4ca940a8bf064b6db954895490054cd7"
-        },
-        {
-          "path": "tests/test_student_benchmark_protocol.py",
-          "size": 3104,
-          "sha256": "9ad4384a6bf02812e757a4a1dd257d84cd57752d69e9de3b60258138f1dd06e5"
-        },
-        {
-          "path": "tests/test_student_runner.py",
-          "size": 27317,
-          "sha256": "e4b6ab6a1630f63322acccd67845a6de1585e9b34e3f806ac8e6d1af54c6f72c"
         }
       ],
       "differs": [
         {
           "path": ".gitignore",
           "other_sha256": "258db1d575044a9c4fcaf98e927e9ffbd73484c8a3cb2384043add2c163286d1",
-          "target_sha256": "a3fc2b124b1f67dbba32f6cdce4d8d81b138785e3fb0292f0854ebbea482d084",
+          "target_sha256": "14eac227dffc4bcf804530c6f5291fe6f6ed0ddf0bbcf1dc4a41b48e3667fd29",
           "other_size": 1501,
-          "target_size": 1615
+          "target_size": 1762
         },
         {
-          "path": "docs/experiments/实验管理.md",
-          "other_sha256": "7de6573354d8061f9d5553e5efdbb31eea2607e9d080fa8879b92b983e8795b6",
-          "target_sha256": "461f30cb2c8be197f7aca3104193f1c1cde3d8b65d632a38b3c5390047109fdc",
-          "other_size": 109498,
-          "target_size": 82875
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k16_seed20260704.csv",
+          "other_sha256": "5e2a525c8ae018de8c3d668f56fb596611830a64dd783ad68ed14fd95ea55bf8",
+          "target_sha256": "b494a9ed0fd606c560e41b8fa9d05f90c32ccc6fb2f8d2e786bc429aed3336dd",
+          "other_size": 20403,
+          "target_size": 20382
         },
         {
-          "path": "docs/theory/理论管理.md",
-          "other_sha256": "a21f5d632a2b136258d92a0dfafd4d0db49f19e244f840d5750ab95c35d3af8e",
-          "target_sha256": "1bde4744f058d3a053076e8e44ac68ffc01084b108a3183e92637c5ae6b82e2d",
-          "other_size": 22357,
-          "target_size": 19656
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k2_seed20260704.csv",
+          "other_sha256": "4b8ae7fc1827bc13ee455bde6830290d6d4c4cc0e2561a26c30b7edd197bf67e",
+          "target_sha256": "522ee117572fbd5869903da55201e8e041aa67e0fa626bc23230a09eb0f581ca",
+          "other_size": 20319,
+          "target_size": 20298
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k4_seed20260704.csv",
+          "other_sha256": "1e9d8bed988d1efa559775e5dfc1c9715a148823464aa36bbb6a779d847f899a",
+          "target_sha256": "b387f989ae31a4135d55aa3d1f777d6311753851913ed537e307f9e47ce8ed90",
+          "other_size": 20339,
+          "target_size": 20318
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260704.csv",
+          "other_sha256": "b7c2c187198df1b79ccbdb188252a6f9e47b9587121bcd68624d463f35f8e9b1",
+          "target_sha256": "63415b2461faf626257531907649537f1370cee5ef05a5cd23875951c08852e5",
+          "other_size": 20371,
+          "target_size": 20350
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k16_seed20260704.csv",
+          "other_sha256": "35c7b214f9baa36aa927cfd058764945b1a346cb1ac5947300d91f8ad6e69ec8",
+          "target_sha256": "145619c6f600c23e6c162b676d02267d3b6c37e89ec53e68dc65593ff9ba66b8",
+          "other_size": 20335,
+          "target_size": 20314
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k2_seed20260704.csv",
+          "other_sha256": "59d2860784807b565c5f7f75c187b34747ab23b9542e831ffbfe8b1e0befb507",
+          "target_sha256": "d14292425fd001dd9582ade1f463ececbf9fab8733f7eea0ff9874f8bfb4eb37",
+          "other_size": 20350,
+          "target_size": 20329
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k4_seed20260704.csv",
+          "other_sha256": "11c696064ede907b8c8a1c0c38859661b52adf2f64205fddbbad0df7d0b5faf0",
+          "target_sha256": "7f94e4b0a838a8902c2fea939007d12452aa40cafa0bac991d5a3a85c3d10114",
+          "other_size": 20337,
+          "target_size": 20316
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260704.csv",
+          "other_sha256": "bd3b8302f2fbdef729da120bf93b1b1afc4eeae45c791f4228eced1021fb175a",
+          "target_sha256": "f9fb1ed2c0476b1fcb08b5ffcecf0579cf38b7ab02c7e289968d11b073114661",
+          "other_size": 20334,
+          "target_size": 20313
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k16_seed20260704.csv",
+          "other_sha256": "dfee0667869c81862ba5d29c78a41725362f351312649c1d1a30af4bfb1ad5f7",
+          "target_sha256": "7a492686c605f2c06d32e312040df4fa0e8d099a6b7dd442c3c9fc46640c3854",
+          "other_size": 20422,
+          "target_size": 20401
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k2_seed20260704.csv",
+          "other_sha256": "e332b2f642b1f3c6045fd9296fb6222bd33bbc43f1ca6dac3d67b4390e0de9c8",
+          "target_sha256": "401495caf03bb3bcbf55b8af53951318bdb77ef5e8c57391fc679817616f8ff2",
+          "other_size": 20357,
+          "target_size": 20336
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k4_seed20260704.csv",
+          "other_sha256": "c298c85e78d56a3246623bd796ad5361ffd8e9b5ce67954e6c49ca75d0ad4a48",
+          "target_sha256": "8681b260dee079a5bcbd2a170028491dacb09b0a50a15d75ed6e8a4e222e75ec",
+          "other_size": 20387,
+          "target_size": 20366
+        },
+        {
+          "path": "outputs/e25_k8_three_source_validation/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260704.csv",
+          "other_sha256": "ef4939ad6cffd8cdb0d71a62c854f7b1418dc107ee69a364c4873b559aa2146e",
+          "target_sha256": "b00c2e64acd3e4ae864dc511507bb7f778c19d651b65b13d253663c9a9071421",
+          "other_size": 20387,
+          "target_size": 20366
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n32_k8_seed20260704.csv",
+          "other_sha256": "2854b0f4318c72b6ce5ed0abc7b309fabc93e05d13c60b8f200fc076d2c8c233",
+          "target_sha256": "f11331bc28235deaf5796628b3356b2f058ff56a6f2fbd3af036a25bfacb5998",
+          "other_size": 20235,
+          "target_size": 20214
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_engstrom_pgd10_n64_k8_seed20260704.csv",
+          "other_sha256": "719fcd78d5d407241668cece8082dc724fab0b127a921682fe414b60ebfe0a78",
+          "target_sha256": "5b51cac6d79cb2362af8372ac84c11b84b53e3f9dbb0caed7e09f326b2fb5205",
+          "other_size": 20284,
+          "target_size": 20263
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n32_k8_seed20260704.csv",
+          "other_sha256": "dde7e29a781627a86b70a6539cdf7e2f9dea3be8c9b94bec187dc1bbd4f64a86",
+          "target_sha256": "23cc46a04abf0097ffb3cbab6cb2688d45bdb6e6a1aff8b8f1bbd51bace7c5be",
+          "other_size": 20238,
+          "target_size": 20217
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_standard_pgd10_n64_k8_seed20260704.csv",
+          "other_sha256": "1eb200c3d45755d6789f2038715f7f998c91486c7a388f26f08b789e38528d39",
+          "target_sha256": "1f6a72fb71ad2409cdcc88453262fbfd5fcfa26696d0de0ff18cccd59c812613",
+          "other_size": 20248,
+          "target_size": 20227
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n32_k8_seed20260704.csv",
+          "other_sha256": "3c2b52d4af416669ffbdcc3cbe18a732b586124c1840835ef702776972392368",
+          "target_sha256": "bf4eb6e508ca8ab4d640c2831aba4aa1c7d5a2baf5b39ebe197052b6852e7f82",
+          "other_size": 20265,
+          "target_size": 20244
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/sample_size/per_source/metrics_20_shared_wang2023_pgd10_n64_k8_seed20260704.csv",
+          "other_sha256": "60e49b3f9cd9a2b24e59defa8e9628cc3146ffa34cca5ce56cd4a1fd2ccd69a5",
+          "target_sha256": "701d222fdb60b54861d283b4445fab80105a056808d2efb1cfea9f589bbb2e18",
+          "other_size": 20349,
+          "target_size": 20328
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260731.csv",
+          "other_sha256": "6b5f1dc83359647b6f086e6e3ef6549aaa16af53540f0d45bd89ecf93adaaaf3",
+          "target_sha256": "6b645cc12dadc28234d0c3dba321ab3c6b0b0dc9497ebc1e1dab14af5136bee3",
+          "other_size": 20349,
+          "target_size": 20328
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260801.csv",
+          "other_sha256": "da2b6b1c2dce686f4cd99bfda33a7db1111ac00950163b4dbf4e6c58822b85b1",
+          "target_sha256": "987bc06e043c40302e296e6b8663d722f4671ed0ce932ef1db3f577a3592813d",
+          "other_size": 20367,
+          "target_size": 20346
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_engstrom_pgd10_n128_k8_seed20260802.csv",
+          "other_sha256": "e1b493fd8b9c676ff05bab001676cd2b03e476bf87c749725c517860128725de",
+          "target_sha256": "65207e94b843c6647ff8c2a3066cb8f184cd2cbf640722e629590b3ced1ca160",
+          "other_size": 20359,
+          "target_size": 20338
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260731.csv",
+          "other_sha256": "07e470e3e4b8d67ccc38b05344480b9713250ce3c3149e17925922f1e9c9f1ee",
+          "target_sha256": "99f01cd583a7f5d66fc1cf4b8e6c007ad1ac77725bae3797930e0c946e42bf41",
+          "other_size": 20327,
+          "target_size": 20306
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260801.csv",
+          "other_sha256": "8de568460a116b016b63930231763e1f25f4ebc7b1557ffaf77483cae32442fb",
+          "target_sha256": "4ee8e5fab3c25ca07c2ab64f8897bf2e8a5e9c0d5c3d96dbc6987be50f5ce538",
+          "other_size": 20335,
+          "target_size": 20314
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_standard_pgd10_n128_k8_seed20260802.csv",
+          "other_sha256": "2f8b09a41cc54bad0cf25a060120ef4aea6694aba38a75651a9e07e8cd1c755a",
+          "target_sha256": "058d08396684122da99904ae64dc0cf1c50da151480c0efebc31a14352f595c2",
+          "other_size": 20355,
+          "target_size": 20334
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260731.csv",
+          "other_sha256": "cee7582e9f866b98fbb47a020aab08982759bed32fadc747ba92343dc0d1e1b4",
+          "target_sha256": "084177583b66332d01bd74023e9121c82bec117d64e8d272e3d4e46858c7afb3",
+          "other_size": 20382,
+          "target_size": 20361
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260801.csv",
+          "other_sha256": "b1581e597bdf68a0fa5a94adc1c170085dde9d097abaa9c4f5a7a4e7648a90c1",
+          "target_sha256": "10f066d339826e13f845fca6a7ce60b22be3c3794feef5ef3089db4a678f4b58",
+          "other_size": 20395,
+          "target_size": 20374
+        },
+        {
+          "path": "outputs/e26_capacity_robustness/seed_robustness/per_source/metrics_20_shared_wang2023_pgd10_n128_k8_seed20260802.csv",
+          "other_sha256": "a6c2326b996319fd3ec169504d0c36f789031ec0f2c874c2def7c29f2d903aa4",
+          "target_sha256": "9a405744500c0733f8879c1096708ceb40f2efc84f8d835d029a88c100a061f0",
+          "other_size": 20372,
+          "target_size": 20351
         },
         {
           "path": "pyproject.toml",
@@ -2162,51 +2006,37 @@
           "target_size": 509
         },
         {
-          "path": "scripts/compute_metric_batch.py",
-          "other_sha256": "709a8d4104aa1209378a643f6d171b1d865c6fa4d9b8a5353a8ee2503c379f61",
-          "target_sha256": "d235c24f0af171eddc22511c4e8ba61ec629eccc96cb1a6784c971cc6e015eaa",
-          "other_size": 17579,
-          "target_size": 14390
-        },
-        {
-          "path": "src/robust_metric_lab/attacks.py",
-          "other_sha256": "65b348cedccfb4fcea1aafc322c2f9984ec6c23d01b0bef232ebe760c8aeee13",
-          "target_sha256": "2ced02cbc4f2fad9d7c057bb878b695998cfcb80a34dfb3665ee724b1bfed925",
-          "other_size": 2628,
-          "target_size": 1746
-        },
-        {
           "path": "src/robust_metric_lab/metric_registry.py",
           "other_sha256": "c0794ed6fa8e03cd3db31adbf684509ecced7e4613d52e09467d252da4f8cee7",
-          "target_sha256": "36a3819d2f84e177bc412c169cfbde2a5acaba9a668a1d616dd4dafad718ebf5",
+          "target_sha256": "182cabb7d899e6f2cbedae80d14aacc2702d0f9517ea8a5318c477a7bf4b3e5a",
           "other_size": 6803,
-          "target_size": 3640
+          "target_size": 7835
         },
         {
           "path": "src/robust_metric_lab/metrics.py",
           "other_sha256": "ec9755b740f7a88bb9057a62c45acf88a0c3795973132b559db2a03f715ca62e",
-          "target_sha256": "16c884ca139c8af1ee554b0b9c3fbbd74424f25cb7d44035c09972b5624978da",
+          "target_sha256": "0db1761404f6176a8882ef60037568dc7df5ab933f7070dbbbe18b708fb9bae1",
           "other_size": 76648,
-          "target_size": 42297
+          "target_size": 76626
         },
         {
-          "path": "src/robust_metric_lab/nasrobbench201.py",
-          "other_sha256": "4fe8b20dd23d6fa4bab67b12c8147f130e7111e0728df3b68599de366fcb1c17",
-          "target_sha256": "22dea77c8b0a4ef1e0510373c6f0b725212dab7046897da14dec833d639836c2",
-          "other_size": 11020,
-          "target_size": 10716
+          "path": "src/robust_metric_lab/trnas.py",
+          "other_sha256": "d11569314cce0af5b9e006772a9a10ffa9c5300585f44cd2d8087324afb5af77",
+          "target_sha256": "a6ddd5bb9b5ccaa539e3b180e6ae2dcf15415a1058e347fbd1eb8163a0a6db95",
+          "other_size": 5889,
+          "target_size": 7132
         },
         {
-          "path": "tests/test_racl_lipschitz_metric.py",
-          "other_sha256": "47a0d7cc4396982d34cf3e6713832e6704015a677d91edba2a994cb0b6a5b30f",
-          "target_sha256": "9fc094b815449d48858a097ecec03622c997728f8d8c94db8e39648231be6aac",
-          "other_size": 2127,
-          "target_size": 1735
+          "path": "tests/test_trnas_metrics.py",
+          "other_sha256": "983f4ba83082bff53b11cbef150b8d22697d66bb1a59f617ea45e99de20b021c",
+          "target_sha256": "b03494421ef9126fd2bcfd34353d2085ca5d3cd8a744708a601746e6ce26bed5",
+          "other_size": 2186,
+          "target_size": 3434
         }
       ],
       "unhashed": [],
-      "only_in_target_count": 107,
-      "only_in_other_bytes": 711102
+      "only_in_target_count": 144,
+      "only_in_other_bytes": 60184
     }
   ]
 }

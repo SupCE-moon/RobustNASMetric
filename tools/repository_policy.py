@@ -94,6 +94,10 @@ def classify_path(path: str | Path, size_bytes: int) -> str:
         return "reject"
     if any(part in PROHIBITED_DIR_NAMES for part in parts[:-1]):
         return "reject"
+    # ``pip install -e .`` writes <package>.egg-info/, which describes one local
+    # install rather than the source tree; committing it publishes machine paths.
+    if any(part.endswith(".egg-info") for part in parts[:-1]):
+        return "reject"
     if p.suffix.lower() in PROHIBITED_SUFFIXES:
         return "reject"
     if size_bytes > REJECT_BYTES:

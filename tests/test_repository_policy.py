@@ -37,6 +37,13 @@ def test_policy_rejects_oversized_file_even_when_text() -> None:
     assert repository_policy.classify_path("outputs/big.csv", 51 * MIB) == "reject"
 
 
+def test_policy_rejects_egg_info_directory() -> None:
+    assert (
+        repository_policy.classify_path("src/robust_metric_lab.egg-info/PKG-INFO", 2048)
+        == "reject"
+    )
+
+
 def test_policy_warns_between_thresholds() -> None:
     assert repository_policy.classify_path("outputs/medium.csv", 12 * MIB) == "warn"
 

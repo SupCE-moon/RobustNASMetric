@@ -1,0 +1,108 @@
+from __future__ import annotations
+
+import os
+from pathlib import Path
+import subprocess
+import sys
+import hashlib
+
+import pytest
+
+from scripts.analyze_e37_layer_diagnostic import analyze_records, join_controls, metric_stage_correlations, paired_spearman
+from robust_metric_lab.e37_metrics import E37_METRIC_NAMES
+
+
+def test_constant_component_is_undefined_without_dropping_pairs() -> None:
+    assert paired_spearman([2.0] * 100, [3.0] * 100) is None
+    with pytest.raises(ValueError, match="100"):
+        paired_spearman([1.0] * 99, [2.0] * 99)
+
+
+def test_control_ids_are_canonical_and_complete() -> None:
+    identifiers = [str(i) for i in range(100)]
+    controls = [{"model_or_arch_id": i, "log_params": float(i)} for i in range(100)]
+    joined = join_controls(identifiers, controls)
+    assert len(joined) == 100
+    assert joined["17"] == 17.0
+    with pytest.raises(ValueError, match="duplicate"):
+        join_controls(identifiers, controls + [controls[0]])
+    with pytest.raises(ValueError, match="complete"):
+        join_controls(identifiers, controls[:-1])
+
+
+def test_analysis_emits_all_39_components_for_all_100_pairs() -> None:
+    sample = {
+        "anchors": [{name: 0.1 for name in (
+            "clean_rms", "adv_rms", "clean_centered_l2", "adv_centered_l2",
+            "channel", "spatial", "spectrum_fisher", "spectrum_triangular", "spectrum_ks",
+        )} for _ in range(4)],
+        "transitions": [{"flow": 0.2} for _ in range(3)],
+    }
+    records = [
+        {
+            "setting": f"darts_e{stage}", "model_or_arch_id": str(identifier),
+            "diagnostic": {"sample_components": [sample] * 64},
+        }
+        for stage in (0, 100) for identifier in range(100)
+    ]
+    controls = [{"model_or_arch_id": identifier, "log_parameter_count": identifier + 1} for identifier in range(100)]
+    rows, correlations = analyze_records(records, controls)
+    assert len(rows) == 100 * 39
+    assert len(correlations) == 39
+    assert all(row["pair_count"] == 100 for row in correlations)
+    assert all(row["stage_spearman"] is None for row in correlations)
+    assert all(row["structure_interpretation"] == "exploratory_noncausal" for row in correlations)
+
+
+def test_all_nine_original_scores_get_paired_stage_correlations() -> None:
+    records = [
+        {
+            "setting": f"darts_e{stage}", "model_or_arch_id": str(identifier),
+            "diagnostic": {"metric_values": {
+                name: float(identifier) if stage == 0 else float(99 - identifier)
+                for name in E37_METRIC_NAMES
+            }},
+        }
+        for stage in (0, 100) for identifier in range(100)
+    ]
+    rows = metric_stage_correlations(records)
+    assert {row["metric_name"] for row in rows} == set(E37_METRIC_NAMES)
+    assert len(rows) == 9
+    assert all(row["pair_count"] == 100 and row["stage_spearman"] == pytest.approx(-1.0) for row in rows)
+    assert all(row["direction"] == "lower" for row in rows)
+
+
+def test_analysis_cli_starts_without_external_pythonpath() -> None:
+    project = Path(__file__).resolve().parents[1]
+    environment = dict(os.environ)
+    environment.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [sys.executable, str(project / "scripts/analyze_e37_layer_diagnostic.py"), "--help"],
+        cwd=project, env=environment, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_analysis_inputs_require_frozen_control_and_canonical_hash(tmp_path: Path) -> None:
+    from scripts.analyze_e37_layer_diagnostic import validate_analysis_inputs
+
+    control = tmp_path / "control.csv"
+    canonical = tmp_path / "canonical_numeric.jsonl"
+    control.write_text("model_or_arch_id,log_parameter_count\n0,1\n", encoding="utf-8")
+    canonical.write_text('{"setting":"darts_e0"}\n', encoding="utf-8")
+    digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+    payload = {
+        "input_paths": {"control_csv": str(control)},
+        "control_csv_sha256": digest(control),
+    }
+    verification = {"status": "PASS", "canonical_numeric_sha256": digest(canonical)}
+    validate_analysis_inputs(payload, verification, control, canonical)
+    control.write_text("model_or_arch_id,log_parameter_count\n0,-1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="control.*hash"):
+        validate_analysis_inputs(payload, verification, control, canonical)
+    control.write_text("model_or_arch_id,log_parameter_count\n0,1\n", encoding="utf-8")
+    canonical.write_text('{"setting":"darts_e100"}\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="canonical.*hash"):
+        validate_analysis_inputs(payload, verification, control, canonical)
+    with pytest.raises(ValueError, match="control.*path"):
+        validate_analysis_inputs(payload, verification, tmp_path / "different.csv", canonical)

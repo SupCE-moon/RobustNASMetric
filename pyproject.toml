@@ -20,6 +20,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "ruff"]
+# Only scripts/plot_e37_layer_diagnostic.py needs this; the metric pipeline does not.
+plot = ["matplotlib"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
