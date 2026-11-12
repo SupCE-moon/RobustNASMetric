@@ -194,3 +194,16 @@ python tools/audit_metric_implementation.py --json results/audits/metric-impleme
 
 退出码 1 表示存在 "只有声明、没有实现" 的名字——这是需要人看的结果，不是工具故障。
 `--dynamic` 会额外前向一次小 ResNet，用来确认 bundle 的字段真的被填上（NaN 除外）。
+
+## 指标基本不变量
+
+`tools/audit_metric_invariants.py` 检查 75 个字段的三条最低性质：零扰动时为 0（距离类）、
+处处有限、随扰动单调上升。它用一个固定种子的两层卷积网络，秒级完成。
+
+```
+python tools/audit_metric_invariants.py --json results/audits/metric-invariants.json --report results/audits/metric-invariants.md
+```
+
+当前结果：69 通过、1 个有记录的非单调（盒计数维度）、1 个已知占位 NaN、
+1 个随扰动下降（`perturbation_capacity_signed_delta`，见 `docs/PROJECT_STATUS.md` §6 第 0 条）、
+3 个记录字段。`decreasing` 不是失败，是"需要人判断符号约定"。

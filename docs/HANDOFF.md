@@ -242,3 +242,15 @@ python tools/audit_metric_implementation.py --dynamic --json out.json --report o
 - 新增指标时：先写进 `metric_registry.py`，再确认它出现在某一档里，然后跑这个工具。
 - 看见 `perturbation_capacity_importance_delta` 是 NaN 不要慌，那是 bundle 的占位，
   真值在 `evaluate_importance_student.py`。
+
+## 17. 指标不变量审计
+
+```
+python tools/audit_metric_invariants.py --json out.json --report out.md
+```
+
+- 秒级，不需要数据集、不需要 GPU；内置一个固定种子的两层卷积网络。
+- 退出码 1 只在"零扰动不为 0"或"出现 NaN"时返回——这两种一定是错的。
+- `decreasing` 只报告、不算失败：符号约定问题需要人判断（见 `docs/DECISIONS.md` D-025）。
+- 改完任何指标实现后跑一次。新增指标如果名字以 `_delta` 结尾，会自动进入距离类检查；
+  如果它本来就不该在零扰动时为 0（例如输入自身的属性），加进 `NOT_A_DISTANCE`。

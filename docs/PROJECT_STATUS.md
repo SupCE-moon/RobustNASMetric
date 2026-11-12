@@ -259,6 +259,36 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
     所以"NaN"在这里表示"不在这个入口算"，不是"算失败"——与 D-014 的"缺失不是零"是同一条原则。
     静态解析（不 import torch）保证在只有 pandas 的机器上也能跑；`--dynamic` 才真的前向一次小 ResNet。
 
+### 14. 指标基本不变量审计（2026-11-12）
+
+**问题**：§3 第 13 条只证明"有代码产出这个数"，没证明"这个数像个距离"。
+一个指标可以在注册表里、有实现、有测试，却在零扰动时不为 0，或者随扰动增大反而变小。
+
+**做法**：`tools/audit_metric_invariants.py` 用固定种子的两层卷积小网络，把扰动从
+0 逐级加到 8/255，对 75 个字段检查三条最低要求：
+`eps=0` 时距离类必须为 0；所有值有限；随 `eps` 单调上升（Spearman ≥ 0.7）。
+
+| 判定 | 数量 | 含义 |
+|---|---|---|
+| 通过 | **69** | 三条都守住 |
+| 已知非单调（有记录） | 1 | `feature_box_dimension_delta`，盒计数维度是量化几何量，不足一像素时整数量跳变 |
+| 已知占位 NaN | 1 | `perturbation_capacity_importance_delta`，真值在两步法入口 |
+| 随扰动**下降** | **1** | `perturbation_capacity_signed_delta` |
+| 记录字段（不是指标） | 3 | `num_layers` / `num_candidate_layers` / `sampled_layer_indices` |
+| 零扰动不为 0 / 出现 NaN | **0** | — |
+
+**唯一需要人看的信号**：`perturbation_capacity_signed_delta` 随扰动增大而单调**变负**
+（Spearman = −1.000），而它和其他 55 个 delta 一样被声明为 `lower`。
+定义是 `(adv_capacity − clean_capacity) / |clean_capacity|`（`metrics.py:1285`），
+是个有符号的相对变化，不是绝对差。
+
+**这一步不能说明什么**：小网络是随机初始化的，"通过"只说明它在这个网络上守住了距离的基本性质，
+不代表在真实 CIFAR 模型上同样成立，也不代表该指标与鲁棒准确率相关。
+
+**原样保留**：`pytest tests/test_audit_metric_invariants.py` 里有一条断言绑定当前事实
+（`signed_capacity_delta` 判为 `decreasing`）。若将来改了它的定义或方向，必须显式改那条测试，
+而不是让它悄悄变绿。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**
@@ -343,6 +373,17 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
    `ba02` 独有 0 个、`strict-metrics-e37` 39 个（已全部并入）。
 
 ## 6. 未完成的问题（按优先级）
+
+0. **`perturbation_capacity_signed_delta` 的方向约定待定**（2026-11-12 新增）。
+   §3 第 14 条测出它随扰动增大而单调变负，与其他 55 个 delta 相反；
+   同时它在发布表里 `direction=lower`，在 NB201 晚期设置的原始相关是 −0.839
+   （即"越负、target 越高"）。两种解释都还没有被排除：
+   一是符号约定本来如此（相对变化量有正负，`lower` 只是说"值越小越好"）；
+   二是**分母效应**——鲁棒模型的 clean capacity 可能更小，同样的绝对下降被 `|clean_capacity|`
+   放大，于是"更负"部分反映的是分母小，不是扰动响应大。
+   区分办法：控制 `perturbation_capacity`（clean 侧）做偏秩相关，看相关性是否显著缩小。
+   **在此之前，跨指标比较时要单独说明这一个指标的方向，不要把它和另外 55 个 delta 一起解释。**
+
 
 1. **服务器现状未知**：`/workspace/robust_metric_lab_nas` 的代码、结果、manifest 未盘点（阻塞，见第 8 节）。
 2. **服务器那一侧仍未确认**：本地已判定代码主线是 `893a994` 一线并能全部合并，
