@@ -329,6 +329,38 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 设计选择还是实现副产物；`analyze_e32_generality.py` 里已有对两者端点一致性的早期观察，
 本轮只是把它变成可复跑、带配对自检的量化。
 
+### 16. 交付前自检的统一入口（2026-11-12）
+
+**问题**：仓库里已经有 11 个审计脚本，每个参数不同（`--rows`、`--repair`、`--table`、
+`--ranking`、`--redundancy`）。交接文档里列 11 条命令，实际结果是有人跑六条、
+有人把 CSV 传错位置，而错的那条通常不会报错——它只是算出了另一个数。
+
+**做法**：`tools/run_audit_suite.py` 把参数接线固定在代码里，按依赖顺序跑完全部 11 步，
+输出 `results/audits/audit-suite.{json,md}` 一张汇总表。依赖顺序是硬约束：
+冗余度矩阵喂给 Φ 增量检验，所以 `redundancy` 必须排在 `phi_incremental` 之前。
+
+**本次运行结果**（`--rows-root` 自动定位到主工作树）：**11 通过 / 0 失败 / 0 跳过**，
+总耗时约 3 分钟。其中两条的退出码是 1 而不是 0，都是**结论**不是崩溃：
+
+| 步骤 | 退出码 | 最后一行 |
+|---|---|---|
+| `implementation` | 1 | `registered=86 bundle=70 other=15 registry_only=1`（已知的 adv-excess 缺口，D-024） |
+| `signed_capacity` | 1 | `verdict='not the same metric' median_rho=0.017`（D-026） |
+
+**两个设计取舍**：
+
+1. **大输入缺失时标 `skipped`，不标通过**。原始行 13.9 MiB 按策略不入库，
+   在一台干净 clone 上跑，7 个依赖它的步骤会被跳过。报告里明确写「skipped 不是通过，
+   不能当成刚跑过」——这是 D-014「缺失不是零」的同一条原则。
+2. **`--rows-root` 三级回退**：显式参数 → `ROBUST_METRIC_OUTPUTS` 环境变量 →
+   `git worktree list` 里的主工作树。第三级是为了「在一台只有这份仓库的机器上也能跑」，
+   但它会让「跳过」变成「实际跑了主工作树的数据」，所以报告开头会打印实际用的 `rows_root`。
+
+**顺带修掉的自污染**：`check_doc_links.py` 只跳过 `doc-links-` 前缀的报告，
+而 suite 里那份报告叫 `doc-links.md`（无日期），于是上一轮报告里列的 25 条缺失路径
+被当成新引用又报了一遍。现在改为 `GENERATED_REPORTS = ("doc-links", "doc-claims", "audit-suite")`
+按前缀跳过，并加了两条测试：生成报告不扫、人写报告（`metric-redundancy-*.md`）仍然扫。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**

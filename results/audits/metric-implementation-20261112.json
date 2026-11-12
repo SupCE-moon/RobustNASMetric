@@ -7,12 +7,10 @@
     "feature_adv_excess_centered_unit_l2"
   ],
   "missing": [],
-  "nan_placeholders": [
-    "perturbation_capacity_importance_delta"
-  ],
+  "nan_placeholders": [],
   "unexplained_nonfinite": [],
   "unknown_bundle_fields": [],
-  "dynamic": true,
+  "dynamic": false,
   "rows": [
     {
       "name": "adversarial_loss",
@@ -22,7 +20,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_adv_excess_centered_unit_l2",
@@ -41,7 +39,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_delta",
@@ -51,7 +49,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_graph_fundamental_rank_delta",
@@ -61,7 +59,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_hausdorff_delta",
@@ -71,7 +69,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_channel_gram_centered_rel_delta",
@@ -82,7 +80,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_channel_gram_cosine_delta",
@@ -93,7 +91,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_cov_delta",
@@ -103,7 +101,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_flow_corr_angular_delta",
@@ -114,7 +112,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_flow_corr_rel_delta",
@@ -124,7 +122,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_flow_corr_rms_delta",
@@ -145,7 +143,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_flow_corr_tophalf_delta",
@@ -175,7 +173,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_flow_rel_allpairs_delta",
@@ -185,7 +183,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_flow_rel_delta",
@@ -195,7 +193,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_flow_rel_multiscale_delta",
@@ -205,7 +203,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_fsp_rel_multiscale_delta",
@@ -215,7 +213,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_local_delta",
@@ -225,7 +223,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_mmd",
@@ -235,7 +233,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_moment_delta",
@@ -245,7 +243,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_multiview_geometric_delta",
@@ -285,7 +283,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_relu_active_hybrid_delta",
@@ -295,7 +293,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_relu_active_hybrid_rel_delta",
@@ -305,7 +303,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_relu_active_spatial_delta",
@@ -315,7 +313,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_relu_active_spatial_rel_delta",
@@ -325,7 +323,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_robust_delta",
@@ -335,7 +333,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_robust_hybrid_delta",
@@ -345,7 +343,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_robust_hybrid_rel_delta",
@@ -355,7 +353,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_robust_rel_delta",
@@ -365,7 +363,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_robust_spatial_delta",
@@ -375,7 +373,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_robust_spatial_rel_delta",
@@ -385,7 +383,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_spatial_gram_cosine_delta",
@@ -396,7 +394,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_spatial_gram_delta",
@@ -406,7 +404,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_spatial_gram_rel_delta",
@@ -416,7 +414,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_spectrum_emd_delta",
@@ -427,7 +425,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_spectrum_fisher_rao_delta",
@@ -448,7 +446,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_spectrum_js_delta",
@@ -459,7 +457,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_spectrum_ks_delta",
@@ -489,7 +487,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_struct_delta",
@@ -499,7 +497,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_swd",
@@ -509,7 +507,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_measure_weighted_delta",
@@ -519,7 +517,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_quantile_hausdorff_delta",
@@ -529,7 +527,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_spectral_decay_exponent_static",
@@ -539,7 +537,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_spectral_erank_static",
@@ -549,7 +547,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "feature_spectral_participation_ratio_static",
@@ -559,7 +557,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "fsp_delta",
@@ -569,7 +567,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "fsp_strict_delta",
@@ -579,7 +577,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "input_grad_l2",
@@ -590,7 +588,7 @@
         "metrics.py",
         "student_runner.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "input_loss_delta",
@@ -600,7 +598,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "jacobian_effective_rank",
@@ -610,7 +608,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "jacobian_spectral_decay",
@@ -620,7 +618,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "jacobian_spectral_norm",
@@ -630,7 +628,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "local_logit_lipschitz",
@@ -640,7 +638,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "logit_kl",
@@ -650,7 +648,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "margin_input_grad_ratio",
@@ -660,7 +658,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "natural_loss",
@@ -670,7 +668,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_above_mean_delta",
@@ -680,7 +678,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_channelwise_delta",
@@ -690,7 +688,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_delta",
@@ -700,7 +698,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_flow_rel_delta",
@@ -710,7 +708,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_gini_delta",
@@ -720,7 +718,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_importance_delta",
@@ -730,7 +728,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": false
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_iqr_active_delta",
@@ -740,7 +738,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_iqr_delta",
@@ -750,7 +748,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_layerprofile_delta",
@@ -760,7 +758,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_multiscale_delta",
@@ -770,7 +768,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_profile_delta",
@@ -780,7 +778,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_relu_active_delta",
@@ -790,7 +788,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_relu_active_multiscale_delta",
@@ -800,7 +798,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_signed_delta",
@@ -810,7 +808,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "perturbation_capacity_topk_delta",
@@ -820,7 +818,7 @@
         "metric_registry.py",
         "metrics.py"
       ],
-      "emitted_finite": true
+      "emitted_finite": null
     },
     {
       "name": "racl_arch_lipschitz_log_upper",

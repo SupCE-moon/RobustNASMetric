@@ -1,6 +1,6 @@
 # 文档声称 vs 发布表：数字对账
 
-- 发布表：`outputs\strict_adv_excess_release_20261024T110422Z\RobustMetric_严格全部指标总表_86项_三位小数.csv`（sha256 `f69717bdbf02f7aba03985bae8a813ab3bd0190936604f9f3662f51357ef5276`）
+- 发布表：`D:\Project\RobustNAS\DynamicBN\DynamicBN20251203\robust_metric\.worktrees\mainline-consolidation\outputs\strict_adv_excess_release_20261024T110422Z\RobustMetric_严格全部指标总表_86项_三位小数.csv`（sha256 `f69717bdbf02f7aba03985bae8a813ab3bd0190936604f9f3662f51357ef5276`）
 - 声称条数：33，通过 33，失败 0
 - 容差：0.0006（表保留三位小数，文档常写四位）
 

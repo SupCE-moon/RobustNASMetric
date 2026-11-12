@@ -612,3 +612,34 @@ Kendall τ 也配上区间。阈值 `REPRODUCTION_TOLERANCE = 5.5e-4`：发布�
 
 **后果**：§3 第 15 条、§6 第 0 条、`results/audits/signed-capacity-20261112.{json,md}`、
 `tools/audit_signed_capacity.py`、`tests/test_audit_signed_capacity.py`（8 个测试）。
+## D-027 —— 用一条命令跑完全部审计，而不是把 11 条命令写进交接文档（2026-11-12）
+
+**背景**：到这一轮，审计脚本已经有 11 个。每多一个，交接时的「跑一下自检」就多一分走样：
+参数名不同（`--rows` / `--table` / `--ranking` / `--redundancy`），
+把原始行传给 `--table` 通常不会报错，只会算出一个看起来合理的数。
+
+**决定**：`tools/run_audit_suite.py` 把参数接线写进代码，按依赖顺序执行，
+产出一张「通过 / 失败 / 跳过」的表。
+
+**五个选择与理由**：
+
+1. **顺序由依赖决定，不由方便决定**。`redundancy` 的输出是 `phi_incremental` 的输入，
+   顺序错了会拿上一轮的聚类去算这一轮，结果仍能跑通——这类错误最难发现，所以写死在列表里。
+2. **`skipped` 与 `ok` 分开计，且报告里明说「skipped 不是通过」**。7 个步骤依赖那份
+   13.9 MiB 的原始行，而它按策略不入库。如果不区分，一台干净 clone 上会显示「11 项检查全部通过」，
+   这是最糟的结果——检查没跑，报告说通过。
+3. **允许的退出码按步骤配置**。`implementation` 与 `signed_capacity` 用退出码 1 表示
+   「有一个需要人看的结论」，把它当崩溃就会逼着人忽略它；把它们当 0 又会掩盖真崩溃。
+   所以每步显式写 `expect_exit`，并在报告里仍然打印退出码。
+4. **`--rows-root` 三级回退**（参数 → 环境变量 → `git worktree list` 的主工作树）。
+   第三级让「干净 clone 也能跑」，代价是它可能悄悄用了另一棵树的 `outputs`，
+   所以报告开头打印实际使用的路径，而不是假装用了仓库内的文件。
+5. **不重算任何数字**。suite 只负责跑和汇总；每个数字仍由它原来的脚本产出，
+   报告链接到原报告的路径。否则一旦有人改判据，就会出现「suite 的数和报告的数不一致」。
+
+**顺带修的自污染**：`check_doc_links.py` 原来只跳过 `doc-links-` 前缀，
+没覆盖 suite 用的无日期 `doc-links.md`，导致上一轮的缺失清单被当成新引用重复计入（25 条假断链）。
+改为按前缀集合跳过，并补了「人写报告仍要扫」的反向测试，避免把规则放宽到看不见真问题。
+
+**后果**：`tools/run_audit_suite.py`、`tests/test_run_audit_suite.py`（9 个测试）、
+`results/audits/audit-suite.{json,md}`、§3 第 16 条、`docs/HANDOFF.md` §19。

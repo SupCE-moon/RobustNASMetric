@@ -282,3 +282,19 @@ python tools/audit_signed_capacity.py `
 
 **不要做**：不要因为它「单调下降」就去改注册表的 `direction`。那是改历史（D-021、D-025），
 而且本轮已证明下降是「方向净额」的正常表现，不是符号写错。
+## 19. 交付前跑一条命令（2026-11-12）
+
+```powershell
+python tools/run_audit_suite.py
+```
+
+它按依赖顺序跑完 11 个审计，写 `results/audits/audit-suite.{json,md}`。
+判据：**`failed` 必须为 0**；`skipped` 不为 0 时，结论只能引用上次在完整数据上的运行。
+
+- 两个步骤的退出码 1 是正常的（`implementation` 报已知缺口、`signed_capacity` 报「两者不同」），
+  suite 已把它们写进各自的 `expect_exit`；报告里仍打印退出码，方便你核对。
+- 大输入不在仓库里时，加 `--rows-root <主工作树>\outputs`，或设 `ROBUST_METRIC_OUTPUTS`。
+- 只想跑几条：`--only doc_claims,doc_links`。
+
+**不要**把这 11 条命令再手抄进别的文档。要改参数就改 `tools/run_audit_suite.py`，
+否则两份参数迟早不一致。

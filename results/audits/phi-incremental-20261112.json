@@ -254,7 +254,7 @@
   "inputs": {
     "rows": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\strict_all_metrics_table_20261024_trnas_repaired\\sources\\metric_values_original_strict.csv",
     "rows_sha256": "b5137e2b3fe89ce5a99a99ea94bafa48d1abb81c45837551e5b1a54fe42ac92d",
-    "redundancy": "results\\audits\\metric-redundancy-20261112.json",
+    "redundancy": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\mainline-consolidation\\results\\audits\\metric-redundancy-20261112.json",
     "redundancy_sha256": "24008c0a40a830b9de459f9c4c30989061b99855f851db61c95d2ec96d8c5373"
   }
 }

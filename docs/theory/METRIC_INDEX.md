@@ -115,6 +115,6 @@
 
 | 名次 | 指标 | 配置里的理由 |
 | --- | --- | --- |
-| 4 | `trnas_activation_psi` | Kang2021Stable float32 step underflow is unresolved under the frozen 1e-6 definition. |
 | 1 | `trnas_consistency_phi` | Kang2021Stable float32 step underflow is unresolved under the frozen 1e-6 definition. |
 | 2 | `trnas_r_score` | Kang2021Stable float32 step underflow is unresolved under the frozen 1e-6 definition. |
+| 4 | `trnas_activation_psi` | Kang2021Stable float32 step underflow is unresolved under the frozen 1e-6 definition. |

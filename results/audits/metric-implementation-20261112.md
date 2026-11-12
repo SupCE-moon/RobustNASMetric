@@ -7,7 +7,6 @@
 - 由其他模块专门计算：**15**
 - 只有声明、找不到实现痕迹：**1**
 - 哪儿都找不到：**0**
-- 动态复跑：bundle 里刻意留空的 NaN **1** 个（都由专门脚本补算），无解释的非有限值 **0** 个
 
 ## 由其他模块计算的指标
 
@@ -34,12 +33,6 @@
 这些名字只在 `metric_registry.py` 里出现。要么实现从没落地，要么它写出去的键名和注册名不一致（例如用 f-string 拼出来的名字）。
 
 - `feature_adv_excess_centered_unit_l2`
-
-## bundle 里留空（NaN）、由专门脚本补算的指标
-
-这是设计，不是缺陷：`metrics.py` 在拿不到重要性向量时写 `float("nan")`，真正计算在 `importance_batched.py` / `evaluate_importance_student.py`。
-
-- `perturbation_capacity_importance_delta`
 
 ## 怎么读
 

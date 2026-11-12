@@ -1208,12 +1208,6 @@
  "problems": [],
  "warnings": [
   {
-   "metric": "trnas_activation_psi",
-   "rank": 4,
-   "eligibility": "implementation_error",
-   "reason": "Kang2021Stable float32 step underflow is unresolved under the frozen 1e-6 definition."
-  },
-  {
    "metric": "trnas_consistency_phi",
    "rank": 1,
    "eligibility": "implementation_error",
@@ -1222,6 +1216,12 @@
   {
    "metric": "trnas_r_score",
    "rank": 2,
+   "eligibility": "implementation_error",
+   "reason": "Kang2021Stable float32 step underflow is unresolved under the frozen 1e-6 definition."
+  },
+  {
+   "metric": "trnas_activation_psi",
+   "rank": 4,
    "eligibility": "implementation_error",
    "reason": "Kang2021Stable float32 step underflow is unresolved under the frozen 1e-6 definition."
   }

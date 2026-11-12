@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-11-12T09:34:23+00:00",
+  "generated_at_utc": "2026-11-12T11:42:12+00:00",
   "inputs": {
     "rows": {
       "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\strict_all_metrics_table_20261024_trnas_repaired\\sources\\metric_values_original_strict.csv",
@@ -7,11 +7,11 @@
       "data_rows": 47600
     },
     "repair": {
-      "path": "outputs\\strict_all_metrics_table_20261024_trnas_repaired\\sources\\repair_rows.csv",
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\strict_all_metrics_table_20261024_trnas_repaired\\sources\\repair_rows.csv",
       "sha256": "91eaa8dae95082b6b042b943cbcb58dc44e10da9aa7a5ffd1b9e5a6ad74ad0eb"
     },
     "ranking": {
-      "path": "outputs\\strict_adv_excess_release_20261024T110422Z\\strict_ranking.csv",
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\mainline-consolidation\\outputs\\strict_adv_excess_release_20261024T110422Z\\strict_ranking.csv",
       "sha256": "fc6ff6bc995e80cd3bf3516506b483c3d48f69b11afa6fe10ca0be36f372ec3e"
     }
   },

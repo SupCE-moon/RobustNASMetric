@@ -217,3 +217,9 @@ python tools/audit_metric_invariants.py --json results/audits/metric-invariants.
 退出码 1 表示「结论是两者不同」（正常）、`|signed|<=abs` 配对自检必须为 0 例外。
 
 结论：两者不是同一指标的符号版本（秩相关中位数 +0.017，4/8 设置符号相反）。
+## 交付前自检汇总（2026-11-12）
+
+`tools/run_audit_suite.py` → `audit-suite.{json,md}`。一条命令跑完 11 个审计，
+`failed` 必须为 0；`skipped` 表示这台机器缺大输入，不等于通过。
+
+本次：11 通过 / 0 失败 / 0 跳过（`implementation`、`signed_capacity` 的退出码 1 是结论）。

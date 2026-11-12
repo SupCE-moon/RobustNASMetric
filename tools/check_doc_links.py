@@ -88,6 +88,9 @@ ALLOWLIST: dict[tuple[str, str], str] = {
 
 
 
+GENERATED_REPORTS = ("doc-links", "doc-claims", "audit-suite")
+
+
 def doc_files(root: Path) -> list[Path]:
     files = [root / "README.md"]
     files += sorted((root / "docs").rglob("*.md"))
@@ -97,7 +100,7 @@ def doc_files(root: Path) -> list[Path]:
     files += [
         path
         for path in sorted((root / "results").rglob("*.md"))
-        if not path.name.startswith("doc-links-")
+        if not path.name.startswith(GENERATED_REPORTS)
     ]
     return [path for path in files if path.is_file()]
 

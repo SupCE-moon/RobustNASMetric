@@ -125,14 +125,27 @@ def test_allowlisted_reference_carries_its_reason(tmp_path: Path, monkeypatch) -
     assert payload["missing_explained"][0]["reason"] == "服务器上的同名新版本"
 
 
-def test_own_report_is_not_scanned(tmp_path: Path) -> None:
+def test_generated_reports_are_not_scanned(tmp_path: Path) -> None:
     root = _repo(tmp_path)
-    (root / "results" / "audits" / "doc-links-20261112.md").write_text(
-        "| `docs/experiments/e25_k2_k8_k16_report.md` |\n", encoding="utf-8"
-    )
+    audits = root / "results" / "audits"
+    for name in ("doc-links-20261112.md", "doc-links.md", "doc-claims.md", "audit-suite.md"):
+        (audits / name).write_text(
+            "| `docs/experiments/e25_k2_k8_k16_report.md` |\n", encoding="utf-8"
+        )
     payload = cdl.scan(root)
     assert payload["docs_scanned"] == 1  # only README.md
     assert payload["missing_required"] == []
+
+
+def test_human_written_audit_report_is_still_scanned(tmp_path: Path) -> None:
+    root = _repo(tmp_path)
+    (root / "results" / "audits" / "metric-redundancy-20261112.md").write_text(
+        "见 `docs/experiments/nonexistent_report.md`。\n", encoding="utf-8"
+    )
+    payload = cdl.scan(root)
+    assert [row["path"] for row in payload["missing_required"]] == [
+        "docs/experiments/nonexistent_report.md"
+    ]
 
 
 def test_render_markdown_reports_zero_as_plain_none(tmp_path: Path) -> None:
