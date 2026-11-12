@@ -254,3 +254,31 @@ python tools/audit_metric_invariants.py --json out.json --report out.md
 - `decreasing` 只报告、不算失败：符号约定问题需要人判断（见 `docs/DECISIONS.md` D-025）。
 - 改完任何指标实现后跑一次。新增指标如果名字以 `_delta` 结尾，会自动进入距离类检查；
   如果它本来就不该在零扰动时为 0（例如输入自身的属性），加进 `NOT_A_DISTANCE`。
+
+## 18. 有符号 vs 绝对 capacity 审计（2026-11-12）
+
+`tools/audit_signed_capacity.py` 回答「`perturbation_capacity_signed_delta` 与
+`perturbation_capacity_delta` 是不是同一个指标」。答案是不是：设置内秩相关中位数 +0.017，
+4/8 设置与 target 的相关符号相反。
+
+**用法**：
+
+```powershell
+python tools/audit_signed_capacity.py `
+  --rows   outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv `
+  --repair outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/repair_rows.csv `
+  --json   results/audits/signed-capacity-20261112.json `
+  --report results/audits/signed-capacity-20261112.md
+```
+
+**三个必须知道的点**：
+
+1. **`--repair` 不能省**。三个 TRNAS 指标在 Kang2021Stable 上因 float32 下溢是 `failed`，
+   修复值单独存在 `repair_rows.csv`；`load_panel` 先 repair 再 dropna，否则要看的指标整列消失。
+2. **退出码 1 表示「不是同一指标」**，这是本工具的正常输出之一，不是崩溃。
+   CI 若把它当失败处理，需要显式接受这个语义。
+3. **`|signed| <= abs` 是配对自检**，560 行必须零例外。不为 0 说明两列不是同一批样本，
+   上面的相关全不可信。
+
+**不要做**：不要因为它「单调下降」就去改注册表的 `direction`。那是改历史（D-021、D-025），
+而且本轮已证明下降是「方向净额」的正常表现，不是符号写错。

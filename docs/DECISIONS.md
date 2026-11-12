@@ -576,3 +576,39 @@ Kendall τ 也配上区间。阈值 `REPRODUCTION_TOLERANCE = 5.5e-4`：发布�
 测试用 6 张（与 CLI 默认一致），并把这个敏感性写进 fixture 注释——它本身是关于该指标的信息。
 
 **后果**：§3 第 14 条、§6 第 0 条、`results/audits/metric-invariants-20261112.{json,md}`。
+
+## D-026 —— 有符号与绝对 capacity 漂移是两个指标，不是同一指标的符号版本（2026-11-12）
+
+**背景**：D-025 的审计发现 `perturbation_capacity_signed_delta` 随扰动增大而单调变负，
+与它注册的 `lower` 方向相反。而 `metrics.py:1265` 与 `:1286` 显示它和
+`perturbation_capacity_delta` 只差一个 `abs()`，所以最自然的读法是「同一个指标，换个符号」。
+
+**决定**：用已发布的 560 行原始数据核对这个读法，结论是不成立——两者在设置内的秩相关
+中位数只有 +0.017，4/8 个设置里它们与 target 的相关符号相反，而配对自检
+`|signed| <= abs` 在 560 行上零例外（两列确实来自同一批样本）。
+
+**为什么这件事值得单独记一笔**：
+
+1. **两条都在榜上**。如果读者以为它们是同一指标的正负版本，就会把两个名次当成两次独立验证；
+   实际上 signed 度量「方向净额」（上升样本抵消下降样本之后的余量），abs 度量「幅度总额」。
+   抵消程度逐模型变化极大，所以两者排序几乎无关。
+2. **不能因此判断哪个更好**。本轮没有控制模型容量，也没有区分「符号约定」与「分母效应」
+   （鲁棒模型的 clean capacity 更小，同样的绝对下降会被放大）。所以 §6 第 0 条只划掉一半，
+   偏秩相关的后续检验仍挂着。
+3. **这不是新发现，而是把旧观察变成可复跑的审计**。`scripts/analyze_e32_generality.py`
+   的 docstring 早就写过 unsigned 丢掉符号结构、会在 NB201 e5 翻转；此前没有人把它量化到
+   榜单层面，也没有配对自检。审计的价值在于「下次改动后能重跑并立刻看到是否还成立」。
+
+**踩过的坑**：把含中文的 Python 补丁脚本经 PowerShell here-string 传给 `Out-File -Encoding utf8`，
+导致整个工具文件写成乱码（U+FFFD），而且脚本里英文双引号包中文还造成语法损坏。
+**教训**：含中文的文件一律用 write 工具写；中文引号一律用「」；脚本里不要把中文放进英文引号中。
+
+**实现里两个会影响结论的细节**：
+
+- `load_panel` 必须**先 repair 再 dropna**，且 `pivot_table(dropna=False)`。否则
+  `repair_rows.csv` 要补的行在合并阶段就被删掉——恰好删掉本次要看的指标（与 D-022 同一个坑）。
+- `summarise` 里加 `abs_le_abs_violations` 配对自检。它是数学恒等式，一旦不为 0 就说明
+  两列不是同一批样本，此时上面所有结论都无意义。测试用「伪造一行 |signed| > |abs|」守住它。
+
+**后果**：§3 第 15 条、§6 第 0 条、`results/audits/signed-capacity-20261112.{json,md}`、
+`tools/audit_signed_capacity.py`、`tests/test_audit_signed_capacity.py`（8 个测试）。

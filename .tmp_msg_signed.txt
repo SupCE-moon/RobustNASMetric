@@ -1,0 +1,17 @@
+feat(audit): show signed and absolute capacity drift are different metrics
+
+`perturbation_capacity_signed_delta` and `perturbation_capacity_delta` differ by
+one `abs()`, so it was natural to read them as one metric up to sign. The released
+rows say otherwise: the within-setting rank correlation between them has a median
+of +0.017, and in 4 of 8 settings their correlation with the target has the
+opposite sign. A pairing self-check (`|signed| <= |absolute|` must hold for every
+row) passes on all 560 rows, so the split is not a join error: the signed value
+averages with sign, letting samples where capacity grew cancel those where it
+shrank.
+
+This does not say which metric is better, and it does not close the question of
+whether the negative direction is a convention or a denominator effect. It does
+mean the two leaderboard entries cannot be cited as two independent confirmations.
+
+Also fixes a real bug found by the new test: `load_panel` dropped NaN rows before
+applying repair_rows.csv, deleting exactly the rows the repair exists to fill.

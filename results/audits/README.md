@@ -207,3 +207,13 @@ python tools/audit_metric_invariants.py --json results/audits/metric-invariants.
 当前结果：69 通过、1 个有记录的非单调（盒计数维度）、1 个已知占位 NaN、
 1 个随扰动下降（`perturbation_capacity_signed_delta`，见 `docs/PROJECT_STATUS.md` §6 第 0 条）、
 3 个记录字段。`decreasing` 不是失败，是"需要人判断符号约定"。
+
+## 有符号 vs 绝对 capacity（2026-11-12）
+
+`tools/audit_signed_capacity.py` → `signed-capacity-20261112.{json,md}`。
+输入是 47,600 行合并表（13.9 MiB，按 D-002/D-012 不入库）+ `repair_rows.csv`。
+
+重跑命令见 `docs/HANDOFF.md` §18。三个容易踩的点：`--repair` 不能省、
+退出码 1 表示「结论是两者不同」（正常）、`|signed|<=abs` 配对自检必须为 0 例外。
+
+结论：两者不是同一指标的符号版本（秩相关中位数 +0.017，4/8 设置符号相反）。

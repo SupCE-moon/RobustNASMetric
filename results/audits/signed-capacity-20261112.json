@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "signed_metric": "perturbation_capacity_signed_delta",
+  "absolute_metric": "perturbation_capacity_delta",
+  "n_rows": 560,
+  "thresholds": {
+    "same_metric_rho": 0.8,
+    "flip_tolerance": 0.1
+  },
+  "summary": {
+    "abs_le_abs_violations": 0,
+    "n_settings": 8,
+    "n_rank_flips": 4,
+    "flipped_settings": [
+      "nb201_e0",
+      "nb201_e25",
+      "nb201_e50",
+      "darts_e100"
+    ],
+    "median_rho_signed_absolute": 0.017284798534798536,
+    "min_rho_signed_absolute": -0.7578397839783977,
+    "median_negative_share": 0.484375
+  },
+  "verdict": "not the same metric",
+  "settings": [
+    {
+      "setting": "rb40_mature",
+      "n": 40,
+      "rho_signed_target": 0.04052532833020639,
+      "rho_absolute_target": -0.6159474671669795,
+      "rho_signed_absolute": -0.326454033771107,
+      "rho_ratio_target": -0.43583489681050663,
+      "ratio_mean": -0.5594528650285724,
+      "ratio_std": 0.4071003811934591,
+      "negative_share": 0.9
+    },
+    {
+      "setting": "nb201_e0",
+      "n": 64,
+      "rho_signed_target": -0.2636446886446886,
+      "rho_absolute_target": 0.2157967032967033,
+      "rho_signed_absolute": 0.010256410256410255,
+      "rho_ratio_target": -0.44674908424908427,
+      "ratio_mean": 0.47342212250158744,
+      "ratio_std": 0.3140820868576111,
+      "negative_share": 0.0625
+    },
+    {
+      "setting": "nb201_e5",
+      "n": 64,
+      "rho_signed_target": 0.1969322344322344,
+      "rho_absolute_target": 0.30769230769230765,
+      "rho_signed_absolute": 0.44052197802197796,
+      "rho_ratio_target": 0.17907509157509155,
+      "ratio_mean": 0.189829789910908,
+      "ratio_std": 0.12191218031944182,
+      "negative_share": 0.046875
+    },
+    {
+      "setting": "nb201_e10",
+      "n": 64,
+      "rho_signed_target": -0.24304029304029304,
+      "rho_absolute_target": -0.18383699633699632,
+      "rho_signed_absolute": 0.44569597069597067,
+      "rho_ratio_target": -0.22568681318681316,
+      "ratio_mean": 0.09954292200489125,
+      "ratio_std": 0.13775428388376734,
+      "negative_share": 0.234375
+    },
+    {
+      "setting": "nb201_e25",
+      "n": 64,
+      "rho_signed_target": -0.613095238095238,
+      "rho_absolute_target": 0.10036630036630036,
+      "rho_signed_absolute": 0.024313186813186814,
+      "rho_ratio_target": -0.5928113553113552,
+      "ratio_mean": -0.0840395717865894,
+      "ratio_std": 0.17786599157275695,
+      "negative_share": 0.734375
+    },
+    {
+      "setting": "nb201_e50",
+      "n": 64,
+      "rho_signed_target": -0.8393315018315018,
+      "rho_absolute_target": 0.5434523809523809,
+      "rho_signed_absolute": -0.5660256410256409,
+      "rho_ratio_target": -0.7120421245421245,
+      "ratio_mean": -0.35958933746887445,
+      "ratio_std": 0.14704131596879416,
+      "negative_share": 0.953125
+    },
+    {
+      "setting": "darts_e0",
+      "n": 100,
+      "rho_signed_target": -0.10745609469645188,
+      "rho_absolute_target": -0.11859417756010734,
+      "rho_signed_absolute": 0.5047344734473447,
+      "rho_ratio_target": 0.06004722905912529,
+      "ratio_mean": 0.6243929290027748,
+      "ratio_std": 0.24308875035031716,
+      "negative_share": 0.01
+    },
+    {
+      "setting": "darts_e100",
+      "n": 100,
+      "rho_signed_target": -0.4039955486968134,
+      "rho_absolute_target": 0.41231310411115957,
+      "rho_signed_absolute": -0.7578397839783977,
+      "rho_ratio_target": -0.22644034520167647,
+      "ratio_mean": -0.5478925066256347,
+      "ratio_std": 0.049331909833239714,
+      "negative_share": 1.0
+    }
+  ],
+  "inputs": {
+    "rows": {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\strict_all_metrics_table_20261024_trnas_repaired\\sources\\metric_values_original_strict.csv",
+      "sha256": "b5137e2b3fe89ce5a99a99ea94bafa48d1abb81c45837551e5b1a54fe42ac92d"
+    },
+    "repair": {
+      "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\strict_all_metrics_table_20261024_trnas_repaired\\sources\\repair_rows.csv",
+      "sha256": "91eaa8dae95082b6b042b943cbcb58dc44e10da9aa7a5ffd1b9e5a6ad74ad0eb"
+    }
+  }
+}
