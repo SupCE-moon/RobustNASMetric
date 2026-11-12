@@ -61,6 +61,25 @@ def test_load_rows_filters_to_one_setting():
     assert loaded.loc["0", "m"] == pytest.approx(1.0)
 
 
+def test_load_rows_keeps_numeric_looking_ids_as_text():
+    """A CSV round-trip turns "0" into 0; the RobBench table keys ids as text.
+
+    Without the cast the join finds nothing, every correlation is None, and the
+    run still looks like it worked until the summary line crashes.
+    """
+    frame = _rows_frame({"0": 1.0, "1": 2.0})
+    frame["model_or_arch_id"] = frame["model_or_arch_id"].astype(int)
+
+    loaded = audit.load_rows_from_frame(frame)
+    robbench = pd.DataFrame(
+        {"target": [0.2, 0.3], "clean": [0.8, 0.9]}, index=pd.Index(["0", "1"], dtype=object)
+    )
+    joined = loaded.join(robbench, how="inner")
+
+    assert len(joined) == 2
+    assert joined["target"].notna().all()
+
+
 def test_partial_spearman_removes_a_shared_driver():
     """If x and y are both driven by control, the partial correlation must collapse."""
     rng = np.random.default_rng(0)

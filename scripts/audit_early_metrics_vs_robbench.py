@@ -69,6 +69,10 @@ def load_rows(path: Path, setting: str = E0_SETTING) -> pd.DataFrame:
 def load_rows_from_frame(rows: pd.DataFrame, setting: str = E0_SETTING) -> pd.DataFrame:
     """Return a models x metrics frame with every metric oriented so higher is better."""
     frame = rows[rows["setting"] == setting].copy()
+    # A CSV round-trip turns arch ids that look like numbers into ints, while the
+    # RobBench table keys them as text.  Without this cast the join silently
+    # returns zero rows and every correlation comes back as None.
+    frame["model_or_arch_id"] = frame["model_or_arch_id"].astype(str)
     lower = frame["direction"].eq("lower")
     frame.loc[lower, "metric_value"] = -frame.loc[lower, "metric_value"]
     return frame.pivot_table(

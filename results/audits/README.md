@@ -242,3 +242,20 @@ python tools/audit_metric_invariants.py --json results/audits/metric-invariants.
 的 `oracle_target` 与 RobBench 的 `autoattack` 对齐核对（64/64、秩相关 +1.000、最大绝对差 0），
 结论是「同一份数据」→ 局限改写为「只有一套 target，无法外部验证」，而不是「两套 target 可能矛盾」。
 suite 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时会自动传这个参数。
+
+## e0 覆盖扩到 400 个架构（2026-11-12）
+
+`scripts/expand_nb201_e0_coverage.py` 把 e27 配方用到 400 个 NB201 架构（必含已发布 64 个），
+`scripts/wide_e0_to_rows.py` 转成 audit 吃的 long 格式。产物：
+
+- `outputs/e28_capacity_family/nb201_e0_n400_20261112.csv`（400 行，不入库，按策略只在本机）
+- `results/audits/early-vs-robbench-n400-20261112.md`（400 架构）
+- `results/audits/early-vs-robbench-same64-20261112.md`（同一配方重跑 64 个，作为对照）
+
+**对照怎么读**：`发布表 64 → 当前代码 64` 只变数据来源（+0.575 → +0.357），
+`当前代码 64 → 当前代码 400` 只变样本量（+0.357 → +0.357，区间收紧）。
+所以 RQ2 的幅度应表述为「约 +0.35」，而不是发布表口径的 +0.5 量级（D-029）。
+
+**不要做的事**：这份 400 表只有 70 个 zero-cost 指标，**不含 TRNAS Φ/R/Ψ**（需要训练轨迹），
+不要用它去重估第 3 节第 17 条里 Φ 的 +0.170；也不要把它与发布表的 e0 数字放进同一张比较表
+（`feature_delta` 差约 20 倍，见 `PROJECT_STATUS` §6 第 10 条）。

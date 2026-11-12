@@ -342,3 +342,35 @@ python scripts/audit_early_metrics_vs_robbench.py `
 
 **下一步不是训练**：RobBench 有 6466 个架构，目前只有 64 个有 e0 指标。先把 e0 指标扩到
 数百个架构（每个约 4 秒），比训练 16 个架构便宜得多，且能把 ±0.25 的区间压窄。
+
+## 21. e0 覆盖扩到 400 个架构：怎么重跑、两个坑（2026-11-12）
+
+**为什么要这条**：`docs/ROADMAP.md` 的 M1 已从"训练 16 个架构"改成"先把 e0 扩到数百个”。
+现在这一步已经做完了（400 个），命令与坑在这里，免得下一个人从头摸。
+
+**数据集位置**：`robust_metric/data/cifar10/cifar-10-batches-py/`。本机 `D:\Project` 下有三份完整副本
+（170,498,071 字节，SHA-256 `6d958be074577803d12ecdefd02955f39262c83c16fe9348329d7fe0b5c001ce`），
+**不需要下载**。`--data-root` 必须指到 `data/cifar10`（torchvision 自己会再拼 `cifar-10-batches-py`），
+指到 `data` 会报 `RuntimeError: Dataset not found or corrupted`，看起来像数据坏了。
+
+**两条命令**：
+
+```powershell
+$env:PYTHONPATH = "<worktree>\src"
+python scripts/expand_nb201_e0_coverage.py --meta <官方>\meta.json --robbench <官方>\NAS-RobBench-201_all.json `
+  --data-root <repo>\data\cifar10 --existing <repo>\outputs\e28_capacity_family\nb201_e0_v3.csv `
+  --limit 400 --output <repo>\outputs\e28_capacity_family\nb201_e0_n400_20261112.csv
+python scripts/wide_e0_to_rows.py --wide <上面的 csv> --output <repo>\outputs\e28_capacity_family\nb201_e0_n400_rows_20261112.csv
+```
+
+**坑 1（会静默毁数据）**：flush 时 `pd.read_csv` 把 `arch_id` 读成 int，`drop_duplicates` 认为 `0` 与 `"0"`
+不同 → 每次 flush 文件翻倍。`merge_rows()` 两侧都 `astype(str)`；有回归测试守着。
+**坑 2（会静默出空结果）**：`audit_early_metrics_vs_robbench` 的 `load_rows` 必须把 arch_id 转字符串，
+否则与 RobBench 的文本索引 join 出 0 行、所有相关为 None，程序跑完只在最后一行崩。
+
+**扩覆盖的能力边界**：e0 只能算 `MetricResult` 的 70 个指标，**不含 TRNAS Φ/R/Ψ**（需要训练轨迹），
+也不含 e37 的 9 个与 racl 3 个。别用这份表去"重估 Φ"。
+
+**当前结论**（改之前先读 D-029）：64 与 400 架构下最高偏相关都是 +0.357，扩大样本买到的是更窄的区间
+（[+0.014,+0.566] → [+0.260,+0.437]），不是更强的信号。发布表的历史 e0 给出 +0.575，
+与当前代码不是同一口径（`feature_delta` 差约 20 倍），**不要混用**。

@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
- "docs_scanned": 97,
- "paths_checked": 472,
+ "docs_scanned": 99,
+ "paths_checked": 488,
  "missing_required": [],
  "missing_planned": [
   {
@@ -130,6 +130,14 @@
  ],
  "missing_optional": [
   {
+   "doc": "docs/DECISIONS.md",
+   "path": "outputs/e28_capacity_family/nb201_e0_n400_20261112.csv"
+  },
+  {
+   "doc": "docs/PROJECT_STATUS.md",
+   "path": "outputs/e28_capacity_family/nb201_e0_n400_20261112.csv"
+  },
+  {
    "doc": "docs/experiments/DARTS_E37_逐层诊断结果与问题记录_20261025.md",
    "path": "outputs/student_metrics/wangjiahao/darts_e37_layer_diagnostic_20261025T120240Z/frozen_manifest.json"
   },
@@ -180,6 +188,10 @@
   {
    "doc": "docs/experiments/实验管理.md",
    "path": "outputs/e21_trnas_mmd/metrics_uniform512_step1e6.csv"
+  },
+  {
+   "doc": "results/audits/README.md",
+   "path": "outputs/e28_capacity_family/nb201_e0_n400_20261112.csv"
   }
  ]
 }
