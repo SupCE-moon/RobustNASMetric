@@ -293,3 +293,18 @@ suite 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时会自动传这
 
 **重跑**：见 `docs/HANDOFF.md` §25；`--reuse` 可只重算分析。该脚本需要 GPU，不进 `run_audit_suite.py`。
 
+
+## e0 指标对权重种子的稳定性（2026-11-12）
+
+`e0-weight-seed-20261112.{json,md}`，由 `scripts/audit_e0_weight_seed.py` 生成（100 架构 × 3 种子，约 11 分钟 GPU）。
+
+回答的问题是"e0 指标是架构的属性，还是那次初始化的运气"。两个数字必须分开看：
+
+- `counts.stable_value`（本次 **53/69**）：同一架构跨种子的指标值是否同序。
+- `counts.stable_signal`（本次 **55/69**）：每个种子单独算的偏相关是否同号同量级。
+
+**输出空间整族（`adversarial_loss`、`natural_loss`、`logit_kl`、`input_loss_delta`）值稳定只有
+0.03–0.17、种子间符号翻转**，不能用于早期预测。输入敏感性与分布距离类稳。
+
+生成前请读 `docs/HANDOFF.md` §26：不要加 `.eval()`（会让结果与发布表不可比），
+`--output-dir` 必须显式给，只改分析时用 `--reuse`。

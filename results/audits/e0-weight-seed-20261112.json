@@ -1,0 +1,1338 @@
+{
+  "schema_version": 1,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "n_architectures": 100,
+  "controls": [
+    "clean",
+    "params"
+  ],
+  "thresholds": {
+    "stable_rho": 0.8,
+    "spread_limit": 0.2
+  },
+  "counts": {
+    "metrics": 69,
+    "stable_value": 53,
+    "stable_signal": 55
+  },
+  "metrics": [
+    {
+      "metric": "input_grad_l2",
+      "value": {
+        "mean_rho": 0.974113411341134,
+        "min_rho": 0.969144914491449,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2915068480355384,
+          0.2966002439492373,
+          0.27844057767422176
+        ],
+        "spread": 0.01815966627501553,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_flow_rel_allpairs_delta",
+      "value": {
+        "mean_rho": 0.9727052705270527,
+        "min_rho": 0.9675487548754875,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.1716295057770131,
+          0.19932842553945487,
+          0.18627287015861438
+        ],
+        "spread": 0.027698919762441765,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "jacobian_spectral_norm",
+      "value": {
+        "mean_rho": 0.9726172617261725,
+        "min_rho": 0.9689408940894088,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2940172711533242,
+          0.31453122567048436,
+          0.2761611600096834
+        ],
+        "spread": 0.03837006566080098,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_delta",
+      "value": {
+        "mean_rho": 0.9673567356735672,
+        "min_rho": 0.9633603360336033,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.13161080152507962,
+          0.1602740092764372,
+          0.12220869343778024
+        ],
+        "spread": 0.038065315838656966,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_flow_rel_multiscale_delta",
+      "value": {
+        "mean_rho": 0.9669324948444533,
+        "min_rho": 0.9615719266242221,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2696990321519243,
+          0.3136243017130424,
+          0.3029945431789259
+        ],
+        "spread": 0.043925269561118085,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_flow_rel_delta",
+      "value": {
+        "mean_rho": 0.9667684774586105,
+        "min_rho": 0.961415910086469,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2735681572999406,
+          0.3124420828300072,
+          0.303960608669591
+        ],
+        "spread": 0.03887392553006658,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_quantile_hausdorff_delta",
+      "value": {
+        "mean_rho": 0.9635283528352835,
+        "min_rho": 0.9574317431743173,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.17516875178473965,
+          0.21079331796961387,
+          0.16415544624880837
+        ],
+        "spread": 0.046637871720805496,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_relu_active_hybrid_rel_delta",
+      "value": {
+        "mean_rho": 0.9628842884288428,
+        "min_rho": 0.9582598259825981,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.165326021228161,
+          0.21141910102369876,
+          0.12270843254205957
+        ],
+        "spread": 0.0887106684816392,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_hausdorff_delta",
+      "value": {
+        "mean_rho": 0.9627642764276426,
+        "min_rho": 0.9567356735673567,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.1847751455557114,
+          0.2113189577850076,
+          0.15378188547371285
+        ],
+        "spread": 0.057537072311294735,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_spectrum_hellinger_delta",
+      "value": {
+        "mean_rho": 0.9603000300030001,
+        "min_rho": 0.9588718871887186,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.15251079604206638,
+          0.19435252471075462,
+          0.16124096929476658
+        ],
+        "spread": 0.04184172866868824,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_relu_active_hybrid_delta",
+      "value": {
+        "mean_rho": 0.9601720172017201,
+        "min_rho": 0.954011401140114,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.15079833159444866,
+          0.17979861258288482,
+          0.07858771697042054
+        ],
+        "spread": 0.10121089561246428,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_graph_fundamental_rank_delta",
+      "value": {
+        "mean_rho": 0.9587598759875986,
+        "min_rho": 0.9519231923192318,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.16534005774950597,
+          0.18313012411842958,
+          0.11683659172378297
+        ],
+        "spread": 0.06629353239464661,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_relu_active_delta",
+      "value": {
+        "mean_rho": 0.9557195719571956,
+        "min_rho": 0.9514911491149114,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.15161473273145695,
+          0.18161806484634826,
+          0.10500074070383542
+        ],
+        "spread": 0.07661732414251285,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_spectrum_js_delta",
+      "value": {
+        "mean_rho": 0.9556555655565555,
+        "min_rho": 0.9525352535253524,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.06537555196474247,
+          0.1363366237599294,
+          0.061324244892733956
+        ],
+        "spread": 0.07501237886719543,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_multiscale_delta",
+      "value": {
+        "mean_rho": 0.951079107910791,
+        "min_rho": 0.9377737773777376,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.21026634859153584,
+          0.2488950785781816,
+          0.21044316300291974
+        ],
+        "spread": 0.038628729986645766,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "local_logit_lipschitz",
+      "value": {
+        "mean_rho": 0.9471707170717071,
+        "min_rho": 0.943066306630663,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.29812758217580926,
+          0.23656085780298886,
+          0.27446454875622994
+        ],
+        "spread": 0.0615667243728204,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_swd",
+      "value": {
+        "mean_rho": 0.9470467046704668,
+        "min_rho": 0.9423822382238223,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2962755276803176,
+          0.23544430209407743,
+          0.26384393093815967
+        ],
+        "spread": 0.060831225586240184,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "fsp_strict_delta",
+      "value": {
+        "mean_rho": 0.9459662724248771,
+        "min_rho": 0.937293353095428,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2790912819983974,
+          0.24609542033590331,
+          0.16900696975492863
+        ],
+        "spread": 0.11008431224346876,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_relu_active_multiscale_delta",
+      "value": {
+        "mean_rho": 0.9426582658265824,
+        "min_rho": 0.9325052505250524,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.13559529586314084,
+          0.22787639432666332,
+          0.1455207322219071
+        ],
+        "spread": 0.09228109846352248,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_flow_delta",
+      "value": {
+        "mean_rho": 0.9402976715531844,
+        "min_rho": 0.9312927170280049,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.31467361008562766,
+          0.2747263833095852,
+          0.17976143808228584
+        ],
+        "spread": 0.13491217200334182,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_relu_active_spatial_delta",
+      "value": {
+        "mean_rho": 0.9387538753875386,
+        "min_rho": 0.9179237923792378,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.14119837094853022,
+          0.08113126360090263,
+          -0.025356596800555405
+        ],
+        "spread": 0.16655496774908563,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    },
+    {
+      "metric": "feature_measure_spatial_gram_delta",
+      "value": {
+        "mean_rho": 0.9352295229522952,
+        "min_rho": 0.9139633963396339,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.14185366883654,
+          0.07778833470427145,
+          -0.007710829793992435
+        ],
+        "spread": 0.14956449863053242,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    },
+    {
+      "metric": "feature_measure_cov_delta",
+      "value": {
+        "mean_rho": 0.9334733473347333,
+        "min_rho": 0.9151755175517551,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.20658599424154037,
+          0.23833228806212098,
+          0.23255248828934377
+        ],
+        "spread": 0.03174629382058061,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "jacobian_spectral_decay",
+      "value": {
+        "mean_rho": 0.9334533453345334,
+        "min_rho": 0.9283888388838883,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.006660007932961322,
+          0.013309118147941867,
+          0.056364318108035535
+        ],
+        "spread": 0.049704310175074214,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_relu_active_spatial_rel_delta",
+      "value": {
+        "mean_rho": 0.933141314131413,
+        "min_rho": 0.9099069906990699,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.14088888152743306,
+          0.07479623378760458,
+          -0.05009510582693008
+        ],
+        "spread": 0.19098398735436314,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    },
+    {
+      "metric": "feature_measure_spatial_gram_rel_delta",
+      "value": {
+        "mean_rho": 0.929080908090809,
+        "min_rho": 0.904218421842184,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.13995249631457676,
+          0.06787115668921705,
+          -0.026674076177689583
+        ],
+        "spread": 0.16662657249226634,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    },
+    {
+      "metric": "feature_measure_spectrum_emd_delta",
+      "value": {
+        "mean_rho": 0.9257885788578856,
+        "min_rho": 0.9206600660066006,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.1089977544485792,
+          0.17308664981901448,
+          0.06476004470115625
+        ],
+        "spread": 0.10832660511785823,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_channel_gram_centered_rel_delta",
+      "value": {
+        "mean_rho": 0.9257285728572856,
+        "min_rho": 0.9061986198619861,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.25261114293743553,
+          0.24618262432500804,
+          0.2856837761467818
+        ],
+        "spread": 0.03950115182177377,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_flow_rel_delta",
+      "value": {
+        "mean_rho": 0.9253108877762167,
+        "min_rho": 0.9092131647515098,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2680913604495958,
+          0.31183324229781373,
+          0.2846263209186942
+        ],
+        "spread": 0.04374188184821792,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_spectral_decay_exponent_static",
+      "value": {
+        "mean_rho": 0.9240959541711421,
+        "min_rho": 0.9057900137414565,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          -0.05664814574724345,
+          -0.08664074272266119,
+          -0.09592973593503652
+        ],
+        "spread": 0.03928159018779307,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_profile_delta",
+      "value": {
+        "mean_rho": 0.9179717971797178,
+        "min_rho": 0.8916651665166515,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2626941939610542,
+          0.32316377793499823,
+          0.30782660587550464
+        ],
+        "spread": 0.06046958397394403,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_robust_rel_delta",
+      "value": {
+        "mean_rho": 0.90991899189919,
+        "min_rho": 0.881008100810081,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.28239699846259214,
+          0.3259008009770549,
+          0.31638231927221994
+        ],
+        "spread": 0.043503802514462786,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_robust_hybrid_rel_delta",
+      "value": {
+        "mean_rho": 0.9064746474647464,
+        "min_rho": 0.8804200420042003,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.24677496472890792,
+          0.31818515614136367,
+          0.29318006655951545
+        ],
+        "spread": 0.07141019141245575,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "jacobian_effective_rank",
+      "value": {
+        "mean_rho": 0.8979657965796578,
+        "min_rho": 0.8938973897389737,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.12828446765180726,
+          0.0550849645095734,
+          0.16702754267973832
+        ],
+        "spread": 0.11194257817016492,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_above_mean_delta",
+      "value": {
+        "mean_rho": 0.8967616761676167,
+        "min_rho": 0.8823162316231622,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2665609925012281,
+          0.2936109671986963,
+          0.2858674282649382
+        ],
+        "spread": 0.02704997469746817,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_mmd",
+      "value": {
+        "mean_rho": 0.8937413741374137,
+        "min_rho": 0.8827002700270027,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2957636829696901,
+          0.2731740273327805,
+          0.3199914526426318
+        ],
+        "spread": 0.04681742530985128,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_robust_spatial_delta",
+      "value": {
+        "mean_rho": 0.8881488148814881,
+        "min_rho": 0.8586738673867387,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.211817669144078,
+          0.276562842659704,
+          0.2053440267577114
+        ],
+        "spread": 0.07121881590199258,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_robust_hybrid_delta",
+      "value": {
+        "mean_rho": 0.8872487248724871,
+        "min_rho": 0.8476447644764475,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.22530093580324417,
+          0.28205679253247484,
+          0.23747359765980855
+        ],
+        "spread": 0.05675585672923067,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_robust_delta",
+      "value": {
+        "mean_rho": 0.8854125412541253,
+        "min_rho": 0.8357755775577557,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2680357681227079,
+          0.30685196298140155,
+          0.31124225349818685
+        ],
+        "spread": 0.04320648537547894,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_robust_spatial_rel_delta",
+      "value": {
+        "mean_rho": 0.8853765376537653,
+        "min_rho": 0.8577017701770175,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.20851688440893484,
+          0.27031469032676564,
+          0.2016006280652545
+        ],
+        "spread": 0.06871406226151114,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_channelwise_delta",
+      "value": {
+        "mean_rho": 0.883028302830283,
+        "min_rho": 0.8479567956795678,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2964371941027831,
+          0.2732891586098715,
+          0.32159237928382317
+        ],
+        "spread": 0.04830322067395165,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_topk_delta",
+      "value": {
+        "mean_rho": 0.8826682668266826,
+        "min_rho": 0.8498889888988898,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.3248858402437692,
+          0.3538964665881487,
+          0.327123072474245
+        ],
+        "spread": 0.02901062634437951,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_delta",
+      "value": {
+        "mean_rho": 0.8806880688068807,
+        "min_rho": 0.8442244224422443,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.28941879873451887,
+          0.3236487741430392,
+          0.2687358123392657
+        ],
+        "spread": 0.05491296180377353,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_flow_corr_symmetric_rel_delta",
+      "value": {
+        "mean_rho": 0.8571665198521363,
+        "min_rho": 0.8364629636936973,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.23696843276388582,
+          0.1570219112484432,
+          0.2675586357411791
+        ],
+        "spread": 0.11053672449273591,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_flow_corr_rel_delta",
+      "value": {
+        "mean_rho": 0.8566142064244672,
+        "min_rho": 0.835958701475564,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2364659041399437,
+          0.15688203454698432,
+          0.2676580989129323
+        ],
+        "spread": 0.11077606436594797,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_gini_delta",
+      "value": {
+        "mean_rho": 0.854173417341734,
+        "min_rho": 0.8402640264026402,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2713701474103576,
+          0.24086307277791325,
+          0.33992944103429945
+        ],
+        "spread": 0.0990663682563862,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_spectral_erank_static",
+      "value": {
+        "mean_rho": 0.84772785915307,
+        "min_rho": 0.7796206397878174,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.305298411476079,
+          0.2705365834428659,
+          0.18689957419905182
+        ],
+        "spread": 0.11839883727702719,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_spectral_participation_ratio_static",
+      "value": {
+        "mean_rho": 0.8354465573350774,
+        "min_rho": 0.7585584071911622,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.3205890491507595,
+          0.2837663837438552,
+          0.21821592531251993
+        ],
+        "spread": 0.10237312383823954,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_weighted_delta",
+      "value": {
+        "mean_rho": 0.8317471747174716,
+        "min_rho": 0.738169816981698,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.26270847568747396,
+          0.3136630672731815,
+          0.29363008662356005
+        ],
+        "spread": 0.05095459158570753,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_fsp_rel_multiscale_delta",
+      "value": {
+        "mean_rho": 0.826190619061906,
+        "min_rho": 0.8082208220822081,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.12881623537435852,
+          0.013688234887556567,
+          0.16069400027794079
+        ],
+        "spread": 0.1470057653903842,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_iqr_delta",
+      "value": {
+        "mean_rho": 0.822074207420742,
+        "min_rho": 0.765088508850885,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2798634850367034,
+          0.3633467704940225,
+          0.23772022819659733
+        ],
+        "spread": 0.12562654229742515,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_relu_active_delta",
+      "value": {
+        "mean_rho": 0.8115291529152914,
+        "min_rho": 0.7732253225322532,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.23105032114091173,
+          0.339517163774279,
+          0.24919865368838523
+        ],
+        "spread": 0.10846684263336726,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_flow_corr_angular_delta",
+      "value": {
+        "mean_rho": 0.8060058980059882,
+        "min_rho": 0.7719654247457787,
+        "pairs": 3
+      },
+      "value_verdict": "stable_value",
+      "signal": {
+        "by_seed": [
+          0.2640735819162599,
+          0.13592318092975975,
+          0.21370516698691908
+        ],
+        "spread": 0.12815040098650016,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_layerprofile_delta",
+      "value": {
+        "mean_rho": 0.7939581595649138,
+        "min_rho": 0.701576367094912,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.2512071690176939,
+          0.11726207381664969,
+          0.012508285765496702
+        ],
+        "spread": 0.2386988832521972,
+        "sign_flips": false
+      },
+      "signal_verdict": "signal_spread"
+    },
+    {
+      "metric": "feature_measure_local_delta",
+      "value": {
+        "mean_rho": 0.7913711371137113,
+        "min_rho": 0.6702670267026702,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.26171693868877965,
+          0.3152856878387301,
+          0.2919027350724952
+        ],
+        "spread": 0.05356874914995047,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "perturbation_capacity_iqr_active_delta",
+      "value": {
+        "mean_rho": 0.7743174317431741,
+        "min_rho": 0.73995799579958,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.2518923156339566,
+          0.35785543028458794,
+          0.2243193648483916
+        ],
+        "spread": 0.13353606543619634,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_struct_delta",
+      "value": {
+        "mean_rho": 0.7630363036303628,
+        "min_rho": 0.6985418541854185,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.2639948991997572,
+          0.22377286569025992,
+          0.29208783945583733
+        ],
+        "spread": 0.06831497376557741,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_moment_delta",
+      "value": {
+        "mean_rho": 0.7402140214021401,
+        "min_rho": 0.6884848484848484,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.15211343084945567,
+          0.05308279502061722,
+          0.2774504588667557
+        ],
+        "spread": 0.22436766384613846,
+        "sign_flips": false
+      },
+      "signal_verdict": "signal_spread"
+    },
+    {
+      "metric": "feature_measure_channel_gram_cosine_delta",
+      "value": {
+        "mean_rho": 0.7199759975997598,
+        "min_rho": 0.6697269726972696,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.05992297666908128,
+          -0.056579591075087726,
+          0.08768711816099126
+        ],
+        "spread": 0.14426670923607898,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    },
+    {
+      "metric": "margin_input_grad_ratio",
+      "value": {
+        "mean_rho": 0.7062906290629062,
+        "min_rho": 0.6543054305430542,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.27786160828181655,
+          0.3122724122383672,
+          0.37977313783195765
+        ],
+        "spread": 0.1019115295501411,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "feature_measure_struct01_delta",
+      "value": {
+        "mean_rho": 0.7048064806480646,
+        "min_rho": 0.6428682868286828,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.17437094972505812,
+          0.11502549462336996,
+          0.30081415858495175
+        ],
+        "spread": 0.18578866396158178,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "fsp_delta",
+      "value": {
+        "mean_rho": 0.7035143514351434,
+        "min_rho": 0.638055805580558,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.14723988817498618,
+          0.05356816608479271,
+          0.27916167895892735
+        ],
+        "spread": 0.22559351287413465,
+        "sign_flips": false
+      },
+      "signal_verdict": "signal_spread"
+    },
+    {
+      "metric": "feature_measure_spatial_gram_cosine_delta",
+      "value": {
+        "mean_rho": 0.6738353835383538,
+        "min_rho": 0.6457605760576057,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.07949295832244381,
+          -0.09594459770548475,
+          -0.12469256017814014
+        ],
+        "spread": 0.20418551850058395,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    },
+    {
+      "metric": "feature_box_dimension_delta",
+      "value": {
+        "mean_rho": 0.6129052905290528,
+        "min_rho": 0.5406060606060605,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.3216962845868384,
+          0.0352675381159483,
+          0.15957107179110142
+        ],
+        "spread": 0.2864287464708901,
+        "sign_flips": false
+      },
+      "signal_verdict": "signal_spread"
+    },
+    {
+      "metric": "perturbation_capacity_signed_delta",
+      "value": {
+        "mean_rho": 0.4219181918191819,
+        "min_rho": 0.2481128112811281,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.11586908516887189,
+          0.16926100415831938,
+          0.15407816661905005
+        ],
+        "spread": 0.05339191898944749,
+        "sign_flips": false
+      },
+      "signal_verdict": "stable_signal"
+    },
+    {
+      "metric": "logit_kl",
+      "value": {
+        "mean_rho": 0.16576931537662218,
+        "min_rho": 0.12069410440848409,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          -0.1559667467138927,
+          0.049668652991620585,
+          0.06081890645783578
+        ],
+        "spread": 0.2167856531717285,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    },
+    {
+      "metric": "natural_loss",
+      "value": {
+        "mean_rho": 0.0937973797379738,
+        "min_rho": -0.0363036303630363,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          -0.136391080085349,
+          0.07481164327601394,
+          0.05043948317978277
+        ],
+        "spread": 0.21120272336136295,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    },
+    {
+      "metric": "adversarial_loss",
+      "value": {
+        "mean_rho": 0.0937973797379738,
+        "min_rho": -0.0363036303630363,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          -0.136391080085349,
+          0.07481164327601394,
+          0.05043948317978277
+        ],
+        "spread": 0.21120272336136295,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    },
+    {
+      "metric": "input_loss_delta",
+      "value": {
+        "mean_rho": 0.03503422785154638,
+        "min_rho": -0.1784606797701945,
+        "pairs": 3
+      },
+      "value_verdict": "seed_dependent",
+      "signal": {
+        "by_seed": [
+          0.01347443588820418,
+          0.07281460755274957,
+          -0.06095405179663616
+        ],
+        "spread": 0.13376865934938573,
+        "sign_flips": true
+      },
+      "signal_verdict": "signal_flips"
+    }
+  ],
+  "inputs": {
+    "wide": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\e28_capacity_family\\nb201_e0_n400_20261112.csv"
+  }
+}

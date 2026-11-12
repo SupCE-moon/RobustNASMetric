@@ -452,3 +452,37 @@ python scripts\audit_e0_perturbation_sensitivity.py `
 **判断标准没变**：`run_audit_suite.py` 的 `failed==0` 是交付门槛；扰动敏感性是"结论稳健性"的附加证据，
 不是门槛的一部分。
 
+
+## 26. 早期指标的"值稳定"要单独测（2026-11-12）
+
+**什么时候需要**：任何声称"e0 指标能预测训练后鲁棒性"的结论，都要先回答"换个随机初始化还在不在"。
+
+**跑一次**（100 架构 × 3 种子，约 11 分钟 GPU）：
+
+```powershell
+python scripts\audit_e0_weight_seed.py `
+  --wide <主工作树>\outputs\e28_capacity_family\nb201_e0_n400_20261112.csv `
+  --data-root <主工作树>\data\cifar10 `
+  --limit 100 --seeds 0,1,2 --samples 64 --device cuda `
+  --output-dir <主工作树>\outputs\e28_capacity_family\seedcheck `
+  --json results\audits\e0-weight-seed-20261112.json `
+  --report results\audits\e0-weight-seed-20261112.md
+```
+
+只改分析逻辑时加 `--reuse`，它直接读 `--output-dir` 下已有的三张表，秒级。
+
+**判据**：`counts.stable_value` 与 `counts.stable_signal`。值稳定 < 0.8 的指标不能当架构的固定特征。
+
+**三个坑**：
+
+1. **不要给网络加 `.eval()`**。发布表由 `scripts/evaluate_nb201_e27_zerocost.py` 生成，那个脚本
+   从不切换模式。加了之后值稳定会从 53/69 掉到 14/69——看着像结论，其实是配方漂移。
+2. **`--output-dir` 必须显式传**。省略时默认写到 `--wide` 的目录；传成空字符串会写到**当前目录**
+   （会在仓库根留下三张 CSV，`git status` 里一眼能看到）。`--reuse` 找的是 `--output-dir` 下的文件，
+   目录不匹配就会静默重跑 11 分钟。
+3. **核对配方**：算完 seed 0，与发布宽表按 `arch_id` 对齐逐列比。2026-11-12 实测 100 行 × 70 列里
+   57 列逐位相同，其余 13 列差 ≤ 1e-2（最大 `margin_input_grad_ratio` 7.8e-3，GPU 规约顺序导致）。
+   如果出现**量级**差异（不是 1e-2 而是 2 倍以上），先查调用序列，不要急着解释。
+
+**不要做的事**：不要用这个结论去否定榜单里 `adversarial_loss` 的名次。榜单评的是**已训练模型**，
+那里的输出层不是随机投影；这里评的是**未训练网络**。两个结论各自成立，不能互相引用。
