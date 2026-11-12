@@ -128,3 +128,19 @@ python tools/check_doc_links.py `
 （实际 `e25_k8_three_source_validation_report.md`）与 2 处 `e35_final_summary.md`（实际 `e35.md`）。
 
 **边界**：只证明路径存在，不证明文件内容与文档描述一致。
+
+## 设置权重与分网格名次（`setting-weights-20261112`）
+
+    python tools/analyze_setting_weights.py \
+      --table outputs/strict_adv_excess_release_20261024T110422Z/RobustMetric_严格全部指标总表_86项_三位小数.csv \
+      --json results/audits/setting-weights-20261112.json \
+      --report results/audits/setting-weights-20261112.md
+
+回答"八设置简单平均实际在平均什么"。把八列拆成 RB40 / NB201 / DARTS 三个网格分别排名，
+算各网格与最终榜的 Kendall τ，并列出 7 个重点指标在四套名次里的位置。
+
+结论：与只 NB201 的 τ = +0.926，与只 RB40 的 τ = −0.127。
+**引用名次时必须说明是哪一套名次**，详见 D-021。
+
+注意：这只是重读已发布表，**不改协议、不改任何数字**。
+RB40 只有 40 个模型，该列是点估计、没有置信区间，不能当定论引用。

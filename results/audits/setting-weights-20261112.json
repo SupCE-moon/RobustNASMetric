@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "n_ranked_metrics": 84,
+  "weights": {
+    "rb40": 0.125,
+    "nb201": 0.625,
+    "darts": 0.25
+  },
+  "agreement": {
+    "all__vs__rb40": {
+      "n": 84,
+      "kendall_tau": -0.127,
+      "top10_overlap": 1
+    },
+    "all__vs__nb201": {
+      "n": 84,
+      "kendall_tau": 0.9258,
+      "top10_overlap": 7
+    },
+    "all__vs__darts": {
+      "n": 84,
+      "kendall_tau": 0.3394,
+      "top10_overlap": 5
+    },
+    "nb201__vs__rb40": {
+      "n": 84,
+      "kendall_tau": -0.1794,
+      "top10_overlap": 0
+    },
+    "darts__vs__rb40": {
+      "n": 84,
+      "kendall_tau": -0.3534,
+      "top10_overlap": 2
+    },
+    "darts__vs__nb201": {
+      "n": 84,
+      "kendall_tau": 0.3222,
+      "top10_overlap": 4
+    }
+  },
+  "focus": {
+    "trnas_consistency_phi": {
+      "rank_all": 1,
+      "rank_rb40": 12,
+      "rank_nb201": 2,
+      "rank_darts": 2,
+      "score_all_setting_mean": 0.782
+    },
+    "trnas_r_score": {
+      "rank_all": 2,
+      "rank_rb40": 73,
+      "rank_nb201": 1,
+      "rank_darts": 1,
+      "score_all_setting_mean": 0.738
+    },
+    "trnas_activation_psi": {
+      "rank_all": 4,
+      "rank_rb40": 76,
+      "rank_nb201": 3,
+      "rank_darts": 3,
+      "score_all_setting_mean": 0.598
+    },
+    "feature_measure_multiview_max_delta": {
+      "rank_all": 6,
+      "rank_rb40": 35,
+      "rank_nb201": 7,
+      "rank_darts": 22,
+      "score_all_setting_mean": 0.524
+    },
+    "feature_measure_multiview_rms_delta": {
+      "rank_all": 7,
+      "rank_rb40": 38,
+      "rank_nb201": 12,
+      "rank_darts": 44,
+      "score_all_setting_mean": 0.495
+    },
+    "adversarial_loss": {
+      "rank_all": 3,
+      "rank_rb40": 2,
+      "rank_nb201": 20,
+      "rank_darts": 5,
+      "score_all_setting_mean": 0.614
+    },
+    "fsp_delta": {
+      "rank_all": 8,
+      "rank_rb40": 43,
+      "rank_nb201": 14,
+      "rank_darts": 30,
+      "score_all_setting_mean": 0.479
+    }
+  },
+  "setting_vs_final": {
+    "rb40_mature": -0.2049,
+    "nb201_e0": 0.567,
+    "nb201_e5": 0.9369,
+    "nb201_e10": 0.9076,
+    "nb201_e25": 0.9342,
+    "nb201_e50": 0.9289,
+    "darts_e0": 0.1288,
+    "darts_e100": 0.5128
+  },
+  "top10_by_grid": {
+    "all": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "rb40": [
+      19,
+      2,
+      52,
+      20,
+      67,
+      62,
+      64,
+      36,
+      61,
+      17
+    ],
+    "nb201": [
+      1,
+      0,
+      3,
+      4,
+      9,
+      11,
+      5,
+      8,
+      10,
+      13
+    ],
+    "darts": [
+      1,
+      0,
+      3,
+      26,
+      2,
+      4,
+      48,
+      55,
+      64,
+      73
+    ]
+  },
+  "top10_names_by_grid": {
+    "all": [
+      "trnas_consistency_phi",
+      "trnas_r_score",
+      "adversarial_loss",
+      "trnas_activation_psi",
+      "natural_loss",
+      "feature_measure_multiview_max_delta",
+      "feature_measure_multiview_rms_delta",
+      "fsp_delta",
+      "feature_measure_flow_corr_rms_delta",
+      "feature_measure_flow_corr_symmetric_rel_delta"
+    ],
+    "rb40": [
+      "feature_adv_excess_centered_unit_l2",
+      "adversarial_loss",
+      "perturbation_capacity_topk_delta",
+      "perturbation_capacity_channelwise_delta",
+      "perturbation_capacity_iqr_delta",
+      "perturbation_capacity_delta",
+      "input_loss_delta",
+      "perturbation_capacity_flow_rel_delta",
+      "perturbation_capacity_multiscale_delta",
+      "perturbation_capacity_profile_delta"
+    ],
+    "nb201": [
+      "trnas_r_score",
+      "trnas_consistency_phi",
+      "trnas_activation_psi",
+      "natural_loss",
+      "feature_measure_flow_corr_symmetric_rel_delta",
+      "feature_measure_flow_corr_rel_delta",
+      "feature_measure_multiview_max_delta",
+      "feature_measure_flow_corr_rms_delta",
+      "feature_measure_flow_corr_angular_delta",
+      "feature_measure_moment_delta"
+    ],
+    "darts": [
+      "trnas_r_score",
+      "trnas_consistency_phi",
+      "trnas_activation_psi",
+      "margin_input_grad_ratio",
+      "adversarial_loss",
+      "natural_loss",
+      "feature_measure_swd",
+      "jacobian_spectral_decay",
+      "input_loss_delta",
+      "jacobian_effective_rank"
+    ]
+  },
+  "input": {
+    "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\.worktrees\\mainline-consolidation\\outputs\\strict_adv_excess_release_20261024T110422Z\\RobustMetric_严格全部指标总表_86项_三位小数.csv",
+    "sha256": "f69717bdbf02f7aba03985bae8a813ab3bd0190936604f9f3662f51357ef5276"
+  }
+}

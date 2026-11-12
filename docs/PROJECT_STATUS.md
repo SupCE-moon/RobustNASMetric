@@ -146,6 +146,38 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
     3 条进"已说明为服务器/外部文件"桶（附理由），12 条 `outputs/` 缺失属正常。
     详见 `results/audits/doc-links-20261112.md` 与 D-018。
 
+11. **八设置平均实际上是"NB201 平均"（2026-11-12 新增，改变对榜单的读法）**
+    `tools/analyze_setting_weights.py` 把冻结表的八列拆成三个网格分别排名，结果：
+
+    | 网格 | 设置数 | 在平均里的权重 | 与最终榜的 Kendall τ |
+    | --- | ---: | ---: | ---: |
+    | RobustBench（已训练防御模型） | 1 | 12.5% | **−0.127** |
+    | NAS-Bench-201（5 个训练阶段） | 5 | 62.5% | **+0.926** |
+    | DARTS（2 个训练阶段） | 2 | 25.0% | +0.339 |
+
+    即：**84 项名次有九成以上由 NB201 的训练阶段决定，而与"已训练防御模型"的排序几乎无关、略反向。**
+
+    具体到指标（全 8 设置名次 → 只 RB40 名次）：
+
+    | 指标 | 全 8 设置 | 只 RB40 | 只 NB201 |
+    | --- | ---: | ---: | ---: |
+    | `trnas_consistency_phi` | 1 | 12 | 2 |
+    | `trnas_r_score` | 2 | **73** | 1 |
+    | `trnas_activation_psi` | 4 | **76** | 3 |
+    | `adversarial_loss` | 3 | **2** | 20 |
+    | `feature_measure_multiview_max_delta` | 6 | 35 | 7 |
+
+    在 40 个真实已训练防御模型上，最强的是 `feature_adv_excess_centered_unit_l2`（0.766）与
+    `adversarial_loss`（0.743）；`trnas_r_score` 是 **−0.184**（负相关，用它排序会把模型排反）。
+
+    **这不说明榜单算错了**——冻结协议就是八设置简单平均，权重高是协议的一部分。
+    它说明的是：**引用"第 N 名"时必须说明是哪一套名次**，不能把全 8 设置的名次
+    直接读成"在已训练防御模型上的排序力"。这一条直接影响 RQ1 的表述方式。
+    详见 `results/audits/setting-weights-20261112.md` 与 D-021。
+
+    **局限**：RB40 只有 40 个模型，单指标 Spearman 的 95% CI 通常宽达 ±0.3，
+    所以"只 RB40"那一列是**指示性**的；要下定论必须补按模型的 bootstrap（列入下一轮待办）。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**
@@ -153,6 +185,9 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 - 在当前的 84 项严格榜上，TRNAS Φ 排第 1（0.7822），自研 multiview max 排第 6（0.5241）。
 - 榜单的 85 个指标并不互相独立：ρ ≥ 0.5 时聚成 21 簇，最大一簇 35 个（`feature_measure_*` 漂移变体），
   TRNAS 的 Φ/R/Ψ 自成一簇，`jacobian_effective_rank` 与主流负相关。
+- **84 项名次约 93% 由 NB201 的 5 个训练阶段决定**（τ = +0.926），与只 RB40 的排名几乎无关
+  （τ = −0.127）；在 40 个已训练防御模型上，`trnas_r_score` 是 **−0.184**（第 73/84），
+  `trnas_activation_psi` 第 76/84，而 `adversarial_loss` 第 2、`feature_adv_excess_centered_unit_l2` 第 1。
 - 自研指标在 NB201 五阶段内部排序能力可用（0.63–0.76），但**跨空间**（DARTS）几乎失效（≈0）。
 - RB40 上自研指标与鲁棒性的相关性，在控制家族与参数量后大幅下降（max 0.576→0.186）。
 
