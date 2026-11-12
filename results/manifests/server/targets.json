@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "note": "Directories that must be censused on the server once SSH works. Paths are taken verbatim from docs/experiments/*.md, not from memory. 'expect' records what the documents claim, so a mismatch is visible instead of silent.",
+  "container": "wangjiahao",
+  "host": "guzhengkai@49.232.181.138",
+  "ports_tried": [17010, 17018, 17013],
+  "targets": [
+    {
+      "path": "/workspace/robust_metric_lab_nas",
+      "kind": "code",
+      "expect": "Not a git worktree. Should correspond to commit dc6fb9c (recorded base); verify with file hashes.",
+      "priority": 1
+    },
+    {
+      "path": "/workspace/robust_metric_lab_nas/outputs/student_metrics/wangjiahao/strict_adv_excess_release_20261024T110422Z",
+      "kind": "release",
+      "expect": "Authoritative 86-row release: 48,160 raw rows, 84 ranked metrics, 2 RACL exclusions, release_verification PASS.",
+      "priority": 1
+    },
+    {
+      "path": "/workspace/robust_metric_lab_nas/outputs/student_metrics/wangjiahao/strict_final_release_20261008T000000Z",
+      "kind": "release_superseded",
+      "expect": "80-metric predecessor. Keep for provenance; never quote its ranks.",
+      "priority": 3
+    },
+    {
+      "path": "/workspace/robust_metric_lab_nas/outputs/student_metrics/wangjiahao/strict_trnas_direct_ode_release_20261024T000000Z",
+      "kind": "release_intermediate",
+      "expect": "TRNAS direct-ODE repair intermediate; maximum parameter change 1.13e-6.",
+      "priority": 3
+    },
+    {
+      "path": "/workspace/robust_metric_lab_nas/outputs/student_metrics/wangjiahao/darts_e37_layer_diagnostic_20261025T120240Z",
+      "kind": "diagnostic",
+      "expect": "v4 verification PASS, 200 keys, 100 cross-stage pairs, canonical SHA-256 63b8ab30...",
+      "priority": 2
+    },
+    {
+      "path": "/workspace/robust_metric_lab_nas/outputs/student_metrics/wangjiahao/existing_metrics_full_v3_cpu_repair",
+      "kind": "grid",
+      "expect": "CPU repair of the existing metric grid; source of the 560-row main grid.",
+      "priority": 3
+    },
+    {
+      "path": "/workspace/robust_metric_lab_nas/shared_benchmarks/robust_metric_v1",
+      "kind": "benchmark_manifests",
+      "expect": "Three main-grid manifests: RB40 5b519799..., NB201 a158c609..., DARTS 7761b4a4...",
+      "priority": 1
+    },
+    {
+      "path": "/workspace/robust_metric_lab_nas/data/official_nasrobbench201_source_20261031",
+      "kind": "dataset",
+      "expect": "NAS-Bench-201 tables; 15.6 MB all.json + 2.1 MB meta.json, byte-identical copy kept locally.",
+      "priority": 2
+    },
+    {
+      "path": "/workspace/robust_metric_lab_nas/docs/experiments/source_snapshot",
+      "kind": "docs",
+      "expect": "Snapshots referenced by experiment reports; small, should be imported once verified.",
+      "priority": 2
+    }
+  ],
+  "hash_policy": {
+    "full_sha256_under_mb": 2048,
+    "above": "record size + mtime + sha256 of first and last 8 MiB, flagged as sampled",
+    "reason": "Full hashing of tens of GB of checkpoints over SSH costs hours and would block the first census; sampled hashes still detect truncation and substitution."
+  },
+  "excluded_from_manifest": [
+    ".venv",
+    "__pycache__",
+    "outputs/**/per_source/*.csv (per-sample rows stay on the server)"
+  ]
+}
