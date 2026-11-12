@@ -54,5 +54,26 @@ def make_adversarial(
         return fgsm(model, x, y, epsilon)
     if attack_key in {"pgd", "pgd-lite", "pgd_lite"}:
         return pgd_linf(model, x, y, epsilon, steps=pgd_steps)
+    if attack_key in {"fixed", "fixed-noise", "fixednoise"}:
+        return fixed_linf(x, epsilon)
     raise ValueError(f"Unsupported attack: {attack}")
+
+
+_FIXED_SIGN = None
+
+
+def fixed_linf(x: torch.Tensor, epsilon: float, seed: int = 20260912) -> torch.Tensor:
+    """Fixed random sign perturbation, identical across models/architectures.
+
+    Unlike white-box fgsm (whose direction is the model's own random gradient at
+    random init), this is a single fixed input-space direction. It removes the
+    'arbitrary direction' confound E27 identified for zero-cost delta metrics.
+    """
+    global _FIXED_SIGN
+    if _FIXED_SIGN is None or _FIXED_SIGN.device != x.device:
+        g = torch.Generator(device=x.device).manual_seed(seed)
+        _FIXED_SIGN = (
+            torch.randint(0, 2, x.shape[1:], generator=g, device=x.device).to(x.dtype) * 2 - 1
+        )
+    return clamp_linf(x + epsilon * _FIXED_SIGN, x, epsilon).detach()
 

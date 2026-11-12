@@ -82,11 +82,16 @@ def racl_architecture_lipschitz_stats(
     num_cells = 0
     num_nodes = 0
     zero_node_sums = 0
+    from .nb201_space import Nb201InferCell
+
     with torch.no_grad():
         for cell in model.modules():
-            if type(cell).__name__ != "InferCell":
-                continue
             if not all(hasattr(cell, field) for field in ("layers", "node_IX")):
+                continue
+            # The repository implementation has a concrete type.  The exact
+            # teacher implementation uses InferCell, but is admitted only
+            # after the structural fields above have been verified.
+            if not isinstance(cell, Nb201InferCell) and type(cell).__name__ != "InferCell":
                 continue
             num_cells += 1
             for node_layers in cell.node_IX:

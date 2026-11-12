@@ -126,3 +126,7 @@ node_modules/
 
 # Microsoft Office lock files
 ~$*
+
+# Sub-agent scratch state
+/.superpowers/
+
