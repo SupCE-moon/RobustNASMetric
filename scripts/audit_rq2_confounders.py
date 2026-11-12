@@ -95,7 +95,14 @@ def partial_rho(x, y, controls) -> float | None:
     if mask.sum() < MIN_ARCH:
         return None
 
-    design = np.column_stack([np.ones(int(mask.sum())), control_matrix[mask]])
+    # Rank the controls too.  Regressing a ranked x on raw control values is not
+    # a rank statistic for any known estimator, and it disagrees with
+    # `audit_early_metrics_vs_robbench.partial_spearman`, which ranks everything.
+    # On the 400-architecture table the difference is not small: `feature_delta`
+    # controlling clean and parameters comes out +0.422 with raw controls and
+    # +0.145 with ranked ones.
+    ranked_controls = [_rank(column) for column in control_matrix[mask].T]
+    design = np.column_stack([np.ones(int(mask.sum())), *ranked_controls])
     rx = _residualise(_rank(x[mask]), design)
     ry = _residualise(_rank(y[mask]), design)
     if rx.std() == 0 or ry.std() == 0:

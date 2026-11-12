@@ -158,3 +158,32 @@ def test_render_markdown_states_the_buckets():
     assert "参数量" in text
     assert "survives" in text
     assert "不是因果" in text
+
+
+def test_partial_rho_ranks_the_controls_too():
+    """A monotone transform of a control must not change the answer.
+
+    Ranking everything makes the estimator invariant under that transform;
+    regressing a ranked x on the raw control does not, and on the real table the
+    gap for `feature_delta` is +0.422 versus +0.145.  This pins the ranked form.
+    """
+    rng = np.random.default_rng(0)
+    control = rng.normal(size=200)
+    x = control * 3.0 + rng.normal(size=200) * 0.1
+    y = control * 3.0 + rng.normal(size=200) * 0.1
+    assert audit.partial_rho(x, y, [np.exp(control)]) == pytest.approx(
+        audit.partial_rho(x, y, [control]), abs=1e-9
+    )
+
+
+def test_partial_rho_agrees_with_the_early_metric_helper():
+    """Two audits in this repo compute the same statistic; they must not diverge."""
+    import audit_early_metrics_vs_robbench as early
+
+    rng = np.random.default_rng(1)
+    control = rng.normal(size=150)
+    x = control * 1.5 + rng.normal(size=150)
+    y = control * 1.5 + rng.normal(size=150)
+    assert audit.partial_rho(x, y, [control]) == pytest.approx(
+        early.partial_spearman(x, y, control), abs=1e-9
+    )

@@ -1,0 +1,1054 @@
+{
+  "schema_version": 1,
+  "n_architectures": 400,
+  "variants": {
+    "weak": {
+      "config": {
+        "attack": "fgsm",
+        "epsilon": 0.01568627450980392,
+        "steps": 1
+      },
+      "n": 400,
+      "scores": {
+        "feature_delta": {
+          "raw": 0.05133747243154471,
+          "controlled": -0.01609490951405312
+        },
+        "feature_measure_swd": {
+          "raw": 0.5513963010634767,
+          "controlled": 0.5039927294210957
+        },
+        "feature_measure_mmd": {
+          "raw": 0.5150847390108906,
+          "controlled": 0.5332727182595083
+        },
+        "feature_measure_cov_delta": {
+          "raw": 0.22890402964463347,
+          "controlled": 0.4860099915994698
+        },
+        "feature_hausdorff_delta": {
+          "raw": -0.020486988560114206,
+          "controlled": 0.174240968782886
+        },
+        "feature_quantile_hausdorff_delta": {
+          "raw": -0.07693069237334887,
+          "controlled": 0.1688956878469332
+        },
+        "feature_box_dimension_delta": {
+          "raw": 0.0631896367861147,
+          "controlled": 0.24292429966931098
+        },
+        "feature_graph_fundamental_rank_delta": {
+          "raw": -0.1344048112917162,
+          "controlled": 0.13813784946042773
+        },
+        "feature_measure_moment_delta": {
+          "raw": -0.13821568779144658,
+          "controlled": -0.14020157235521422
+        },
+        "feature_measure_local_delta": {
+          "raw": -0.3821665342447033,
+          "controlled": -0.29568842153121067
+        },
+        "feature_measure_weighted_delta": {
+          "raw": -0.3761429512295203,
+          "controlled": -0.2799382738492756
+        },
+        "feature_measure_struct_delta": {
+          "raw": -0.22422258316343993,
+          "controlled": -0.1974169059068771
+        },
+        "feature_measure_struct01_delta": {
+          "raw": -0.1665916191471846,
+          "controlled": -0.16042553704216933
+        },
+        "perturbation_capacity_delta": {
+          "raw": 0.06485277607872254,
+          "controlled": 0.2528376182034616
+        },
+        "perturbation_capacity_relu_active_delta": {
+          "raw": -0.19498986319467237,
+          "controlled": 0.043083800105612545
+        },
+        "perturbation_capacity_above_mean_delta": {
+          "raw": -0.0921641670360636,
+          "controlled": 0.07183966447661753
+        },
+        "perturbation_capacity_signed_delta": {
+          "raw": -0.2113184410184329,
+          "controlled": -0.18090115628574588
+        },
+        "perturbation_capacity_iqr_delta": {
+          "raw": -0.049420830960401806,
+          "controlled": 0.15659903261286687
+        },
+        "perturbation_capacity_multiscale_delta": {
+          "raw": 0.11845320545755975,
+          "controlled": 0.31653475250837876
+        },
+        "perturbation_capacity_relu_active_multiscale_delta": {
+          "raw": -0.0152227870708682,
+          "controlled": 0.22273471946680962
+        },
+        "perturbation_capacity_topk_delta": {
+          "raw": 0.16931442379629455,
+          "controlled": 0.2637739601775079
+        },
+        "perturbation_capacity_iqr_active_delta": {
+          "raw": -0.14686813714845703,
+          "controlled": 0.054450385126899176
+        },
+        "perturbation_capacity_profile_delta": {
+          "raw": 0.11379013413427776,
+          "controlled": 0.0999189273212875
+        },
+        "perturbation_capacity_importance_delta": {
+          "raw": null,
+          "controlled": null
+        },
+        "perturbation_capacity_gini_delta": {
+          "raw": 0.07616062325556529,
+          "controlled": 0.03289627269970452
+        },
+        "perturbation_capacity_layerprofile_delta": {
+          "raw": 0.16085845778005642,
+          "controlled": 0.30953918966411187
+        },
+        "perturbation_capacity_flow_rel_delta": {
+          "raw": 0.08352773299912798,
+          "controlled": 0.2957492130086325
+        },
+        "perturbation_capacity_channelwise_delta": {
+          "raw": 0.09015780604389334,
+          "controlled": 0.157397218411394
+        },
+        "feature_spectral_erank_static": {
+          "raw": -0.6752866197861789,
+          "controlled": -0.28811284643866264
+        },
+        "feature_spectral_participation_ratio_static": {
+          "raw": 0.19191511044108617,
+          "controlled": 0.43461035204119813
+        },
+        "feature_spectral_decay_exponent_static": {
+          "raw": -0.3278439085859978,
+          "controlled": -0.43358544685411626
+        },
+        "jacobian_spectral_norm": {
+          "raw": 0.40143841861251256,
+          "controlled": 0.5050936063732742
+        },
+        "jacobian_effective_rank": {
+          "raw": -0.7146014536082046,
+          "controlled": -0.5079092290658919
+        },
+        "jacobian_spectral_decay": {
+          "raw": -0.750550762547677,
+          "controlled": -0.5569410067148385
+        },
+        "logit_kl": {
+          "raw": 0.03787213183949376,
+          "controlled": 0.06372812994062729
+        },
+        "natural_loss": {
+          "raw": -0.09388397118351623,
+          "controlled": -0.2257410494950003
+        },
+        "adversarial_loss": {
+          "raw": -0.09299583317739428,
+          "controlled": -0.22454709712554055
+        },
+        "input_loss_delta": {
+          "raw": 0.43291715811049325,
+          "controlled": 0.4515797356647019
+        },
+        "input_grad_l2": {
+          "raw": 0.3556397437800249,
+          "controlled": 0.4810943714765343
+        },
+        "local_logit_lipschitz": {
+          "raw": 0.4337679468511723,
+          "controlled": 0.524118655045921
+        },
+        "margin_input_grad_ratio": {
+          "raw": 0.3873883029368624,
+          "controlled": 0.44579379556870036
+        },
+        "feature_measure_flow_delta": {
+          "raw": 0.5168855592762895,
+          "controlled": 0.5519337270119733
+        },
+        "feature_measure_flow_rel_delta": {
+          "raw": 0.5567543268370657,
+          "controlled": 0.5026482259706639
+        },
+        "feature_measure_flow_rel_multiscale_delta": {
+          "raw": 0.5571279239727903,
+          "controlled": 0.45623139317058753
+        },
+        "feature_measure_flow_rel_allpairs_delta": {
+          "raw": 0.5698732723499995,
+          "controlled": 0.48153496996651945
+        },
+        "feature_measure_flow_corr_rel_delta": {
+          "raw": -0.08038019719567839,
+          "controlled": -0.0564036991853563
+        },
+        "feature_measure_spatial_gram_delta": {
+          "raw": -0.2243348028778284,
+          "controlled": -0.11991963917129946
+        },
+        "feature_measure_spatial_gram_rel_delta": {
+          "raw": -0.25406880840452006,
+          "controlled": -0.12755911897057243
+        },
+        "feature_measure_relu_active_delta": {
+          "raw": -0.29864300396413557,
+          "controlled": -0.22033734038265504
+        },
+        "feature_measure_relu_active_spatial_delta": {
+          "raw": -0.19912033619093605,
+          "controlled": -0.0990258240727128
+        },
+        "feature_measure_relu_active_spatial_rel_delta": {
+          "raw": -0.22425258342125473,
+          "controlled": -0.10318119663005006
+        },
+        "feature_measure_relu_active_hybrid_delta": {
+          "raw": -0.29274260950760456,
+          "controlled": -0.2114879595896865
+        },
+        "feature_measure_relu_active_hybrid_rel_delta": {
+          "raw": 0.19056848144841085,
+          "controlled": 0.15722633905972624
+        },
+        "feature_measure_robust_delta": {
+          "raw": -0.376883020089489,
+          "controlled": -0.27089170052943495
+        },
+        "feature_measure_robust_rel_delta": {
+          "raw": 0.3553299911180871,
+          "controlled": 0.3067851467984439
+        },
+        "feature_measure_robust_spatial_delta": {
+          "raw": -0.36557789168601074,
+          "controlled": -0.2622637141027345
+        },
+        "feature_measure_robust_spatial_rel_delta": {
+          "raw": -0.3689936085398369,
+          "controlled": -0.2615158720155363
+        },
+        "feature_measure_robust_hybrid_delta": {
+          "raw": -0.37097146928708313,
+          "controlled": -0.271103735576961
+        },
+        "feature_measure_robust_hybrid_rel_delta": {
+          "raw": 0.12328549698507835,
+          "controlled": 0.11500342793730679
+        },
+        "fsp_strict_delta": {
+          "raw": 0.5016225459552046,
+          "controlled": 0.5444671800067866
+        },
+        "fsp_delta": {
+          "raw": -0.150582450318346,
+          "controlled": -0.14863860900154335
+        },
+        "feature_measure_fsp_rel_multiscale_delta": {
+          "raw": -0.1490621872535811,
+          "controlled": -0.1470781176913731
+        },
+        "feature_measure_channel_gram_cosine_delta": {
+          "raw": -0.2108186554733995,
+          "controlled": -0.18313090500928253
+        },
+        "feature_measure_channel_gram_centered_rel_delta": {
+          "raw": -0.0016615455289114528,
+          "controlled": -0.033475094635699656
+        },
+        "feature_measure_spatial_gram_cosine_delta": {
+          "raw": 0.22320135563726307,
+          "controlled": 0.13490948986580628
+        },
+        "feature_measure_spectrum_js_delta": {
+          "raw": 0.33203910346195736,
+          "controlled": 0.2371096823691371
+        },
+        "feature_measure_spectrum_emd_delta": {
+          "raw": -0.17405821456325946,
+          "controlled": 0.07352158982147133
+        },
+        "feature_measure_spectrum_hellinger_delta": {
+          "raw": 0.19666444008557213,
+          "controlled": 0.20597531721101245
+        },
+        "feature_measure_flow_corr_angular_delta": {
+          "raw": -0.08973296945519342,
+          "controlled": -0.053844861135768814
+        },
+        "feature_measure_flow_corr_symmetric_rel_delta": {
+          "raw": -0.08041629127278102,
+          "controlled": -0.05640803821710523
+        }
+      },
+      "comparison": {
+        "metrics": 70,
+        "rho_between_variants": 0.0439,
+        "top5_baseline": [
+          "feature_measure_robust_delta",
+          "feature_measure_weighted_delta",
+          "feature_measure_local_delta",
+          "feature_measure_struct_delta",
+          "feature_measure_robust_hybrid_delta"
+        ],
+        "top5_variant": [
+          "feature_measure_flow_delta",
+          "fsp_strict_delta",
+          "feature_measure_mmd",
+          "local_logit_lipschitz",
+          "jacobian_spectral_norm"
+        ],
+        "top5_overlap": 0,
+        "best_baseline": "feature_measure_robust_delta",
+        "best_variant": "feature_measure_flow_delta",
+        "largest_moves": [
+          {
+            "metric": "jacobian_spectral_decay",
+            "baseline": 0.19609599551374263,
+            "variant": -0.5569410067148385,
+            "delta": -0.753037002228581
+          },
+          {
+            "metric": "jacobian_effective_rank",
+            "baseline": 0.22156956797860275,
+            "variant": -0.5079092290658919,
+            "delta": -0.7294787970444946
+          },
+          {
+            "metric": "feature_measure_local_delta",
+            "baseline": 0.39682647702410917,
+            "variant": -0.29568842153121067,
+            "delta": -0.6925148985553198
+          },
+          {
+            "metric": "feature_measure_weighted_delta",
+            "baseline": 0.3973584267861169,
+            "variant": -0.2799382738492756,
+            "delta": -0.6772967006353925
+          },
+          {
+            "metric": "feature_measure_robust_delta",
+            "baseline": 0.3999609564212103,
+            "variant": -0.27089170052943495,
+            "delta": -0.6708526569506452
+          },
+          {
+            "metric": "feature_measure_robust_hybrid_delta",
+            "baseline": 0.36792216371622977,
+            "variant": -0.271103735576961,
+            "delta": -0.6390258992931908
+          },
+          {
+            "metric": "feature_spectral_erank_static",
+            "baseline": 0.31480702673167377,
+            "variant": -0.28811284643866264,
+            "delta": -0.6029198731703365
+          },
+          {
+            "metric": "feature_measure_robust_spatial_delta",
+            "baseline": 0.33845743964617664,
+            "variant": -0.2622637141027345,
+            "delta": -0.6007211537489112
+          },
+          {
+            "metric": "feature_measure_robust_spatial_rel_delta",
+            "baseline": 0.33391933317344025,
+            "variant": -0.2615158720155363,
+            "delta": -0.5954352051889765
+          },
+          {
+            "metric": "feature_measure_struct_delta",
+            "baseline": 0.37421564912798316,
+            "variant": -0.1974169059068771,
+            "delta": -0.5716325550348602
+          }
+        ]
+      }
+    },
+    "pgd": {
+      "config": {
+        "attack": "pgd",
+        "epsilon": 0.03137254901960784,
+        "steps": 3
+      },
+      "n": 400,
+      "scores": {
+        "feature_delta": {
+          "raw": 0.027281296948720585,
+          "controlled": -0.0321888186919287
+        },
+        "feature_measure_swd": {
+          "raw": 0.5428659152554502,
+          "controlled": 0.49815081274296186
+        },
+        "feature_measure_mmd": {
+          "raw": 0.5076720503080767,
+          "controlled": 0.5252845198086666
+        },
+        "feature_measure_cov_delta": {
+          "raw": 0.22159081054663674,
+          "controlled": 0.48686345403692144
+        },
+        "feature_hausdorff_delta": {
+          "raw": -0.027170670998028515,
+          "controlled": 0.1743903044507789
+        },
+        "feature_quantile_hausdorff_delta": {
+          "raw": -0.08779828576675947,
+          "controlled": 0.16537300738333674
+        },
+        "feature_box_dimension_delta": {
+          "raw": 0.03609715396001599,
+          "controlled": 0.2440241679534745
+        },
+        "feature_graph_fundamental_rank_delta": {
+          "raw": -0.1336767425348733,
+          "controlled": 0.14312733366973082
+        },
+        "feature_measure_moment_delta": {
+          "raw": -0.14973438053024393,
+          "controlled": -0.1480571392215139
+        },
+        "feature_measure_local_delta": {
+          "raw": -0.38462561787746,
+          "controlled": -0.29169585519072083
+        },
+        "feature_measure_weighted_delta": {
+          "raw": -0.38228859779368723,
+          "controlled": -0.2793463334033914
+        },
+        "feature_measure_struct_delta": {
+          "raw": -0.23598652800987327,
+          "controlled": -0.20465718207282743
+        },
+        "feature_measure_struct01_delta": {
+          "raw": -0.18030717451527623,
+          "controlled": -0.16928491285295402
+        },
+        "perturbation_capacity_delta": {
+          "raw": 0.0178739661044453,
+          "controlled": 0.2270210834213047
+        },
+        "perturbation_capacity_relu_active_delta": {
+          "raw": -0.2383180167961114,
+          "controlled": 0.005781136764642859
+        },
+        "perturbation_capacity_above_mean_delta": {
+          "raw": -0.1804986136604569,
+          "controlled": -0.0039516113750627324
+        },
+        "perturbation_capacity_signed_delta": {
+          "raw": -0.2627532267862644,
+          "controlled": -0.2077924779057023
+        },
+        "perturbation_capacity_iqr_delta": {
+          "raw": -0.060169642083026914,
+          "controlled": 0.15045415593005762
+        },
+        "perturbation_capacity_multiscale_delta": {
+          "raw": 0.09818325001257447,
+          "controlled": 0.3082413312885406
+        },
+        "perturbation_capacity_relu_active_multiscale_delta": {
+          "raw": -0.04857416743438481,
+          "controlled": 0.2073067803062726
+        },
+        "perturbation_capacity_topk_delta": {
+          "raw": 0.13365030480767404,
+          "controlled": 0.2302796618745135
+        },
+        "perturbation_capacity_iqr_active_delta": {
+          "raw": -0.16376325109088885,
+          "controlled": 0.03855269491961072
+        },
+        "perturbation_capacity_profile_delta": {
+          "raw": 0.08793534944465081,
+          "controlled": 0.08285509508463448
+        },
+        "perturbation_capacity_importance_delta": {
+          "raw": null,
+          "controlled": null
+        },
+        "perturbation_capacity_gini_delta": {
+          "raw": 0.06615844354930596,
+          "controlled": 0.024317742597907668
+        },
+        "perturbation_capacity_layerprofile_delta": {
+          "raw": 0.23163744296473407,
+          "controlled": 0.4072240647634592
+        },
+        "perturbation_capacity_flow_rel_delta": {
+          "raw": 0.06770860514777913,
+          "controlled": 0.289068591836529
+        },
+        "perturbation_capacity_channelwise_delta": {
+          "raw": 0.05306351851475798,
+          "controlled": 0.13184893102388423
+        },
+        "feature_spectral_erank_static": {
+          "raw": -0.6752866197861789,
+          "controlled": -0.28811284643866264
+        },
+        "feature_spectral_participation_ratio_static": {
+          "raw": 0.19191511044108617,
+          "controlled": 0.43461035204119813
+        },
+        "feature_spectral_decay_exponent_static": {
+          "raw": -0.3278439085859978,
+          "controlled": -0.43358544685411626
+        },
+        "jacobian_spectral_norm": {
+          "raw": 0.40143841861251256,
+          "controlled": 0.5050936063732742
+        },
+        "jacobian_effective_rank": {
+          "raw": -0.7146014536082046,
+          "controlled": -0.5079092290658919
+        },
+        "jacobian_spectral_decay": {
+          "raw": -0.750550762547677,
+          "controlled": -0.5569410067148385
+        },
+        "logit_kl": {
+          "raw": 0.0370669769255594,
+          "controlled": 0.07595814100770282
+        },
+        "natural_loss": {
+          "raw": -0.09388397118351623,
+          "controlled": -0.2257410494950003
+        },
+        "adversarial_loss": {
+          "raw": -0.09301880257146575,
+          "controlled": -0.22458775688607446
+        },
+        "input_loss_delta": {
+          "raw": 0.4407983897472056,
+          "controlled": 0.4602191547707746
+        },
+        "input_grad_l2": {
+          "raw": 0.3556397437800249,
+          "controlled": 0.4810943714765343
+        },
+        "local_logit_lipschitz": {
+          "raw": 0.42598512267112165,
+          "controlled": 0.5177027735704095
+        },
+        "margin_input_grad_ratio": {
+          "raw": 0.3873883029368624,
+          "controlled": 0.44579379556870036
+        },
+        "feature_measure_flow_delta": {
+          "raw": 0.5147310710012358,
+          "controlled": 0.5508370670148361
+        },
+        "feature_measure_flow_rel_delta": {
+          "raw": 0.5539047697629497,
+          "controlled": 0.49995014678706984
+        },
+        "feature_measure_flow_rel_multiscale_delta": {
+          "raw": 0.5559049441395335,
+          "controlled": 0.45327510806681925
+        },
+        "feature_measure_flow_rel_allpairs_delta": {
+          "raw": 0.5644131316769005,
+          "controlled": 0.47470311267109444
+        },
+        "feature_measure_flow_corr_rel_delta": {
+          "raw": -0.08803786034326412,
+          "controlled": -0.058182046208782666
+        },
+        "feature_measure_spatial_gram_delta": {
+          "raw": -0.26606628650788045,
+          "controlled": -0.1352417300608194
+        },
+        "feature_measure_spatial_gram_rel_delta": {
+          "raw": -0.2935708178861227,
+          "controlled": -0.14283011573207274
+        },
+        "feature_measure_relu_active_delta": {
+          "raw": -0.316778441065598,
+          "controlled": -0.2282468441855923
+        },
+        "feature_measure_relu_active_spatial_delta": {
+          "raw": -0.25044674602741157,
+          "controlled": -0.12033602026256668
+        },
+        "feature_measure_relu_active_spatial_rel_delta": {
+          "raw": -0.2741501372284948,
+          "controlled": -0.12496708059550267
+        },
+        "feature_measure_relu_active_hybrid_delta": {
+          "raw": -0.31253387333883237,
+          "controlled": -0.22053036091642333
+        },
+        "feature_measure_relu_active_hybrid_rel_delta": {
+          "raw": 0.1854352498346876,
+          "controlled": 0.15572023117265044
+        },
+        "feature_measure_robust_delta": {
+          "raw": -0.3876383937685111,
+          "controlled": -0.27474713442626386
+        },
+        "feature_measure_robust_rel_delta": {
+          "raw": 0.3596599658288192,
+          "controlled": 0.31505324629509696
+        },
+        "feature_measure_robust_spatial_delta": {
+          "raw": -0.372847891662593,
+          "controlled": -0.2613291189950755
+        },
+        "feature_measure_robust_spatial_rel_delta": {
+          "raw": -0.3762489833907344,
+          "controlled": -0.26007053231116245
+        },
+        "feature_measure_robust_hybrid_delta": {
+          "raw": -0.3767556127445818,
+          "controlled": -0.2693239232623486
+        },
+        "feature_measure_robust_hybrid_rel_delta": {
+          "raw": 0.14001195322810764,
+          "controlled": 0.13155536887531386
+        },
+        "fsp_strict_delta": {
+          "raw": 0.499456245073099,
+          "controlled": 0.5429755900910849
+        },
+        "fsp_delta": {
+          "raw": -0.16360134344949462,
+          "controlled": -0.1572943333947846
+        },
+        "feature_measure_fsp_rel_multiscale_delta": {
+          "raw": -0.1600328127824244,
+          "controlled": -0.15401778909814878
+        },
+        "feature_measure_channel_gram_cosine_delta": {
+          "raw": -0.22248641199321414,
+          "controlled": -0.19560052073398607
+        },
+        "feature_measure_channel_gram_centered_rel_delta": {
+          "raw": -0.02268610120874457,
+          "controlled": -0.04603987153894151
+        },
+        "feature_measure_spatial_gram_cosine_delta": {
+          "raw": 0.2575254943604245,
+          "controlled": 0.17181506993028206
+        },
+        "feature_measure_spectrum_js_delta": {
+          "raw": 0.32039825342337036,
+          "controlled": 0.2392273432798741
+        },
+        "feature_measure_spectrum_emd_delta": {
+          "raw": -0.21395096364168142,
+          "controlled": 0.0446698344298129
+        },
+        "feature_measure_spectrum_hellinger_delta": {
+          "raw": 0.18003520342802398,
+          "controlled": 0.19927754277945567
+        },
+        "feature_measure_flow_corr_angular_delta": {
+          "raw": -0.09908742923000156,
+          "controlled": -0.05961118252982132
+        },
+        "feature_measure_flow_corr_symmetric_rel_delta": {
+          "raw": -0.08781492082287433,
+          "controlled": -0.05811968545661383
+        }
+      },
+      "comparison": {
+        "metrics": 70,
+        "rho_between_variants": 0.0312,
+        "top5_baseline": [
+          "feature_measure_robust_delta",
+          "feature_measure_weighted_delta",
+          "feature_measure_local_delta",
+          "feature_measure_struct_delta",
+          "feature_measure_robust_hybrid_delta"
+        ],
+        "top5_variant": [
+          "feature_measure_flow_delta",
+          "fsp_strict_delta",
+          "feature_measure_mmd",
+          "local_logit_lipschitz",
+          "jacobian_spectral_norm"
+        ],
+        "top5_overlap": 0,
+        "best_baseline": "feature_measure_robust_delta",
+        "best_variant": "feature_measure_flow_delta",
+        "largest_moves": [
+          {
+            "metric": "jacobian_spectral_decay",
+            "baseline": 0.19609599551374263,
+            "variant": -0.5569410067148385,
+            "delta": -0.753037002228581
+          },
+          {
+            "metric": "jacobian_effective_rank",
+            "baseline": 0.22156956797860275,
+            "variant": -0.5079092290658919,
+            "delta": -0.7294787970444946
+          },
+          {
+            "metric": "feature_measure_local_delta",
+            "baseline": 0.39682647702410917,
+            "variant": -0.29169585519072083,
+            "delta": -0.68852233221483
+          },
+          {
+            "metric": "feature_measure_weighted_delta",
+            "baseline": 0.3973584267861169,
+            "variant": -0.2793463334033914,
+            "delta": -0.6767047601895082
+          },
+          {
+            "metric": "feature_measure_robust_delta",
+            "baseline": 0.3999609564212103,
+            "variant": -0.27474713442626386,
+            "delta": -0.6747080908474742
+          },
+          {
+            "metric": "feature_measure_robust_hybrid_delta",
+            "baseline": 0.36792216371622977,
+            "variant": -0.2693239232623486,
+            "delta": -0.6372460869785783
+          },
+          {
+            "metric": "feature_spectral_erank_static",
+            "baseline": 0.31480702673167377,
+            "variant": -0.28811284643866264,
+            "delta": -0.6029198731703365
+          },
+          {
+            "metric": "feature_measure_robust_spatial_delta",
+            "baseline": 0.33845743964617664,
+            "variant": -0.2613291189950755,
+            "delta": -0.5997865586412521
+          },
+          {
+            "metric": "feature_measure_robust_spatial_rel_delta",
+            "baseline": 0.33391933317344025,
+            "variant": -0.26007053231116245,
+            "delta": -0.5939898654846028
+          },
+          {
+            "metric": "feature_measure_struct_delta",
+            "baseline": 0.37421564912798316,
+            "variant": -0.20465718207282743,
+            "delta": -0.5788728312008106
+          }
+        ]
+      }
+    }
+  },
+  "baseline": {
+    "arch_string": {
+      "raw": null,
+      "controlled": null
+    },
+    "feature_delta": {
+      "raw": 0.7601932204125758,
+      "controlled": 0.14510591088667918
+    },
+    "feature_measure_swd": {
+      "raw": 0.3000467347774511,
+      "controlled": 0.2726276557533939
+    },
+    "feature_measure_mmd": {
+      "raw": 0.45348202211237304,
+      "controlled": 0.2790007038804598
+    },
+    "feature_measure_cov_delta": {
+      "raw": 0.7496863801193883,
+      "controlled": 0.26118229647372626
+    },
+    "feature_hausdorff_delta": {
+      "raw": 0.7292133604293192,
+      "controlled": 0.2195212410176628
+    },
+    "feature_quantile_hausdorff_delta": {
+      "raw": 0.7316812566378089,
+      "controlled": 0.22414104470662613
+    },
+    "feature_box_dimension_delta": {
+      "raw": 0.4565020168154608,
+      "controlled": 0.15776038886974203
+    },
+    "feature_graph_fundamental_rank_delta": {
+      "raw": 0.7245642579760821,
+      "controlled": 0.18076824590686863
+    },
+    "feature_measure_moment_delta": {
+      "raw": 0.611478004890784,
+      "controlled": 0.2533111402616441
+    },
+    "feature_measure_local_delta": {
+      "raw": 0.3145649845436999,
+      "controlled": 0.39682647702410917
+    },
+    "feature_measure_weighted_delta": {
+      "raw": 0.3054299060390939,
+      "controlled": 0.3973584267861169
+    },
+    "feature_measure_struct_delta": {
+      "raw": 0.43214968253752123,
+      "controlled": 0.37421564912798316
+    },
+    "feature_measure_struct01_delta": {
+      "raw": 0.5543299512745412,
+      "controlled": 0.3031961649674808
+    },
+    "perturbation_capacity_delta": {
+      "raw": 0.6216344046723725,
+      "controlled": 0.24975499568630424
+    },
+    "perturbation_capacity_relu_active_delta": {
+      "raw": 0.36680274596210555,
+      "controlled": 0.2736906252712481
+    },
+    "perturbation_capacity_above_mean_delta": {
+      "raw": 0.4357165256900894,
+      "controlled": 0.2552797730532066
+    },
+    "perturbation_capacity_signed_delta": {
+      "raw": -0.11686675432399096,
+      "controlled": 0.1853340404388828
+    },
+    "perturbation_capacity_iqr_delta": {
+      "raw": 0.5338320876209692,
+      "controlled": 0.2314432289494693
+    },
+    "perturbation_capacity_multiscale_delta": {
+      "raw": 0.7769342080304843,
+      "controlled": 0.19678353942140023
+    },
+    "perturbation_capacity_relu_active_multiscale_delta": {
+      "raw": 0.77234135606065,
+      "controlled": 0.1692420011481218
+    },
+    "perturbation_capacity_topk_delta": {
+      "raw": 0.6993653539229311,
+      "controlled": 0.3058415722460086
+    },
+    "perturbation_capacity_iqr_active_delta": {
+      "raw": 0.35437598291957656,
+      "controlled": 0.23633913736799375
+    },
+    "perturbation_capacity_profile_delta": {
+      "raw": 0.7018314688661133,
+      "controlled": 0.27759942170180224
+    },
+    "perturbation_capacity_importance_delta": {
+      "raw": null,
+      "controlled": null
+    },
+    "perturbation_capacity_gini_delta": {
+      "raw": 0.6088436072514222,
+      "controlled": 0.275571006000796
+    },
+    "perturbation_capacity_layerprofile_delta": {
+      "raw": -0.06317054123314098,
+      "controlled": 0.27414201253311216
+    },
+    "perturbation_capacity_flow_rel_delta": {
+      "raw": 0.6162166804327766,
+      "controlled": 0.2792513253380071
+    },
+    "perturbation_capacity_channelwise_delta": {
+      "raw": 0.6116579126868671,
+      "controlled": 0.27861949656289153
+    },
+    "feature_spectral_erank_static": {
+      "raw": 0.023862826750477305,
+      "controlled": 0.31480702673167377
+    },
+    "feature_spectral_participation_ratio_static": {
+      "raw": 0.09235434129048203,
+      "controlled": 0.32773832316614104
+    },
+    "feature_spectral_decay_exponent_static": {
+      "raw": 0.27290900448833294,
+      "controlled": -0.028914638087963795
+    },
+    "jacobian_spectral_norm": {
+      "raw": 0.3719708528755386,
+      "controlled": 0.3614292164512678
+    },
+    "jacobian_effective_rank": {
+      "raw": -0.7514539578095139,
+      "controlled": 0.22156956797860275
+    },
+    "jacobian_spectral_decay": {
+      "raw": -0.7755826964159276,
+      "controlled": 0.19609599551374263
+    },
+    "logit_kl": {
+      "raw": -0.05996934868186652,
+      "controlled": -0.006528177567126853
+    },
+    "natural_loss": {
+      "raw": -0.12789954263232295,
+      "controlled": -0.14263335434803118
+    },
+    "adversarial_loss": {
+      "raw": -0.12789120480516547,
+      "controlled": -0.14266986848061558
+    },
+    "input_loss_delta": {
+      "raw": 0.03405057448766388,
+      "controlled": 0.03966943873159481
+    },
+    "input_grad_l2": {
+      "raw": 0.3343845611182405,
+      "controlled": 0.3666228630799154
+    },
+    "local_logit_lipschitz": {
+      "raw": 0.1639870342640261,
+      "controlled": 0.2733773185037318
+    },
+    "margin_input_grad_ratio": {
+      "raw": 0.2780772647272575,
+      "controlled": 0.25200958769238996
+    },
+    "feature_measure_flow_delta": {
+      "raw": 0.6038021594581314,
+      "controlled": 0.2409382820712484
+    },
+    "feature_measure_flow_rel_delta": {
+      "raw": 0.6749687106551269,
+      "controlled": 0.2536789264498366
+    },
+    "feature_measure_flow_rel_multiscale_delta": {
+      "raw": 0.6754962466859231,
+      "controlled": 0.24946816052739515
+    },
+    "feature_measure_flow_rel_allpairs_delta": {
+      "raw": 0.7382301254171679,
+      "controlled": 0.1971183248361093
+    },
+    "feature_measure_flow_corr_rel_delta": {
+      "raw": 0.5579107563460218,
+      "controlled": 0.22426049054790825
+    },
+    "feature_measure_spatial_gram_delta": {
+      "raw": 0.7319490089388059,
+      "controlled": 0.13020222588403635
+    },
+    "feature_measure_spatial_gram_rel_delta": {
+      "raw": 0.7311126580014128,
+      "controlled": 0.13192728986392105
+    },
+    "feature_measure_relu_active_delta": {
+      "raw": 0.6943094667238866,
+      "controlled": 0.24793895159367577
+    },
+    "feature_measure_relu_active_spatial_delta": {
+      "raw": 0.7303196199362397,
+      "controlled": 0.12307141992424742
+    },
+    "feature_measure_relu_active_spatial_rel_delta": {
+      "raw": 0.7286106364996585,
+      "controlled": 0.12282192448525672
+    },
+    "feature_measure_relu_active_hybrid_delta": {
+      "raw": 0.7018523752957779,
+      "controlled": 0.2385966964492935
+    },
+    "feature_measure_relu_active_hybrid_rel_delta": {
+      "raw": 0.7067584487073598,
+      "controlled": 0.2482601146771694
+    },
+    "feature_measure_robust_delta": {
+      "raw": 0.29513822384492183,
+      "controlled": 0.3999609564212103
+    },
+    "feature_measure_robust_rel_delta": {
+      "raw": 0.5076345499858081,
+      "controlled": 0.3623116837513255
+    },
+    "feature_measure_robust_spatial_delta": {
+      "raw": 0.5638720957773719,
+      "controlled": 0.33845743964617664
+    },
+    "feature_measure_robust_spatial_rel_delta": {
+      "raw": 0.5768895826464353,
+      "controlled": 0.33391933317344025
+    },
+    "feature_measure_robust_hybrid_delta": {
+      "raw": 0.47195214959008175,
+      "controlled": 0.36792216371622977
+    },
+    "feature_measure_robust_hybrid_rel_delta": {
+      "raw": 0.5566780339533833,
+      "controlled": 0.35209531992345305
+    },
+    "fsp_strict_delta": {
+      "raw": 0.585461211993263,
+      "controlled": 0.20340443765121505
+    },
+    "fsp_delta": {
+      "raw": 0.5877323320763431,
+      "controlled": 0.25700257086620315
+    },
+    "feature_measure_fsp_rel_multiscale_delta": {
+      "raw": 0.6420855804247203,
+      "controlled": 0.19974032364922917
+    },
+    "feature_measure_channel_gram_cosine_delta": {
+      "raw": 0.6046662588523227,
+      "controlled": 0.13736736695602414
+    },
+    "feature_measure_channel_gram_centered_rel_delta": {
+      "raw": 0.6689147172376885,
+      "controlled": 0.27874179136078137
+    },
+    "feature_measure_spatial_gram_cosine_delta": {
+      "raw": 0.5976904489039369,
+      "controlled": -0.020919014394125104
+    },
+    "feature_measure_spectrum_js_delta": {
+      "raw": 0.7766410492611502,
+      "controlled": 0.09978989281375268
+    },
+    "feature_measure_spectrum_emd_delta": {
+      "raw": 0.7337204304119641,
+      "controlled": 0.1761866493433596
+    },
+    "feature_measure_spectrum_hellinger_delta": {
+      "raw": 0.7678327860651142,
+      "controlled": 0.18680493792489117
+    },
+    "feature_measure_flow_corr_angular_delta": {
+      "raw": 0.5737681673051052,
+      "controlled": 0.19750465434539097
+    },
+    "feature_measure_flow_corr_symmetric_rel_delta": {
+      "raw": 0.5582394033919525,
+      "controlled": 0.2240168526314059
+    },
+    "clean_acc": {
+      "raw": -0.1439923452685532,
+      "controlled": -0.08022779229701946
+    },
+    "adv_acc": {
+      "raw": -0.1439923452685532,
+      "controlled": -0.08022779229701946
+    },
+    "num_layers": {
+      "raw": null,
+      "controlled": 0.020993231689445686
+    },
+    "num_candidate_layers": {
+      "raw": 0.3525743824271832,
+      "controlled": -0.019513840209775393
+    }
+  }
+}

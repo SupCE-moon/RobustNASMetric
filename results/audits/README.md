@@ -276,3 +276,20 @@ suite 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时会自动传这
 
 结果：70 列里 `clean` **0 个**、`spiked` 14 个、`divergent` 55 个、`uncomparable` 1 个。
 **在这张表被重算之前，不要引用它上面得到的任何幅度**（第 3 节第 17 条的更正、D-031）。
+## RQ2 的扰动敏感性，以及一次偏相关口径更正（2026-11-12）
+
+脚本：`scripts/audit_e0_perturbation_sensitivity.py`，报告：
+`results/audits/e0-perturbation-20261112.{json,md}`。
+
+三个配置跑同一批 400 架构：`base` = FGSM 8/255 单步、`weak` = FGSM 4/255、`pgd` = PGD-3 8/255。
+结论：`base` 上最强的 `feature_measure_robust_delta`（+0.400）在两个变体里变成 −0.27，
+前五名重合 0/5，指标级排序相关约 0.03–0.04；但 `input_grad_l2` 三个配置都在 +0.37 以上。
+所以"哪个早期指标最好"是配置的性质，不是架构的性质。
+
+**同期的口径更正**：`audit_rq2_confounders.partial_rho` 原来只秩化 x/y、控制列用原值，
+与 `audit_early_metrics_vs_robbench.partial_spearman` 不一致（+0.422 vs +0.145）。
+已统一为全秩化，`rq2-confounders-20261112.{json,md}` 与 `PROJECT_STATUS.md` §3 第 19 条按新口径重写。
+以后要引用 RQ2 的数字，用 +0.400（`feature_measure_robust_delta`），不要再用 `feature_delta` 的 +0.42。
+
+**重跑**：见 `docs/HANDOFF.md` §25；`--reuse` 可只重算分析。该脚本需要 GPU，不进 `run_audit_suite.py`。
+

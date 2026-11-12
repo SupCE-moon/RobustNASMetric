@@ -784,3 +784,43 @@ RQ2 的幅度表述从「约 +0.35」更新为「约 +0.35~+0.42，两个混杂�
 **后果**：`tools/audit_published_e0_sanity.py`、`tests/test_audit_published_e0_sanity.py`（9 个）、
 `results/audits/published-e0-20261112.{json,md}`、`docs/PROJECT_STATUS.md` §3 第 17 条加更正框、
 §3 第 20 条、§4 把那条从"已验证事实"降级为"作废"。
+## D-032 —— 偏相关必须把控制变量也秩化，RQ2 的信号随扰动口径变化
+
+**背景（两件事撞在一起）**：这一轮本来是给 RQ2 补"扰动敏感性"，结果在核对基准列时发现
+**同一个仓库里两个"偏秩相关"实现给出相差三倍的结果**：
+`audit_rq2_confounders.partial_rho` 只把 x 与 y 秩化，控制列以原值进回归；
+`audit_early_metrics_vs_robbench.partial_spearman` 则把控制列也秩化。
+对同一个指标（`feature_delta`，400 架构，控 clean + 参数量）前者给 **+0.422**、后者给 **+0.145**。
+
+**决定 1：统一为全秩化**。理由：
+1. 只有全秩化才是"秩偏相关"的标准形式，且对控制列的任意单调变换不变——这是可检验的性质，
+   现在用 `test_partial_rho_ranks_the_controls_too`（把控制列取 `exp` 后结果必须不变）守住。
+2. 混着用会让两个审计互相矛盾，而读者只会看到两份都写着"偏相关"的数字。
+3. 加了 `test_partial_rho_agrees_with_the_early_metric_helper`，两个实现必须给同一结果。
+
+**决定 2：更正 D-030 的数字，不回避**。`feature_delta` 不是最强的早期信号（只 +0.145，属
+`weak_before_capacity`）；最强的是 `feature_measure_robust_delta` **+0.400 [+0.304,+0.478]**；
+`survives` 从 12 个降到 5 个，`explained_by_capacity` 从 5 升到 11。已在 `PROJECT_STATUS.md` §3
+第 19 条写明"这是口径更正"，不悄悄改数。
+
+**决定 3：做扰动敏感性，并把结论往下调**。同一批 400 架构、同一权重种子，只换扰动：
+`base` = FGSM 8/255 单步、`weak` = FGSM 4/255、`pgd` = PGD-3 8/255。结果：
+- `feature_measure_robust_delta` 从 **+0.400** 变成 **−0.271 / −0.275**（翻号）；
+- 前五名重合 **0/5**，指标级排序相关 **+0.044 / +0.031**；
+- 但 `input_grad_l2`（+0.367 → +0.481）与 `margin_input_grad_ratio`（+0.252 → +0.446）方向稳定。
+
+所以"某个指标最好"是**配置的性质**，不是架构的性质。RQ2 的正确表述改成
+「存在早期信号，量级 0.3–0.5，但排序随扰动口径变化」。
+
+**为什么不干脆说 RQ2 失败**：因为信号没有消失——控制两个混杂后仍有 5 个指标 |ρ| ≥ 0.30，
+且 `input_grad_l2` 在三个配置下都在 +0.37 以上。坏消息是**排名**不稳，不是**存在性**不成立。
+
+**代价**：30 分钟 GPU（400 架构 × 2 变体）。因此**不放进** `run_audit_suite.py`（那里预算是 3 分钟），
+只在 HANDOFF 里记为可选重跑。
+
+**后果**：`scripts/audit_e0_perturbation_sensitivity.py`、`tests/test_audit_e0_perturbation_sensitivity.py`
+（13 个）、`scripts/audit_rq2_confounders.py` 修 `partial_rho`、`tests/test_audit_rq2_confounders.py`
+（12 → 14 个）、`results/audits/e0-perturbation-20261112.{json,md}`、
+`results/audits/rq2-confounders-20261112.{json,md}` 按新口径重生成、
+`docs/PROJECT_STATUS.md` §3 第 19 条加更正段、新增 §3 第 21 条、§4 两处改写。
+

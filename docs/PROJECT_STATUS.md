@@ -482,31 +482,41 @@ target 0.149–0.4385（均值 0.3642），唯一全 NaN 列是已知的 `pertur
 更大的架构既可能漂移得更厉害，也可能训练得更准。RobBench 的 `meta.json` 没有参数量，但它可由
 `Nb201TinyNetwork(ops)` 直接算出来（C=16、N=5，实测范围 91,226–2,699,770）。
 
-**结果·已验证事实**（400 个架构，`scripts/audit_rq2_confounders.py`）：
+**结果·已验证事实**（400 个架构，`scripts/audit_rq2_confounders.py`；**数字已于 2026-11-12 夜按统一口径更正，见本节末尾**）：
 
 - 参数量确实与两者都强相关：ρ(target, params) = **+0.710**、ρ(clean, params) = **+0.692**
   （ρ(target, clean) = +0.983 不变）。
-- 但**控制参数量之后，信号没有消失、反而略升**：最强的是 `feature_delta`，
-  只控 clean 时 **+0.371**，再加参数量后 **+0.422**（95% 区间 [+0.335, +0.490]）。
-- 判定分布：**survives 12 / shrinks 7 / explained_by_capacity 5 / weak_before_capacity 45**。
-  12 个「survives」几乎全是 `feature_delta` 与 `feature_measure_*_delta` 漂移幅度类；
-  `jacobian_spectral_decay`（−0.499 → −0.362）与 `perturbation_capacity_relu_active_multiscale_delta`
-  （+0.468 → +0.361）属于 shrinks。
+- 控制参数量之后，最强的是 `feature_measure_robust_delta`：
+  只控 clean 时 **+0.325**，再加参数量后 **+0.400**（95% 区间 [+0.304, +0.478]）。
+  紧跟其后 `feature_measure_weighted_delta` +0.397、`feature_measure_local_delta` +0.397、
+  `feature_measure_struct_delta` +0.374。
+- 判定分布：**survives 5 / weak_before_capacity 53 / explained_by_capacity 11 / shrinks 0**。
+- `feature_delta` 只有 **+0.145**（只控 clean 时 +0.091），属 `weak_before_capacity`——
+  它**不是**这批架构上最强的早期信号。
+
+**口径更正（2026-11-12 深夜）**：本节最初写的是「`feature_delta` 只控 clean +0.371、加参数量 +0.422、
+survives 12 / explained 5」。那组数字来自一个**与同仓库另一个审计不一致的偏相关实现**：
+`audit_rq2_confounders.partial_rho` 只把 x 与 y 秩化，控制列直接送进回归；
+`audit_early_metrics_vs_robbench.partial_spearman` 则把所有变量都秩化。
+两者对同一张表、同一个指标差三倍（+0.422 vs +0.145）。已统一为**全秩化**
+（标准秩偏相关，且对控制列的任意单调变换不变），并加了两个测试守住
+（`test_partial_rho_ranks_the_controls_too`、`test_partial_rho_agrees_with_the_early_metric_helper`）。
+上面的 +0.400 与 survives 5 是更正后的数。
 
 **怎么解释这个"反而升高"**：参数量在这里更像**抑制变量**而不是解释变量——它与 clean 同向、
 与漂移类指标不同向，控掉它等于去掉了一部分与 target 无关的指标变异，剩下的部分与 target 的关系
 反而更清楚。这是**一种解释，不是已验证的机制**；要证实需要看指标与参数量、clean 三者的联合结构。
 
 **判定桶的口径**（重要，别读错）：`rho_clean` 本来就 < 0.30 的记 `weak_before_capacity`，
-**不算**被参数量解释——它们本来就没有超出 clean 的信号。只有原本 ≥0.30、加控制后掉到 0.30 以下
-的 5 个才记 `explained_by_capacity`。
+**不算**被参数量解释——它们本来就没有超出 clean 的信号。只有原本 ≥0.30、加控制后掉到 0.30 以下的
+11 个才记 `explained_by_capacity`。
 
 **这份结果不能说明什么**：仍是相关不是因果；只控制了 clean 与参数量两项（训练难度、RobBench
 自身协议差异未控）；单次初始化（权重种子固定 0）；参数量在 C=16 下实际是「op 类型组合」的代理，
 控制它等于在同一档规模内部比较。
 
 **产出**：`results/audits/rq2-confounders-20261112.{json,md}`、
-`scripts/audit_rq2_confounders.py`、`tests/test_audit_rq2_confounders.py`（12 个测试）。
+`scripts/audit_rq2_confounders.py`、`tests/test_audit_rq2_confounders.py`（14 个测试）。
 
 ### 20. 发布表的 e0 到底能不能引用：按代码上界逐列核对（2026-11-12）
 
@@ -562,6 +572,52 @@ target 0.149–0.4385（均值 0.3642），唯一全 NaN 列是已知的 `pertur
 **产出**：`tools/audit_published_e0_sanity.py`、`tests/test_audit_published_e0_sanity.py`（9 个）、
 `results/audits/published-e0-20261112.{json,md}`、`results/audits/early-vs-robbench-published-20261112.{json,md}`。
 
+### 21. 换个扰动强度，"最强指标"还是不是同一个（2026-11-12）
+
+**为什么做**：到目前为止 RQ2 的每个数字都来自**同一套扰动**——FGSM 单步、8/255、64 张测试图、
+权重种子 0。如果结论是架构的性质，换个扰动应该还在；如果只是那个旋钮的产物，换一下就散。
+这是第 19 条结论最该被质疑的地方。
+
+**怎么做的**（`scripts/audit_e0_perturbation_sensitivity.py`）：同一批 400 个架构、同一个权重种子、
+同一批图，只换扰动，重算同一套 70 个指标：
+
+| 变体 | 攻击 | 半径 | 步数 |
+| --- | --- | --- | --- |
+| `base` | FGSM | 8/255 | 1 |
+| `weak` | FGSM | 4/255（半径减半） | 1 |
+| `pgd` | PGD | 8/255 | 3 |
+
+每个架构约 2.3 秒，400 × 2 个变体共 30 分钟（RTX 4060 Laptop）。所有相关都是**控制 clean 准确率与
+参数量之后**的偏秩相关，并且对 `lower` 指标统一翻号（正数=方向对）。
+
+**结果·已验证事实**：
+
+- 最强指标**换人了，而且翻了号**：`base` 上是 `feature_measure_robust_delta` **+0.400**；
+  在 `weak` 与 `pgd` 上它变成 **−0.271 / −0.275**。
+- 前五名重合 **0/5**（`base` 前五全是 `feature_measure_*_robust*` 系列，变体前五换成了
+  `feature_measure_flow_delta` 与 `margin_input_grad_ratio` 一类）。
+- 指标级排序相关只有 **+0.044（weak）/ +0.031（pgd）**——两套配置对各指标强弱的判断几乎无关。
+- 但**不是全都散了**：`input_grad_l2` 从 +0.367 升到 **+0.481**（两个变体一模一样），
+  `margin_input_grad_ratio` 从 +0.252 升到 **+0.446**，`jacobian_effective_rank` 从 +0.222 到 −0.508。
+
+**怎么读**：漂移幅度类指标（`feature_measure_*`）的强弱**高度依赖扰动配置**，在半径减半时甚至反向；
+输入敏感性类（`input_grad_l2`、`margin_input_grad_ratio`）在三个配置下方向一致、量级接近。
+所以「哪个早期指标最好」**在这批数据上不是一个稳定的事实**。
+
+**这份结果不能说明什么**：(1) 仍是一次随机初始化、一套训练协议、一批 64 张图；
+(2) 两个变体的数值几乎相同（`weak` 与 `pgd` 的多数列到小数点后三位一致），说明它们没能把
+"半径"与"步数"分开——这不是设计好的正交实验；(3) 单个指标的偏相关有抽样误差（n=400 时约 ±0.1），
+`top5` 这种取极值的统计尤其不稳；(4) 相关不是因果。
+
+**对 RQ2 结论的影响**：第 19 条那个 +0.400 是**一个配置下的数**，不是架构的固有属性。
+RQ2 目前的正确表述是「存在早期信号，量级 0.3–0.5，但**排序不稳、随扰动口径变化**」。
+
+**产出**：`scripts/audit_e0_perturbation_sensitivity.py`、
+`tests/test_audit_e0_perturbation_sensitivity.py`（13 个）、
+`results/audits/e0-perturbation-20261112.{json,md}`。三个逐架构表在
+`outputs/e28_capacity_family/pert400/`（按 D-012 不入库，manifest 记哈希）。
+该脚本需要 GPU 与 30 分钟，**不进** `run_audit_suite.py`（那里的预算是 3 分钟）。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**
@@ -579,10 +635,13 @@ target 0.149–0.4385（均值 0.3642），唯一全 NaN 列是已知的 `pertur
 
 **合理推断**
 
-- **RQ2 的早期信号量级约 +0.35~+0.42，且两个混杂（clean、参数量）都已控制**：400 个架构、
-  当前代码重算，控制 clean 后最强偏相关 +0.371，再控参数量后 **+0.422 [+0.335,+0.490]**；
-  12 个指标维持 |ρ| ≥ 0.30，几乎全是 `feature_delta` 与 `feature_measure_*_delta` 漂移幅度类（第 19 条）。
-  说是"推断"而不是"事实"，因为它是单次初始化、单套训练协议下的相关，不是因果。
+- **RQ2 的早期信号量级约 +0.30~+0.40，且两个混杂（clean、参数量）都已控制，但排序随扰动口径变化**：
+  400 个架构、当前代码重算，控制 clean 后最强偏相关 +0.325，再控参数量后
+  **+0.400 [+0.304, +0.478]**；5 个指标维持 |ρ| ≥ 0.30（`feature_measure_robust_delta`、
+  `feature_measure_weighted_delta`、`feature_measure_local_delta`、`feature_measure_struct_delta` 等，第 19 条）。
+  说是"推断"而不是"事实"，因为它是单次初始化、单套训练协议下的相关，不是因果；
+  而且**换个扰动就会换冠军**——`base` 上第一名的 `feature_measure_robust_delta` 在半径减半与 PGD-3
+  下变成 −0.27，前五名重合 0/5（第 21 条）。所以能说的是"存在早期信号"，不能说"某个指标最好"。
 - ~~第 17 条那批数字（Φ +0.170、`feature_spectral_participation_ratio_static` +0.575、
   `feature_measure_swd` +0.512）~~ **不能用**：它们的输入是发布表 e0，而那张表 70 个共有指标里
   0 个通过第 20 条的核对（14 个含超代码上界的值、55 个秩相关 < 0.8）。
@@ -600,12 +659,15 @@ target 0.149–0.4385（均值 0.3642），唯一全 NaN 列是已知的 `pertur
 **尚待验证的假设**
 
 - 特征空间稳定性是否是**因果**因素，而不只是与鲁棒性共变的伴随现象——目前所有结果都是相关性。
-- 训练早期指标能否预测"训练完成后"的鲁棒性：**已有正面证据，量级约 +0.35~+0.42，两个混杂都已控制**。
-  在 400 个 NB201 架构上（当前代码口径），只控 clean 时最强偏相关是 +0.371（区间 [+0.260,+0.437]）；
-  再控住参数量（ρ(target,params)=+0.710）后反而是 **+0.422 [+0.335,+0.490]**——参数量在这批架构里
+- 训练早期指标能否预测"训练完成后"的鲁棒性：**有信号，量级 +0.30~+0.40，但排序不稳**。
+  在 400 个 NB201 架构上（当前代码口径），只控 clean 时最强偏相关是 +0.325；
+  再控住参数量（ρ(target,params)=+0.710）后是 **+0.400 [+0.304,+0.478]**——参数量在这批架构里
   起抑制变量作用，不是解释掉信号（第 3 节第 19 条）。同一配方在 64 个架构上是 +0.357，只是区间更宽。
+  **但**：换扰动强度或攻击步数，最强指标会换人甚至翻号（`feature_measure_robust_delta` 从 +0.400
+  变成 −0.27，前五重合 0/5，第 21 条）。所以"某个指标最好"不成立，成立的是"这批指标里存在早期信号"。
   ~~发布表历史 e0 上的 +0.575 对比~~ **作废**：那张表的 e0 已证明无法与当前代码互相印证（第 20 条）。
-  要把这变成更强的结论，需要的是**不同种类的早期信号**（不是更多同一个指标）与第二套训练协议。
+  要把这变成更强的结论，需要的是**不同种类的早期信号**（不是更多同一个指标）、**多套扰动口径都报**
+  与第二套训练协议。
 
 ## 5. 四方差异盘点结果（2026-11-12，本机可完成的部分）
 

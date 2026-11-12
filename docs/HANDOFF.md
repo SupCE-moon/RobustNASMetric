@@ -419,3 +419,36 @@ python tools/audit_published_e0_sanity.py `
 判成 `spiked` 的列不能引用；判成 `divergent` 的列说明两个实现算的不是同一个量，引用时必须标数据源。
 
 现在的结果：70 列里 `clean` 0 个。**任何"发布表 e0 上得到 +0.5"的说法都要先重跑这个工具再写。**
+## 25. RQ2 的两个口径坑（2026-11-12 深夜）
+
+**坑一：同一个仓库里两个"偏秩相关"实现不一致。**
+`audit_rq2_confounders.partial_rho` 原本只秩化 x 与 y，控制列以原值进回归；
+`audit_early_metrics_vs_robbench.partial_spearman` 秩化全部变量。两者对同一张表、同一个指标
+（`feature_delta`，控 clean + 参数量）差三倍：**+0.422 vs +0.145**。已统一为全秩化。
+**以后新增任何偏相关函数，必须先和 `audit_early_metrics_vs_robbench.partial_spearman` 对齐**，
+仓库里有 `test_partial_rho_agrees_with_the_early_metric_helper` 盯着。
+
+**坑二：不要只报一套扰动口径。**
+同一批 400 架构、同一权重种子，只把扰动从 FGSM 8/255 换成 4/255 或 PGD-3 8/255，
+`feature_measure_robust_delta` 就从 **+0.400** 变成 **−0.27**，前五名重合 **0/5**。
+所以任何"X 指标最好"的句子后面都必须写清扰动配置；只报一套等于报了一个旋钮的产物。
+
+**重跑扰动敏感性**（可选，需要 GPU，约 30 分钟；**不在** `run_audit_suite.py` 里）：
+
+```powershell
+python scripts\audit_e0_perturbation_sensitivity.py `
+  --wide outputs\e28_capacity_family\nb201_e0_n400_20261112.csv `
+  --data-root data\cifar10 `
+  --limit 400 `
+  --output-dir outputs\e28_capacity_family\pert400 `
+  --json results\audits\e0-perturbation-20261112.json `
+  --report results\audits\e0-perturbation-20261112.md
+```
+
+加了 `--reuse` 就只重算分析、不重跑前向（表已在 `outputs/e28_capacity_family/pert400/`）。
+`--data-root` 要指到 `data\cifar10`（里面是 `cifar-10-batches-py`），指到上一层会报
+`Dataset not found or corrupted`。
+
+**判断标准没变**：`run_audit_suite.py` 的 `failed==0` 是交付门槛；扰动敏感性是"结论稳健性"的附加证据，
+不是门槛的一部分。
+
