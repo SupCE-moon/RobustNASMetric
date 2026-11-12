@@ -185,17 +185,21 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
 
 ## 9. 下一步
 
-**已完成的部分**（2026-11-12 第二轮）：主线判定（893a994）、三条线合并、9 棵树对照归零、
-大型结果的 manifest 清单已写好（
-esults/manifests/server/PLAN.md + 	argets.json），
-SSH 一通就能执行。测试 477 passed / 3 skipped。
+**已完成的部分**（2026-11-12，第二轮 + 第三轮）：
+
+- 主线判定（`893a994`）、三条线合并、9 棵树对照归零、测试 477 passed / 3 skipped。
+- 服务器大盘点清单已写好（`results/manifests/server/PLAN.md` + `targets.json`），SSH 一通就能执行。
+- **本地大产物已建 manifest**：`results/manifests/local/`，422 个文件、1,107.2 MiB，全部 SHA-256（无采样），
+  记录绝对根路径 + 相对路径，可逐个核对身份（含 1 GB holdout checkpoint、18 个 `adv_cache`、两份 13.9 MiB 合并表）。
+- **GitHub 分支已做可复现性验证**：从 `SupCE-moon/RobustNASMetric` 全新 `--depth 1` clone 评审分支，
+  727 个文件 / 21.75 MiB，最大文件 1.76 MiB（无二进制），`PYTHONPATH=<clone>/src pytest tests -q`
+  → 477 passed / 3 skipped（103 秒）。说明这条分支不依赖本机任何未提交文件。
 
 **仍然按顺序剩下的事**：
 
-1. **服务器只读普查**（阻塞在 SSH）：	ools/server_inventory.py，只 stat + sha256，不写服务器。
+1. **服务器只读普查**（阻塞在 SSH）：`tools/server_inventory.py`，只 stat + sha256，不写服务器。
 2. **用第 1 步的结果核对主线判定**：服务器若出现本地没有的源码文件，说明服务器更新，需要再并一轮。
-3. **服务器大结果落 manifest**：按 
-esults/manifests/server/PLAN.md 第 4 节的四条命令执行。
+3. **服务器大结果落 manifest**：按 `results/manifests/server/PLAN.md` 第 4 节的四条命令执行。
 4. **三空间独立留出集**：371 键验证包未冻结，这是当前最影响"结论可信度"的缺口（见第 6 节第 3 条）。
-5. **eature_activation_sign_survival_sum 终态**：560 键全网格跑完没有、发布验证过没有，只能上服务器查。
+5. **`feature_activation_sign_survival_sum` 终态**：560 键全网格跑完没有、发布验证过没有，只能上服务器查。
 6. **进入第二阶段研究**：主线整理完成后，才谈新指标与新实验（用户明确要求先整理、后设计）。

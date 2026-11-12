@@ -191,3 +191,43 @@ adversarial-excess feature drift", "Ours")`）。
    丢了就无法复现"这个数字是哪次跑出来的"。三个文件合计 17 KB，属于应入库的小结果。
 
 **后果**：`pytest tests -q` = **477 passed, 3 skipped**（3 skip = 2 个符号链接 + 1 个 matplotlib）。
+
+---
+
+## D-011 用"全新 clone 能跑通"来证明 GitHub 分支可信，而不是"本机跑通"
+
+**背景**：本机有 9 个 worktree、共享一个 `.venv`（editable 安装还指向主工作树）。
+在本机跑 `pytest` 通过，**不能**证明 GitHub 上那条分支是完整的——它可能悄悄依赖了
+某个 worktree 里未提交的文件，或者依赖了 `.venv` 里的本地状态。这正是本任务最该防的失败模式：
+"本地看着齐全，别人 clone 下来跑不起来"。
+
+**选择**：把 `git clone --depth 1 --branch <branch> https://github.com/SupCE-moon/RobustNASMetric.git`
+到一个临时目录，设 `PYTHONPATH=<clone>/src` 后跑 `pytest tests -q`，把结果当作分支是否自洽的判据。
+
+**实测**（2026-11-12）：727 个文件 / 21.75 MiB，最大单文件 1.76 MiB（`search_trials.csv`），
+无权重/二进制；`477 passed, 3 skipped in 103.15s`。
+
+**理由**：clone 出来的是"别人拿到的东西"，不含本机任何未跟踪文件、不含 `.venv`。
+它跑通才说明源码、配置、测试三者闭合。用 `--depth 1` 是为了快，不影响这个判断
+（只检出一个提交，恰好就是要交付的那一版）。
+
+**后果**：以后每次阶段交付前都跑一次这个检查，写进 `docs/PROJECT_STATUS.md`。
+文件数 727（clone）与 738（本机 `git ls-files`）的差，是被 `.gitignore` 排除的生成物，不是缺失。
+
+---
+
+## D-012 本地 1.1 GiB 产物也建 manifest，即使它们永远不进 Git
+
+**背景**：`outputs/` 里有 422 个文件、1,107.2 MiB（含 1 GB holdout checkpoint、18 个对抗缓存）。
+它们按策略不入库，但"不入库"不等于"不用管"——报告里的数字要能追到具体文件。
+
+**选择**：用 `tools/inventory_tree.py` 对主工作树 `outputs/` 做全量 SHA-256（无采样），
+产出 `results/manifests/local/outputs-inventory.json` + `README.md`，**入库的是清单不是文件**。
+
+**理由**：
+1. 清单里有绝对根路径，所以别人（或半年后的自己）能确定"这个哈希对应哪台机器哪个目录"。
+2. 1,107 MiB 全量哈希耗时可控（几分钟），换来的是一张能查"这个 1 GB checkpoint 到底是哪一版"的表。
+3. 512 MiB 以上才采样会掩盖"同名不同内容"的风险，而 checkpoint 恰恰最容易同名不同内容。
+
+**后果**：清单入库（commit `67b5e74`），文件本体继续留在服务器/本地，符合"GitHub 只存小型结果"的约定。
+被策略判为 `reject` 的 22 个文件在 README 里逐个列出，没有静默丢弃。
