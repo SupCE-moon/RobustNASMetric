@@ -144,3 +144,22 @@ python tools/check_doc_links.py `
 
 注意：这只是重读已发布表，**不改协议、不改任何数字**。
 RB40 只有 40 个模型，该列是点估计、没有置信区间，不能当定论引用。
+## RB40 名次的置信区间（`bootstrap-rb40-20261112`）
+
+    python tools/bootstrap_rb40.py \
+      --rows outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv \
+      --repair outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/repair_rows.csv \
+      --table outputs/strict_adv_excess_release_20261024T110422Z/RobustMetric_严格全部指标总表_86项_三位小数.csv \
+      --json results/audits/bootstrap-rb40-20261112.json \
+      --report results/audits/bootstrap-rb40-20261112.md
+
+按**模型**（40 个 RB40 网络）重采样 2000 次，给每个指标的 RB40 相关系数与名次配 95% 区间。
+
+两条容易踩的坑：
+1. 必须传 `--repair`。三个 TRNAS 指标在 Kang2021Stable 上因 float32 下溢失败过，
+   修复值在 `repair_rows.csv` 里；不合并这份补丁，这三个指标会各缺一个模型而被整列丢弃——
+   恰好丢掉本审计要看的指标。测试 `test_repair_rows_restore_a_failed_metric` 守住这一点。
+2. 复现核对用 5.5e-4 而不是 1e-6。发布表只存三位小数，重算与表的最大差不可能小于半步。
+
+结论：Φ 与 `adversarial_loss` 稳定为正；`trnas_r_score` / Ψ 的区间跨 0，
+所以"在已训练模型上失效"这句话没有依据，只能说"40 个模型分辨不出来"。详见 D-022。

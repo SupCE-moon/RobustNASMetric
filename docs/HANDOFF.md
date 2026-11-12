@@ -183,3 +183,21 @@ python tools/check_doc_links.py `
 没有 reason 的豁免半年后就没人知道它是不是漏了。
 
 改完文档不要忘了顺序：先跑体检 → 再跑 `tools/verify_doc_claims.py`（数字）→ 最后提交。
+
+## 14. RB40 名次的置信区间（2026-11-12）
+
+`tools/bootstrap_rb40.py` 按**模型**重采样，给 RB40 的相关系数与名次配 95% 区间。
+
+    python tools/bootstrap_rb40.py \
+      --rows outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv \
+      --repair outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/repair_rows.csv \
+      --table outputs/strict_adv_excess_release_20261024T110422Z/RobustMetric_严格全部指标总表_86项_三位小数.csv \
+      --json results/audits/bootstrap-rb40-20261112.json \
+      --report results/audits/bootstrap-rb40-20261112.md
+
+**必须传 `--repair`**：三个 TRNAS 指标在 Kang2021Stable 上因下溢失败，修复值在
+`repair_rows.csv`；漏掉它，这三个指标会各缺一个模型而被整列丢弃——恰好丢掉要看的指标。
+（`--repair` 省略时会自动在同目录找 `repair_rows.csv`，但显式传更安全。）
+
+判据：区间覆盖 0 就是**方向不知道**，不许写成"失效"；写结论时带上区间，不要只写点估计。
+配合读：`results/audits/bootstrap-rb40-20261112.md`、D-022。
