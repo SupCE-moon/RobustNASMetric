@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
- "docs_scanned": 105,
- "paths_checked": 521,
+ "docs_scanned": 107,
+ "paths_checked": 536,
  "missing_required": [],
  "missing_planned": [
   {
@@ -131,11 +131,11 @@
  "missing_optional": [
   {
    "doc": "docs/DECISIONS.md",
-   "path": "outputs/e28_capacity_family/nb201_e0_n400_20261112.csv"
+   "path": "outputs/.../sources/metric_value_rows_adv_excess.csv"
   },
   {
-   "doc": "docs/PROJECT_STATUS.md",
-   "path": "outputs/e28_capacity_family/nb201_e0_n400_20261112.csv"
+   "doc": "docs/SERVER_AUDIT.md",
+   "path": "outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv"
   },
   {
    "doc": "docs/experiments/DARTS_E37_逐层诊断结果与问题记录_20261025.md",
@@ -188,10 +188,6 @@
   {
    "doc": "docs/experiments/实验管理.md",
    "path": "outputs/e21_trnas_mmd/metrics_uniform512_step1e6.csv"
-  },
-  {
-   "doc": "results/audits/README.md",
-   "path": "outputs/e28_capacity_family/nb201_e0_n400_20261112.csv"
   }
  ]
 }

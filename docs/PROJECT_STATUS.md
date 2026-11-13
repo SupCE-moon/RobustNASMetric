@@ -1,9 +1,11 @@
 # 项目状态（PROJECT_STATUS）
 
-最后更新：2026-11-12
-更新人：接管整理（分支 `codex/mainline-consolidation-20261112`）
-状态标记：**服务器一侧尚未盘点**（SSH 端口不可达，见第 7 节）。以下"已验证事实"仅限本机与
-已入库文档；凡涉及服务器现状的，一律标注为待核实。
+最后更新：2026-11-13
+更新人：接管整理（分支 `codex/server-mainline-merge-20261112`）
+状态标记：**服务器已完成只读普查**（2026-11-13，见 `docs/SERVER_AUDIT.md`）：源码 26 个模块
+25 个逐字节相同、本地 47,600 行原始记录与服务端发布包逐行同值、84 个入榜指标可全部离线复算
+（`max_abs_error = 0.000e+00`）。仍属待核实的是：服务器上其余运行目录、`shared_benchmarks/`
+权重的逐个哈希、以及发布表 e0 那一列由哪版代码产出。
 
 ---
 
@@ -78,14 +80,15 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
    RB40 `5b519799…`、NB201 `a158c609…`、DARTS `7761b4a4…`。
    **结论：教师数据包尚未齐备，不能宣称已交付。**
 
-6. **严格排名离线复算（2026-11-12 新增，服务器不可达时做的独立验证）**
-   不从报告抄名次，而是用 `tools/verify_strict_ranking.py` 从 47,600 行原始记录重算一遍：
+6. **严格排名离线复算（2026-11-12 起，2026-11-13 补全为 84 项）**
+   不从报告抄名次，而是用 `tools/verify_strict_ranking.py` 从原始记录重算一遍：
    逐 metric × 逐 setting 算 Spearman、按 `direction` 定向、八设置平均、再排序。
-   **结果：83 项逐值最大绝对误差 0.000e+00，名次顺序完全一致**；2 项 RACL 的 `ok` 行数为 0（全是 failed），
-   因此被排除——与官方"证据不足"的排除理由精确对应。
-   边界：官方 84 项里那 1 项 `feature_adv_excess_centered_unit_l2` 的原始行只在服务器，
-   本地这批行冻结在它加入之前，**离线无法复算**，只能等 SSH。
-   详见 `results/audits/strict-ranking-recompute-20261112.md`。
+   **结果：84 项逐值最大绝对误差 0.000e+00，名次顺序完全一致**；2 项 RACL 的 `ok` 行数为 0
+   （全是 failed），因此被排除——与官方"证据不足"的排除理由精确对应。
+   补全过程：起初只有 47,600 行（85 个指标），只能复算 83 项；2026-11-13 从服务器取回
+   `feature_adv_excess_centered_unit_l2` 的 560 行（sha256 与 `provenance.json` 的
+   `new_raw_sha256` 相同），用 `--extra` 追加后 84 项全部可复算。详见
+   `results/audits/strict-ranking-recompute-20261112.md` 与 `docs/SERVER_AUDIT.md`。
 
 7. **指标冗余度：85 项里到底有几个独立信号（2026-11-12 新增）**
    榜单上有 84 项，但"84 项都独立"和"84 项是 5 个信号的变体"是两件完全不同的事，
@@ -198,8 +201,8 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
     详见 `results/audits/setting-weights-20261112.md` 与 D-021。
 
     **局限**：区间只说明"在这 40 个模型上排得稳不稳"，不说明"换 40 个模型会怎样"；
-    后者需要新的模型集合。另外 `feature_adv_excess_centered_unit_l2` 的原始行只在服务器，
-    本机无法为它配区间（它不在上表里）。
+    后者需要新的模型集合。（`feature_adv_excess_centered_unit_l2` 的原始行已于 2026-11-13
+    从服务器取回，重跑 bootstrap 时可把它纳入，见 `docs/SERVER_AUDIT.md`。）
 
 12. **Φ 对特征漂移族有实质增量（2026-11-12 新增，按预注册判据执行）**
     第 7 条发现 85 个指标塌成 21 簇、最大簇 35 个全是特征漂移变体，因此必须回答：
@@ -243,7 +246,8 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
     **不可以说**：Φ 更好是因为它测了"一致性"而不是"漂移幅度"——那是机制解释，
     本检验不涉及。**也不可以说**因果。
 
-    **局限**：只有 85 个指标（第 86 个 adv-excess 的原始行只在服务器）；三个网格的 target
+    **局限**：当时只有 85 个指标（第 86 个 adv-excess 的原始行 2026-11-13 已从服务器取回，
+    重跑时可纳入）；三个网格的 target
     语义不同，混平均是对齐冻结协议而非自然选择；B 的成员来自一次 ρ≥0.5 的冻结聚类，
     换阈值会变。详见 `results/audits/phi-incremental-20261112.md` 与 D-023。
 
@@ -253,7 +257,7 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
     `student_runner.py` 的 RACL 3 个与 TRNAS 3 个），**0 个**在仓库里完全没有实现痕迹。
     唯一例外：`feature_adv_excess_centered_unit_l2` 只在 `metric_registry.py` 出现——
     它的漂移公式在 `adv_excess_metric.py`（`_unit_centered`）里，但**没有任何代码把这个名字写成输出键**；
-    这与"它的原始行只存在于服务器、离线无法复算"是同一件事的两面。
+    这与"它的原始行由另一条运行产出"是同一件事的两面（那 560 行已于 2026-11-13 取回并入库）。
     另一个记录：`perturbation_capacity_importance_delta` 在 bundle 里被刻意写成 `float("nan")`，
     真正计算在 `importance_batched.py` / `evaluate_importance_student.py`（两遍法），
     所以"NaN"在这里表示"不在这个入口算"，不是"算失败"——与 D-014 的"缺失不是零"是同一条原则。
@@ -734,6 +738,42 @@ RQ2 目前的正确表述是「存在早期信号，量级 0.3–0.5，但**排�
 其中一个是本轮的回归：`clean`/`params` 不在注册表里，曾被当成"越小越好"，导致基线全为负）、
 `results/audits/rq2-selection-value-20261112.{json,md}`。
 
+### 25. 服务器只读普查：源码同源、数据同值、84 项复算闭合（2026-11-13）
+
+**为什么做**：第一阶段的核心任务之一就是"盘点四方差异"。此前一直卡在 SSH，所有关于服务器
+的说法都只能标注为"待核实"。用户 2026-11-13 提供密码后端口恢复，当晚完成普查。
+
+**怎么做的**：全程只读（`ls` / `sha256sum` / `docker exec ... python3`），只下载两个 CSV。
+完整报告见 **`docs/SERVER_AUDIT.md`**，这里只记结论。
+
+**结果·已验证事实**：
+
+| 检查 | 结果 |
+| --- | --- |
+| 服务器 `src/robust_metric_lab/*.py` 与本分支同文件哈希 | **25 / 26 完全相同**（含 `metrics.py`，`0db17614…`，76,626 B / 56 个函数） |
+| 唯一不同 | `metric_registry.py`：服务器 `1aab7d25…`，本分支 `182cabb7…` |
+| 差异原因 | 服务器上补丁打失败（`.orig` / `.rej` 还在），本分支是打上之后的版本 |
+| 发布包行数 | 48,160 = 86 指标 × 8 设置 × 560；`status` 为 ok 47,600 / failed 560 |
+| 本地 47,600 行的键能否在服务端找到 | **47,600 / 47,600** |
+| `metric_value` 最大绝对差 | **0.000e+00** |
+| 服务端多出的 560 行 | 全部是 `feature_adv_excess_centered_unit_l2` |
+| 取回那 560 行后的复算 | **84 项，`max_abs_error = 0.000e+00`，名次顺序一致** |
+
+**关键收获**：此前"只能复算 83 项、第 84 项原始行只在服务器"的限制**解除**。
+`tools/verify_strict_ranking.py` 新增 `--extra` 参数（追加原始行文件），
+`tests/test_verify_strict_ranking.py` 加了回归测试守住"附加行必须在八设置校验之前合并"。
+
+**这份结果不能说明什么**：(1) 不能说明发布表每个数值都由本仓库这版代码产出——
+第 20 条已发现 e0 列里存在 `clamp_max(1e3)` 挡不住的量级，生成它的那一版代码不在仓库历史里；
+(2) 只核对了 `strict_adv_excess_release_20261024T110422Z` 一个目录，`student_metrics/` 下
+其余运行目录未逐个登记；(3) 不能说明 adv-excess 的计算过程正确，只说明它的原始行与
+`provenance.json` 的 `new_raw_sha256` 一致、且能让复算达到零误差。
+
+**产出**：`docs/SERVER_AUDIT.md`、
+`outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_value_rows_adv_excess.csv`
+（172,751 B，sha256 `947f53c7…`）、`tools/verify_strict_ranking.py` 的 `--extra`、
+`tests/test_verify_strict_ranking.py` 新增 1 个测试。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**
@@ -860,12 +900,16 @@ RQ2 目前的正确表述是「存在早期信号，量级 0.3–0.5，但**排�
    **在此之前，跨指标比较时要单独说明这一个指标的方向，不要把它和另外 55 个 delta 一起解释。**
 
 
-1. **服务器现状未知**：`/workspace/robust_metric_lab_nas` 的代码、结果、manifest 未盘点（阻塞，见第 8 节）。
-2. **服务器那一侧仍未确认**：本地已判定代码主线是 `893a994` 一线并能全部合并，
-   但服务器目录 `/workspace/robust_metric_lab_nas` 究竟停在哪一版，仍要等 SSH 才能核实（见第 8 节）。
+1. ~~服务器现状未知~~（2026-11-13 已完成只读普查，见 `docs/SERVER_AUDIT.md`）：
+   `/workspace/robust_metric_lab_nas` = 48 GB；源码 26 个模块里 25 个与本分支逐字节相同，
+   唯一不同的 `metric_registry.py` 是因为补丁在服务器上打失败（`.rej` 还在）；
+   本地 47,600 行原始记录与服务端发布包逐行同值（`metric_value` 最大差 0）。
+2. ~~服务器那一侧仍未确认~~（同上）：服务器跑的代码 = 本分支代码 − adv-excess 注册，
+   这坐实了"代码主线 = `893a994` 一线、`dc6fb9c` 只是归档时点"。
 3. **三空间独立留出集仍缺**：`三空间独立验证材料审计_20261025.md` 指出 371 键独立验证包未冻结。
 4. **激活状态保持候选结果未知**：`feature_activation_sign_survival_sum` 的 560 键全网格
-   在服务器上跑完了没有，无从确认（等待 SSH）。
+   在服务器上是否跑完、是否通过发布验证，本轮普查未逐目录核对（`student_metrics/` 9.7 GB、
+   多个运行目录），仍是待办。
 5. **571 行未提交指标代码未评审**（内容与 `dc6fb9c` 逐字节相同，见第 7 节）。
    2026-11-12 的对照审计（第 3 节第 13 条）已确认这些名字都有实现入口，
    但"哪个函数用哪个入口"的逐行数学评审仍未做。
@@ -909,21 +953,30 @@ RQ2 目前的正确表述是「存在早期信号，量级 0.3–0.5，但**排�
 依赖该补丁的两个文件（`e36_batched.py`、`test_e36_batched.py`）以原始字节保存在
 `results/manifests/reconciliation-20261112/held/`。
 
-## 8. 当前阻塞：服务器 SSH 不可达
+## 8. 服务器：从"不可达"到"已只读普查"
 
-2026-11-12 16:2x 实测（`socket.connect_ex`）：
+2026-11-12 全天，`socket.connect_ex` 对 17010 / 17018 / 17013 返回 `10061`（连接被拒绝）、
+后来变成 `10035`（超时），22 端口开放但是另一台机器（host key
+`SHA256:Wd29pYQlkJNZzh4e4jst7fYt5H1o68eopbfdHflonTQ` 与 `known_hosts` 三条记录都不匹配，
+`guzhengkai` 认证失败）。当时的判断是容器或端口映射下线。
 
-| 端口 | 结果 | 含义 |
-| --- | --- | --- |
-| 17010 | error 10061 | 主机在线，但该端口**没有服务监听**（连接被拒绝） |
-| 17018 | error 10061 | 同上 |
-| 17013 | error 10061 | 同上 |
-| 22 | open | 是另一台机器（host key `SHA256:Wd29pYQlkJNZzh4e4jst7fYt5H1o68eopbfdHflonTQ`，与 known_hosts 中三条记录都不匹配），`guzhengkai` 认证失败 |
+2026-11-13 16:29，用户提供了密码，四个端口全部恢复 OPEN（延迟 43–55 ms），
+17010 的主机密钥 `SHA256:6170fe70d1769091ea5c279f48f6ad5f` 与 `known_hosts` 匹配，
+`guzhengkai` 认证成功，容器 `wangjiahao` 在跑（Up 8 weeks）。当晚完成了只读普查。
 
-`known_hosts` 里记录的三个目标主机密钥分别是 17010 `SHA256:uxigsIW4dwxlfweYzCEhF5iJkF5qmx0vZ41/VIk5Xsk`、
-17018 `SHA256:IL7ZtDjAKWmmK/ihyFsgJ4IqMV0Q6GEPoibfUwZVwqQ`、17013 `SHA256:TARUCHl9kMyYacOF34dNCoazUPmDyRpjVs8O5lmIcRA`。
+普查结果、证据链、大产物清单、服务器上的残留物、以及"这份报告能说明什么/不能说明什么"
+全部写在 **`docs/SERVER_AUDIT.md`**。三个要点：
 
-判断：容器（`wangjiahao`）或其端口映射已下线/重启换了端口。需要恢复端口映射或取得新端口后重试。
+1. 源码 26 个模块里 25 个与本分支逐字节相同，唯一不同是 `metric_registry.py`
+   （服务器上补丁打失败，`.rej` 还在）——服务器代码 = 本分支 − adv-excess 注册。
+2. 本地 47,600 行原始记录与服务端 `metric_values_merged.csv` 的 85 个指标逐行同值
+   （`metric_value` 最大绝对差 `0.000e+00`）。
+3. 取回 `feature_adv_excess_centered_unit_l2` 的 560 行（sha256 与 `provenance.json` 的
+   `new_raw_sha256` 相同）后，**84 个入榜指标可以全部离线复算，零误差**。
+
+操作注意事项：服务器会因 `MaxStartups` 限流而丢掉 SSH banner
+（`Error reading SSH protocol banner`），这是限流不是网络故障，隔几秒重试即可；
+密码只用于当次连接，未写入任何文件或 Git 历史。
 
 ## 9. 下一步
 
@@ -939,11 +992,15 @@ RQ2 目前的正确表述是「存在早期信号，量级 0.3–0.5，但**排�
 
 **仍然按顺序剩下的事**：
 
-1. **服务器只读普查**（阻塞在 SSH）：`tools/server_inventory.py`，只 stat + sha256，不写服务器。
-2. **用第 1 步的结果核对主线判定**：服务器若出现本地没有的源码文件，说明服务器更新，需要再并一轮。
-3. **服务器大结果落 manifest**：按 `results/manifests/server/PLAN.md` 第 4 节的四条命令执行。
+1. ~~服务器只读普查~~（2026-11-13 已完成，见 `docs/SERVER_AUDIT.md`）：源码、发布包、
+   原始行都核对过，84 项复算零误差。
+2. ~~用第 1 步的结果核对主线判定~~（已完成）：服务器代码 = 本分支 − adv-excess 注册。
+3. **服务器大结果落 manifest**：`results/manifests/server/` 里的清单已写，但本轮只核对了
+   `strict_adv_excess_release_20261024T110422Z` 一个目录；`student_metrics/` 下其余运行目录
+   仍要逐个登记（`STATUS.env` + 大小 + 哈希）。
 4. **三空间独立留出集**：371 键验证包未冻结，这是当前最影响"结论可信度"的缺口（见第 6 节第 3 条）。
-5. **`feature_activation_sign_survival_sum` 终态**：560 键全网格跑完没有、发布验证过没有，只能上服务器查。
+5. **`feature_activation_sign_survival_sum` 终态**：服务器已可连，下一步直接查
+   `student_metrics/` 下对应运行目录的 `STATUS.env`。
 6. **进入第二阶段研究**：主线整理完成后，才谈新指标与新实验（用户明确要求先整理、后设计）。
 
 **第二阶段计划已写好**：`docs/ROADMAP.md`（2026-11-12 第一版）。它把两个研究问题拆开看：

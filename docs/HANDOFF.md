@@ -534,3 +534,51 @@ python scripts\audit_rq2_selection_value.py `
    而程序不会报错（见 D-035 的回归测试）。
 2. 区间必须"每次重采样重新选 top-k"，否则低估误差。
 3. `clean` 更强是必然的（它训练过），不能拿它证明"早期指标不如不用"。
+---
+
+## 29. 服务器恢复了：先跑这三步（2026-11-13）
+
+服务器入口 `guzhengkai@49.232.181.138:17010`，容器 `wangjiahao`。密码**不要写进任何文件**，
+用环境变量传（`RM_PW`）。临时脚本一律 `.tmp_` 前缀，已被 `.gitignore` 忽略。
+
+**第一步：确认真的是这台机器**
+
+```powershell
+$env:RM_PW = "<密码>"
+python .tmp_ssh2.py <一个只读脚本>.sh
+```
+
+看两件事：`hostname` 应为 `516server`；主机密钥指纹应为
+`SHA256:6170fe70d1769091ea5c279f48f6ad5f`（`known_hosts` 里 `[49.232.181.138]:17010` 那条）。
+不要用 `AutoAddPolicy`——连上了但不能证明连的是对的那台，这个证据就没用。
+
+**第二步：跑 84 项复算**
+
+```powershell
+python tools\verify_strict_ranking.py `
+  --rows     <主工作树>\outputs\strict_all_metrics_table_20261024_trnas_repaired\sources\metric_values_original_strict.csv `
+  --extra    outputs\strict_all_metrics_table_20261024_trnas_repaired\sources\metric_value_rows_adv_excess.csv `
+  --repair   outputs\strict_all_metrics_table_20261024_trnas_repaired\sources\repair_rows.csv `
+  --ranking  outputs\strict_adv_excess_release_20261024T110422Z\strict_ranking.csv `
+  --output   results\audits\strict-ranking-recompute-20261112.json `
+  --report   results\audits\strict-ranking-recompute-20261112.md
+```
+
+判据：`recomputed=84 compared=84 max_abs_error=0.000e+00 exact=True order_identical=True`。
+出现 83 而不是 84，说明 `--extra` 没给或文件路径不对——那 560 行是
+`feature_adv_excess_centered_unit_l2`，没有它这一项就不入榜。
+
+**第三步：把 `student_metrics/` 下其余运行目录登记进 manifest**
+
+本轮只核对了 `strict_adv_excess_release_20261024T110422Z` 一个。其余目录逐个取
+`STATUS.env`（看 `state=`）、文件数、总大小、关键文件的 sha256，写进
+`results/manifests/server/`。**不要下载**——9.7 GB，D-012 已定"只登记不入库"。
+
+**两个坑**：
+
+1. 连续快速建连接会被 `MaxStartups` 限流，报 `SSHException: Error reading SSH protocol banner`。
+   这是限流不是网络故障，隔几秒重试即可（`.tmp_ssh2.py` 已带 4 次退避重试）。
+2. 远程命令要写进 `.sh` 文件再执行，**不要内联**：PowerShell 会先展开双引号里的 `$(...)`
+   与 `$var`，内联的 bash 脚本会被本地 shell 吃掉。
+
+详见 `docs/SERVER_AUDIT.md`。

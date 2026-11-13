@@ -908,3 +908,38 @@ p=0.21）；`feature_measure_robust_hybrid_delta` 高 **+0.028**（显著）但�
 
 **后果**：`scripts/audit_rq2_selection_value.py`、`tests/test_audit_rq2_selection_value.py`（16 个）、
 `results/audits/rq2-selection-value-20261112.{json,md}`、§3 第 24 条、§4 RQ2 条再收窄、`HANDOFF.md` §28。
+---
+
+## D-036 服务器普查：只读、可核对、不把密码写进仓库
+
+**背景**：第一阶段要求"盘点四方差异"，但 2026-11-12 全天 SSH 不通（`10061` 拒绝、
+之后 `10035` 超时）。用户 2026-11-13 提供密码后端口恢复，当晚完成只读普查。
+
+**决定**：
+
+1. **密码只走环境变量，不落盘**。临时脚本 `.tmp_ssh2.py` / `.tmp_fetch.py` 从
+   `RM_PW` 读密码，`.tmp_*` 已被 `.gitignore` 忽略；提交前逐个看过 `git status`。
+2. **主机密钥必须校验**。用 `RejectPolicy` + `load_system_host_keys()`，
+   **不用** `AutoAddPolicy`——否则"连上了"这件事本身就不能作为证据。
+3. **只读**。服务器上只执行 `ls` / `sha256sum` / `docker exec ... python3` 读文件；
+   需要算哈希的就地算，不下载大文件。只下载两个 CSV（14.8 MB、173 KB）。
+4. **用哈希判断"同源"，不用时间戳**。这与 D-008 同一条原则：26 个模块里 25 个逐字节相同，
+   唯一不同的那个有 `.rej` 作证，说明是补丁没打上，而不是"服务器更新了"。
+5. **取回缺失的 560 行原始数据并入库**。它 172,751 字节，远低于 10 MiB 警告线，
+   而且是"84 项能否复算"的缺口所在，属于"小型结果/配置"范畴，应当入库。
+
+**为什么不下载整个 `outputs/`（9.7 GB）**：D-012 已经定过——大产物只登记不入库。
+本轮只取了两份 CSV，因为它们是"让结论可复算"的最小集合。
+
+**结果**：见 `docs/SERVER_AUDIT.md`。三个可核对的结论：源码 25/26 同字节；
+47,600 行逐值同源（`max|diff| = 0`）；84 项复算零误差。
+
+**为什么不改 `metric_registry.py` 去对齐服务器**：服务器上那份是**补丁没打上**的状态，
+不是"更新的版本"。把本地改回去等于抹掉 adv-excess 注册，会让 86 项里的第 86 项消失。
+
+**顺带一个 API 变更**：`tools/verify_strict_ranking.py` 增加 `--extra`（可多次），
+用于追加原始行文件。加它的理由不是"方便"，而是不加就只能复算 83 项。
+
+**后果**：`docs/SERVER_AUDIT.md`、`tools/verify_strict_ranking.py`、`tests/test_verify_strict_ranking.py`、
+`outputs/.../sources/metric_value_rows_adv_excess.csv`、`docs/PROJECT_STATUS.md` §2/§3 第 25 条/§6/§8/§9、
+`docs/HANDOFF.md` §29。

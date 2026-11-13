@@ -110,6 +110,31 @@ def test_compare_flags_a_changed_value() -> None:
     assert verdict["max_abs_error"] == pytest.approx(0.01)
 
 
+def test_extra_rows_are_appended_before_recomputing(tmp_path: Path) -> None:
+    """The main raw-row export predates one metric; its rows arrive in a second file.
+
+    Before the server copy was recovered the recomputation covered 83 of the 84
+    ranked metrics, and the report said the missing one could not be checked
+    offline. Appending the extra file is what makes the fourth-place-through-
+    eighty-fourth comparison complete, so the append must happen *before* the
+    repair merge and before the eight-setting check.
+    """
+    frame = _rows("late_metric", "higher")
+    first = frame.iloc[: len(frame) // 2]
+    second = frame.iloc[len(frame) // 2 :]
+    rows_path = tmp_path / "rows.csv"
+    extra_path = tmp_path / "extra.csv"
+    first.to_csv(rows_path, index=False)
+    second.to_csv(extra_path, index=False)
+
+    _, rejected = vsr.recompute(vsr.load_rows(rows_path, None), SMALL)
+    assert "late_metric" in rejected, "half the grid must not be enough"
+
+    table, rejected2 = vsr.recompute(vsr.load_rows(rows_path, None, [extra_path]), SMALL)
+    assert not rejected2
+    assert table.loc[0, "all_setting_mean"] == pytest.approx(1.0)
+
+
 def _official_from(table: pd.DataFrame) -> Path:
     import tempfile
 

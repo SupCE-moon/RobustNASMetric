@@ -1,7 +1,7 @@
 # 文档里的路径引用：存在性检查
 
-- 扫描文档：105 份
-- 检查过的仓库内路径：521 条
+- 扫描文档：107 份
+- 检查过的仓库内路径：536 条
 - 应当修复的缺失（`docs/ src/ scripts/ tests/ tools/ configs/ results/`）：**0** 条
 
 ## 1. 应当修复的缺失
@@ -65,8 +65,8 @@
 
 | 文档 | 引用的路径 |
 | --- | --- |
-| `docs/DECISIONS.md` | `outputs/e28_capacity_family/nb201_e0_n400_20261112.csv` |
-| `docs/PROJECT_STATUS.md` | `outputs/e28_capacity_family/nb201_e0_n400_20261112.csv` |
+| `docs/DECISIONS.md` | `outputs/.../sources/metric_value_rows_adv_excess.csv` |
+| `docs/SERVER_AUDIT.md` | `outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv` |
 | `docs/experiments/DARTS_E37_逐层诊断结果与问题记录_20261025.md` | `outputs/student_metrics/wangjiahao/darts_e37_layer_diagnostic_20261025T120240Z/frozen_manifest.json` |
 | `docs/experiments/activation_holdout_provenance_audit_20261027.md` | `outputs/student_metrics/wangjiahao/activation_holdout_nb201_weights_20261031/training_plan.json` |
 | `docs/experiments/activation_holdout_provenance_audit_20261027.md` | `outputs/student_metrics/wangjiahao/activation_holdout_nb201_weights_20261031_v2/training_plan.json` |
@@ -80,7 +80,6 @@
 | `docs/experiments/实验管理.md` | `outputs/command_validation/e05_multisource_aggregate_check.csv` |
 | `docs/experiments/实验管理.md` | `outputs/command_validation/e08_fixture_search_check.csv` |
 | `docs/experiments/实验管理.md` | `outputs/e21_trnas_mmd/metrics_uniform512_step1e6.csv` |
-| `results/audits/README.md` | `outputs/e28_capacity_family/nb201_e0_n400_20261112.csv` |
 
 ## 这条检查能证明什么
 

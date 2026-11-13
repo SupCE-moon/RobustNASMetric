@@ -27,7 +27,7 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import pandas as pd
 from scipy import stats
@@ -67,9 +67,25 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def load_rows(rows_path: Path, repair_path: Path | None) -> pd.DataFrame:
-    """Load raw rows and apply the TRNAS repair rows, if any."""
+def load_rows(
+    rows_path: Path,
+    repair_path: Path | None,
+    extra_paths: Sequence[Path] = (),
+) -> pd.DataFrame:
+    """Load raw rows, append extra row files, then apply the TRNAS repair rows.
+
+    ``extra_paths`` exists because the main raw-row export predates one metric:
+    ``feature_adv_excess_centered_unit_l2`` was computed in a later run and its
+    rows live in a separate file. Without appending them the recomputation can
+    only cover 83 of the 84 ranked metrics, which is what the earlier audit
+    reported before the server copy was recovered.
+    """
     frame = pd.read_csv(rows_path, keep_default_na=False, na_values=[""])
+    for extra in extra_paths:
+        frame = pd.concat(
+            [frame, pd.read_csv(extra, keep_default_na=False, na_values=[""])],
+            ignore_index=True,
+        )
     if repair_path is None:
         return frame
     repair = pd.read_csv(repair_path, keep_default_na=False, na_values=[""])
@@ -177,13 +193,20 @@ def compare(mine: pd.DataFrame, official: pd.DataFrame) -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--rows", required=True, type=Path, help="merged raw metric rows CSV")
+    parser.add_argument(
+        "--extra",
+        type=Path,
+        action="append",
+        default=[],
+        help="additional raw-row CSV(s) to append before recomputing (e.g. the adv-excess rows)",
+    )
     parser.add_argument("--repair", type=Path, default=None, help="optional repair rows CSV")
     parser.add_argument("--ranking", required=True, type=Path, help="official strict_ranking.csv")
     parser.add_argument("--output", required=True, type=Path, help="JSON report path")
     parser.add_argument("--report", type=Path, default=None, help="optional Markdown summary")
     args = parser.parse_args(argv)
 
-    frame = load_rows(args.rows, args.repair)
+    frame = load_rows(args.rows, args.repair, args.extra)
     mine, rejected = recompute(frame)
     official = pd.read_csv(args.ranking)
     result = compare(mine, official)
@@ -197,6 +220,7 @@ def main(argv: list[str] | None = None) -> int:
                 if args.repair
                 else None
             ),
+            "extra": [{"path": str(p), "sha256": sha256_file(p)} for p in args.extra],
             "ranking": {"path": str(args.ranking), "sha256": sha256_file(args.ranking)},
         },
         "protocol": {
@@ -227,8 +251,7 @@ def main(argv: list[str] | None = None) -> int:
             "",
             f"生成时间（UTC）：{payload['generated_at_utc']}",
             "",
-            f"- 原始行：`{args.rows}`（{len(frame):,} 行，sha256 `{payload['inputs']['rows']['sha256'][:16]}…`）",
-            f"- 官方排名表：`{args.ranking}`",
+            f"- 原始行：`{args.rows}`（{len(frame):,} 行，sha256 `{payload['inputs']['rows']['sha256'][:16]}…`）",            f"- 官方排名表：`{args.ranking}`",
             f"- 复算成功指标：**{len(mine)}**；被排除：{len(rejected)}",
             f"- 与官方逐值比较：{result['metrics_compared']} 项，最大绝对误差 `{result['max_abs_error']:.3e}`"
             f"（{result['max_abs_error_at']}）",
