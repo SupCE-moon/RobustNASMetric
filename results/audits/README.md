@@ -323,3 +323,17 @@ suite 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时会自动传这
 
 前十名里没有"都不稳定"组的指标，所以 RQ2 的正面结论站得住。前五里有两个只保证信号稳定
 （`local_delta`、`struct_delta`），用它们要多次采样。
+## 早期指标能不能用来挑架构（2026-11-12）
+
+`rq2-selection-value-20261112.{json,md}`，由 `scripts/audit_rq2_selection_value.py` 生成（纯 CPU）。
+
+按指标排序取前 10%，看这组的真实鲁棒性比全体高多少，并与随机子集、参数量、clean 比：
+
+| 指标 | 前 10% 相对全体 | 随机基线 p |
+| --- | --- | --- |
+| `clean`（需训练） | +0.060 | 0.0002 |
+| `params`（免费） | +0.051 | 0.0002 |
+| `feature_measure_robust_hybrid_delta` | +0.028 | 0.0002 |
+| `feature_measure_robust_delta`（偏相关最强） | +0.007 | 0.211 |
+
+结论：相关最强的指标在尾部没有区分度；能筛的指标也不如直接数参数量。

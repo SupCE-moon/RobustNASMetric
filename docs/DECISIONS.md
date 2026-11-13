@@ -882,3 +882,29 @@ RQ2 的幅度表述从「约 +0.35」更新为「约 +0.35~+0.42，两个混杂�
 **后果**：`scripts/audit_rq2_stable_subset.py`、`tests/test_audit_rq2_stable_subset.py`（13 个）、
 `results/audits/rq2-stable-subset-20261112.{json,md}`、`docs/PROJECT_STATUS.md` §3 第 23 条与 §4 RQ2 条、
 `docs/HANDOFF.md` §27。纯 CPU、秒级，读两张已存在的表。
+## D-035：从"相关"走到"决策价值"——用前 k% 的真实收益检验（2026-11-12）
+
+**背景**：前 23 条全是秩相关。相关显著不等于"照着它挑架构"有用：一个指标可以在 400 个架构上
+整体同向，却在前 10% 的尾部完全没有区分度。
+
+**决定**：新增 `scripts/audit_rq2_selection_value.py`，按指标排序取前 10/20/30%，报这组的
+平均鲁棒性与全体之差，并与三个参照比：随机子集（必赢）、参数量（免费）、clean（需训练）。
+
+**为什么要"每次重采样里重新选 top-k"**：只对固定选择集做 bootstrap 会低估误差，
+它把"选择本身会变"这件事漏掉了。重采样内重新排序才反映真实的决策风险。
+
+**为什么 verdict 只判早期指标、并把参数量写在旁边**：`clean` 需要先训练，`params` 什么都不需要。
+若把 `clean` 当冠军，回答的是另一个问题（"训练后能不能挑"）；若不说参数量，读者会误以为
++0.028 是个成就。
+
+**结果**：`feature_measure_robust_delta`（偏相关 +0.400）前 10% 只高 **+0.007**（[−0.007,+0.021]，
+p=0.21）；`feature_measure_robust_hybrid_delta` 高 **+0.028**（显著）但仍低于参数量 **+0.051**。
+结论写进 §3 第 24 条与 §4：**相关存在，但决策价值未被证明**。
+
+**踩到的坑（已写成回归测试）**：`clean` 与 `params` 不在 `METRIC_SPECS` 里，
+`higher_is_better()` 的 fallback 是 "lower"，于是第一版把它们当"越小越好"排序，
+选出了准确率最低、参数最少的 10%——两个基线都变成负值。这种符号错不会报错，
+只会给出一个"看起来很有信息量"的结论。现在 `higher_is_better` 对这两个名字显式返回 True。
+
+**后果**：`scripts/audit_rq2_selection_value.py`、`tests/test_audit_rq2_selection_value.py`（16 个）、
+`results/audits/rq2-selection-value-20261112.{json,md}`、§3 第 24 条、§4 RQ2 条再收窄、`HANDOFF.md` §28。

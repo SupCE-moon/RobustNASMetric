@@ -510,3 +510,27 @@ python scripts\audit_rq2_stable_subset.py `
    但要在报告里写明这个跨度。
 3. 阈值 0.8 附近的指标（`local_delta` 0.791、`struct_delta` 0.763）要标"边界"，
    不要让读者以为它们是"确定不稳"。
+## 28. 报"指标有用"之前先问：拿它挑架构能挑出什么（2026-11-12）
+
+**一句话**：相关系数回答"排序是否同向"，不回答"照着挑能不能挑到好的"。两者的差距可以大到
+相关 +0.40、实际收益 +0.007。
+
+**跑一次**（纯 CPU，约 1 分钟）：
+
+```powershell
+python scripts\audit_rq2_selection_value.py `
+  --wide <主工作树>\outputs\e28_capacity_family\nb201_e0_n400_20261112.csv `
+  --seed-report results\audits\e0-weight-seed-20261112.json `
+  --json results\audits\rq2-selection-value-20261112.json `
+  --report results\audits\rq2-selection-value-20261112.md
+```
+
+**判据**：看 `verdict`。三档——"可用于筛选"（显著且超过参数量）、
+"有信号但不及免费基线"（显著但 ≤ 参数量）、"不足以筛选"（区间跨 0）。
+
+**三个坑**：
+
+1. `clean` 与 `params` 不在 `METRIC_SPECS`，方向必须显式当 higher；否则会选出最差的 10%，
+   而程序不会报错（见 D-035 的回归测试）。
+2. 区间必须"每次重采样重新选 top-k"，否则低估误差。
+3. `clean` 更强是必然的（它训练过），不能拿它证明"早期指标不如不用"。

@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "wide": {
+    "path": "D:\\Project\\RobustNAS\\DynamicBN\\DynamicBN20251203\\robust_metric\\outputs\\e28_capacity_family\\nb201_e0_n400_20261112.csv",
+    "sha256": "b618ecf32fede27655386ba7fc81c87c9f76e45bc5429d221dfa25e779a9014c"
+  },
+  "ks": [
+    10,
+    20,
+    30
+  ],
+  "resamples": 2000,
+  "verdict": "早期指标有信号但不及免费基线：feature_measure_robust_hybrid_delta 前 10% 高 +0.028（显著，p=0.0002），而参数量高 +0.051。既然数参数就能做得更好，这些指标的实用价值需要用「增量超过参数量」来证明，不能只报显著性。",
+  "candidates": [
+    "feature_measure_robust_delta",
+    "feature_measure_weighted_delta",
+    "feature_measure_robust_hybrid_delta",
+    "clean",
+    "params"
+  ],
+  "rows": [
+    {
+      "metric": "feature_measure_robust_delta",
+      "k_percent": 10,
+      "n_selected": 40,
+      "mean_target": 0.37134750187397003,
+      "delta": 0.0071112521737813905,
+      "random_sd": 0.00855338578387672,
+      "p_random": 0.21075784843031395,
+      "ci_low": -0.006800159720703974,
+      "ci_high": 0.020697897052392347
+    },
+    {
+      "metric": "feature_measure_robust_delta",
+      "k_percent": 20,
+      "n_selected": 80,
+      "mean_target": 0.3776562511920929,
+      "delta": 0.013420001491904254,
+      "random_sd": 0.0058180824362640314,
+      "p_random": 0.006998600279944011,
+      "ci_low": 0.003727608256973296,
+      "ci_high": 0.022264514300972215
+    },
+    {
+      "metric": "feature_measure_robust_delta",
+      "k_percent": 30,
+      "n_selected": 120,
+      "mean_target": 0.3830958349009355,
+      "delta": 0.018859585200746876,
+      "random_sd": 0.004345622439753379,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.010167543112921219,
+      "ci_high": 0.024382853315211808
+    },
+    {
+      "metric": "feature_measure_weighted_delta",
+      "k_percent": 10,
+      "n_selected": 40,
+      "mean_target": 0.3740700013935566,
+      "delta": 0.009833751693367976,
+      "random_sd": 0.00855338578387672,
+      "p_random": 0.1231753649270146,
+      "ci_low": -0.002796018100343629,
+      "ci_high": 0.022420718361623564
+    },
+    {
+      "metric": "feature_measure_weighted_delta",
+      "k_percent": 20,
+      "n_selected": 80,
+      "mean_target": 0.377436251193285,
+      "delta": 0.013200001493096358,
+      "random_sd": 0.0058180824362640314,
+      "p_random": 0.008398320335932814,
+      "ci_low": 0.004503351555205888,
+      "ci_high": 0.02274635737575593
+    },
+    {
+      "metric": "feature_measure_weighted_delta",
+      "k_percent": 30,
+      "n_selected": 120,
+      "mean_target": 0.3835600013534228,
+      "delta": 0.019323751653234134,
+      "random_sd": 0.004345622439753379,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.011285480692051318,
+      "ci_high": 0.025049928237684035
+    },
+    {
+      "metric": "feature_measure_robust_hybrid_delta",
+      "k_percent": 10,
+      "n_selected": 40,
+      "mean_target": 0.3921474993228912,
+      "delta": 0.027911249622702583,
+      "random_sd": 0.00855338578387672,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.0182001486169174,
+      "ci_high": 0.035709731669165176
+    },
+    {
+      "metric": "feature_measure_robust_hybrid_delta",
+      "k_percent": 20,
+      "n_selected": 80,
+      "mean_target": 0.39534125067293646,
+      "delta": 0.03110500097274782,
+      "random_sd": 0.0058180824362640314,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.024060401680879293,
+      "ci_high": 0.037883287579752505
+    },
+    {
+      "metric": "feature_measure_robust_hybrid_delta",
+      "k_percent": 30,
+      "n_selected": 120,
+      "mean_target": 0.39567666724324224,
+      "delta": 0.0314404175430536,
+      "random_sd": 0.004345622439753379,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.02438687365036454,
+      "ci_high": 0.036478654126326227
+    },
+    {
+      "metric": "clean",
+      "k_percent": 10,
+      "n_selected": 40,
+      "mean_target": 0.4242424987256527,
+      "delta": 0.06000624902546403,
+      "random_sd": 0.00855338578387672,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.0548031798256561,
+      "ci_high": 0.06583561252430081
+    },
+    {
+      "metric": "clean",
+      "k_percent": 20,
+      "n_selected": 80,
+      "mean_target": 0.420737498998642,
+      "delta": 0.05650124929845335,
+      "random_sd": 0.0058180824362640314,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.05152841852698473,
+      "ci_high": 0.06158045063354078
+    },
+    {
+      "metric": "clean",
+      "k_percent": 30,
+      "n_selected": 120,
+      "mean_target": 0.4164424993097782,
+      "delta": 0.05220624960958958,
+      "random_sd": 0.004345622439753379,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.047681572900774606,
+      "ci_high": 0.05713420116932442
+    },
+    {
+      "metric": "params",
+      "k_percent": 10,
+      "n_selected": 40,
+      "mean_target": 0.4153749980032444,
+      "delta": 0.05113874830305576,
+      "random_sd": 0.00855338578387672,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.04345030674710869,
+      "ci_high": 0.057859581448137756
+    },
+    {
+      "metric": "params",
+      "k_percent": 20,
+      "n_selected": 80,
+      "mean_target": 0.4082624979317188,
+      "delta": 0.044026248231530174,
+      "random_sd": 0.0058180824362640314,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.037647873850539325,
+      "ci_high": 0.05172252295445654
+    },
+    {
+      "metric": "params",
+      "k_percent": 30,
+      "n_selected": 120,
+      "mean_target": 0.4028183311223984,
+      "delta": 0.03858208142220976,
+      "random_sd": 0.004345622439753379,
+      "p_random": 0.0001999600079984003,
+      "ci_low": 0.03315217512287198,
+      "ci_high": 0.04657399439252915
+    }
+  ]
+}
