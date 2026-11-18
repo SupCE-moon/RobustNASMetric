@@ -176,3 +176,27 @@ def test_only_rb40_rows_are_used(tmp_path):
 
     matrix, _, _, _ = bb.load_rb40(rows_path)
     assert matrix.shape[0] == 10
+
+
+def test_extra_paths_supply_rows_that_live_in_a_second_file(tmp_path):
+    """The adv-excess rows ship in their own file.
+
+    Without ``extra_paths`` that metric looks like one with no local rows at
+    all, so it silently disappears from the comparison — and it happens to be
+    the strongest Ours metric on RB40.  This test pins the merge.
+    """
+    targets = np.linspace(0.0, 1.0, 12)
+    rows_path = write_rows(tmp_path / "rows.csv", make_rows(targets, {"base": (targets.copy(), "higher")}))
+    extra_path = write_rows(
+        tmp_path / "extra.csv", make_rows(targets, {"late_metric": (targets * 3.0, "higher")})
+    )
+
+    without = bb.load_rb40(rows_path)
+    assert "late_metric" not in without[0].columns
+
+    matrix, target, direction, _ = bb.load_rb40(rows_path, None, [extra_path])
+    assert "late_metric" in matrix.columns
+    assert matrix["late_metric"].notna().all()
+    assert direction["late_metric"] == "higher"
+    assert len(target) == 12
+

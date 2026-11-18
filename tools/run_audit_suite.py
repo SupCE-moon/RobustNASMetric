@@ -49,6 +49,7 @@ class Inputs:
     robbench: Path | None = None
     oracle: Path | None = None
     e0_rows: Path | None = None
+    adv_excess_rows: Path | None = None
 
     def missing_for(self, needs: tuple[str, ...]) -> list[str]:
         missing = []
@@ -190,12 +191,17 @@ def build_steps(inputs: Inputs) -> list[Step]:
             argv=(
                 "--rows", _p(rows),
                 "--repair", _p(repair),
+                *(
+                    ("--extra", _p(inputs.adv_excess_rows))
+                    if inputs.adv_excess_rows is not None
+                    else ()
+                ),
                 "--table", _p(table),
                 "--json", _p(OUT / "rb40-bootstrap-20261112.json"),
                 "--report", _p(OUT / "rb40-bootstrap-20261112.md"),
             ),
             needs=("rows", "repair", "table"),
-            why="RB40 上每个指标的相关性有没有 95% 区间",
+            why="RB40 上每个指标的相关性有没有 95% 区间（含 adv-excess 那 560 行）",
         ),
         Step(
             name="phi_incremental",
@@ -426,6 +432,11 @@ def main(argv: list[str] | None = None) -> int:
         if (rows_root / "e28_capacity_family" / "nb201_e0_v3.csv").is_file()
         else None,
         e0_rows=resolve_e0_rows(rows_root),
+        # 560 行 adv-excess 原始行已入库，位于仓库内的 sources/ 下；
+        # 漏掉它会把 RB40 上最强的那一个自研指标判成"没有本地行"。
+        adv_excess_rows=(ROOT / "outputs" / repaired / "sources" / "metric_value_rows_adv_excess.csv")
+        if (ROOT / "outputs" / repaired / "sources" / "metric_value_rows_adv_excess.csv").is_file()
+        else None,
     )
 
     steps = build_steps(inputs)

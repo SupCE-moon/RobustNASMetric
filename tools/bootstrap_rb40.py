@@ -34,7 +34,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 import pandas as pd
@@ -71,7 +71,9 @@ def sha256_file(path: Path) -> str:
 
 
 def load_rb40(
-    rows_path: Path, repair_path: Path | None = None
+    rows_path: Path,
+    repair_path: Path | None = None,
+    extra_paths: Sequence[Path] = (),
 ) -> tuple[pd.DataFrame, pd.Series, dict[str, str], list[str]]:
     """Pivot the RB40 slice into (models x metrics), with one target per model.
 
@@ -81,10 +83,21 @@ def load_rb40(
     one model each and get dropped from the comparison — which would silently
     remove exactly the metrics this audit is about.
 
+    ``extra_paths`` matters for the same reason: the adv-excess rows live in
+    their own 560-row file (they were produced by a later run and merged into
+    the release afterwards).  Left out, ``feature_adv_excess_centered_unit_l2``
+    looks like a metric with no local rows at all, and — since it is the
+    strongest Ours metric on RB40 — the audit would quietly report a weaker
+    picture than the data supports.
+
     Returns the raw matrix (before direction normalisation), the target vector,
     each metric's declared direction, and the names repaired from the patch.
     """
     frame = pd.read_csv(rows_path)
+    for extra in extra_paths:
+        if extra is not None and extra.exists():
+            frame = pd.concat([frame, pd.read_csv(extra)], ignore_index=True)
+
     repaired: list[str] = []
     if repair_path is not None and repair_path.exists():
         patch = pd.read_csv(repair_path)
@@ -243,9 +256,14 @@ def verdict(rho_low: float, rho_high: float) -> str:
 
 
 def analyze(
-    rows_path: Path, table_path: Path, resamples: int, seed: int, repair_path: Path | None = None
+    rows_path: Path,
+    table_path: Path,
+    resamples: int,
+    seed: int,
+    repair_path: Path | None = None,
+    extra_paths: Sequence[Path] = (),
 ) -> dict[str, Any]:
-    matrix, targets, direction, repaired = load_rb40(rows_path, repair_path)
+    matrix, targets, direction, repaired = load_rb40(rows_path, repair_path, extra_paths)
     oriented = orient(matrix, direction)
     result = bootstrap(oriented, targets, resamples=resamples, seed=seed)
     result["repaired_metrics"] = repaired
@@ -300,6 +318,11 @@ def analyze(
         "table": str(table_path),
         "table_sha256": sha256_file(table_path),
     }
+    extras = [p for p in extra_paths if p is not None and p.exists()]
+    if extras:
+        result["inputs"]["extra"] = [
+            {"path": str(p), "sha256": sha256_file(p)} for p in extras
+        ]
     return result
 
 
@@ -406,6 +429,13 @@ def main(argv: list[str] | None = None) -> int:
         help="repair_rows.csv with the recomputed TRNAS rows (default: next to --rows)",
     )
     parser.add_argument("--table", type=Path, required=True, help="86-row release table")
+    parser.add_argument(
+        "--extra",
+        type=Path,
+        action="append",
+        default=[],
+        help="additional raw-row CSVs (e.g. the 560 adv-excess rows); repeatable",
+    )
     parser.add_argument("--json", type=Path, required=True)
     parser.add_argument("--report", type=Path)
     parser.add_argument("--resamples", type=int, default=DEFAULT_RESAMPLES)
@@ -413,7 +443,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     repair = args.repair if args.repair is not None else args.rows.parent / "repair_rows.csv"
-    result = analyze(args.rows, args.table, args.resamples, args.seed, repair)
+    result = analyze(args.rows, args.table, args.resamples, args.seed, repair, args.extra)
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
     if args.report:

@@ -192,15 +192,15 @@ python tools/check_doc_links.py `
       --rows outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/metric_values_original_strict.csv \
       --repair outputs/strict_all_metrics_table_20261024_trnas_repaired/sources/repair_rows.csv \
       --table outputs/strict_adv_excess_release_20261024T110422Z/RobustMetric_严格全部指标总表_86项_三位小数.csv \
-      --json results/audits/bootstrap-rb40-20261112.json \
-      --report results/audits/bootstrap-rb40-20261112.md
+      --json results/audits/rb40-bootstrap-20261112.json \
+      --report results/audits/rb40-bootstrap-20261112.md
 
 **必须传 `--repair`**：三个 TRNAS 指标在 Kang2021Stable 上因下溢失败，修复值在
 `repair_rows.csv`；漏掉它，这三个指标会各缺一个模型而被整列丢弃——恰好丢掉要看的指标。
 （`--repair` 省略时会自动在同目录找 `repair_rows.csv`，但显式传更安全。）
 
 判据：区间覆盖 0 就是**方向不知道**，不许写成"失效"；写结论时带上区间，不要只写点估计。
-配合读：`results/audits/bootstrap-rb40-20261112.md`、D-022。
+配合读：`results/audits/rb40-bootstrap-20261112.md`、D-022。
 ## 15. Φ 对漂移族的增量检验（2026-11-12）
 
 `scripts/audit_phi_incremental.py` 回答的是"Φ 排第一，是不是 35 个漂移指标的另一种写法"。
@@ -582,3 +582,35 @@ python tools\verify_strict_ranking.py `
    与 `$var`，内联的 bash 脚本会被本地 shell 吃掉。
 
 详见 `docs/SERVER_AUDIT.md`。
+
+## 30. 报指标成绩要分方向，且必须带"全榜位置"（2026-11-18）
+
+**什么时候用**：导师问"你们的指标到底强在哪"、或者要写实验章节的"优势"段时。
+
+**一条命令**：
+
+```powershell
+python scripts\analyze_ours_directions.py `
+  --table    outputs\strict_adv_excess_release_20261024T110422Z\RobustMetric_严格全部指标总表_86项_三位小数.csv `
+  --confounders results\audits\rq2-confounders-20261112.json `
+  --seed        results\audits\e0-weight-seed-20261112.json `
+  --selection   results\audits\rq2-selection-value-20261112.json `
+  --json        results\audits\ours-directions-20261118.json `
+  --report      results\audits\ours-directions-20261118.md
+```
+
+**判据**：八个方向都要有 `champion`；`n_ours == 69`；每个方向的
+`best_all_rank` 必须和 `gaps` 表对得上。
+
+**三个注意**：
+
+1. **不能只报"自研第一"**。84 项里 15 个是别人的方法，前五名全是外部的。
+   要报就报"该方向的冠军 + 它在全榜的位置"两个数。
+2. **bootstrap 必须带 `--extra`**，否则 `feature_adv_excess_centered_unit_l2`
+   会被静默列进 `board_metrics_missing_rows`，而它恰好是 RB40 上最强的自研指标。
+   判据是 `metrics=85 missing_rows=[]`。
+3. **反例要一起写**。同一个指标换个方向常常掉到 20 名以外，"没有万能指标"
+   比"谁第一"更站得住，也更像一篇论文该说的话。
+
+详见 `docs/experiments/Ours指标分方向优势_20261118.md`。
+

@@ -943,3 +943,34 @@ p=0.21）；`feature_measure_robust_hybrid_delta` 高 **+0.028**（显著）但�
 **后果**：`docs/SERVER_AUDIT.md`、`tools/verify_strict_ranking.py`、`tests/test_verify_strict_ranking.py`、
 `outputs/.../sources/metric_value_rows_adv_excess.csv`、`docs/PROJECT_STATUS.md` §2/§3 第 25 条/§6/§8/§9、
 `docs/HANDOFF.md` §29。
+
+## D-037：按方向报告自研指标，而不是只报总榜名次（2026-11-18）
+
+**背景**：导师的意见是"不一定要所有方面都好，找出 Ours 在某些方向上比较好"。
+总榜是八设置平均，而其中 62.5% 的权重在 NB201——一个只在 RB40 上强的指标会被稀释。
+如果只报总榜，等于用平均分否定了专长。
+
+**决定**：
+
+1. **八个方向各自排名，并且同时报"该冠军在全榜的位置"**。只报"自研第一"会让人以为
+   自研在所有方向都第一；只报总榜又会埋没专长。两个数并列才对得上事实。
+2. **不把"我们第一"写进任何文档**。84 项里 69 个自研、15 个已有方法，
+   前五名全是外部的（Φ 0.782、R-Score 0.738、adversarial_loss 0.614、Ψ 0.598、natural_loss 0.591），
+   自研最好的总榜名次是第 6。正确表述是"把 15 个已有方法放进同一框架后的相对位置"。
+3. **反例必须与冠军一起写**。`feature_adv_excess` 在 NB201 上只排 20 名左右，
+   `multiview_max` 在 RB40 上只排 35——这些和"RB40 上第 1"一样重要，因为
+   它们共同证明了"换用途就要换指标"，而这才是可写的结论。
+
+**为什么 bundle 的 `--extra` 是必须修的真 bug、不是可选的便利**：
+`feature_adv_excess_centered_unit_l2` 的 560 行原始数据单独存放，`bootstrap_rb40` 原来只读主表，
+于是它被静默列为 `board_metrics_missing_rows`。结果是"RB40 上最强的自研指标"
+在置信区间表里根本没有出现过，而没有人会去注意一个"少了某行"的列表。
+补上后 `metrics=85 missing_rows=[]`，rho = +0.766 [+0.594, +0.880]。
+
+**代价**：一次全量 suite（约 4 分钟）+ 一次 2000 次重采样（约 20 秒）。
+
+**后果**：`docs/experiments/Ours指标分方向优势_20261118.md`、
+`scripts/analyze_ours_directions.py` + `tests/test_analyze_ours_directions.py`、
+`results/audits/ours-directions-20261118.{json,md}`、`tools/bootstrap_rb40.py` 的 `--extra`、
+`docs/PROJECT_STATUS.md` §3 第 26 条与 §4、`docs/HANDOFF.md` §30。
+

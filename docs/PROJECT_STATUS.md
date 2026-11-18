@@ -173,7 +173,7 @@ natural_loss 0.591 / multiview max 0.524 / RMS 0.495 / fsp_delta 0.479。
     在 40 个真实已训练防御模型上，最强的是 `feature_adv_excess_centered_unit_l2`（0.766）与
     `adversarial_loss`（0.743）。
 
-    **这些点估计必须配置信区间读**（`results/audits/bootstrap-rb40-20261112.md`，
+    **这些点估计必须配置信区间读**（`results/audits/rb40-bootstrap-20261112.md`，
     按模型重采样 2000 次，种子 20261112）：
 
     | 指标 | RB40 点估计 | 95% 区间 | 判定 |
@@ -774,6 +774,52 @@ RQ2 目前的正确表述是「存在早期信号，量级 0.3–0.5，但**排�
 （172,751 B，sha256 `947f53c7…`）、`tools/verify_strict_ranking.py` 的 `--extra`、
 `tests/test_verify_strict_ranking.py` 新增 1 个测试。
 
+### 26. 自研指标在哪些方向上最强（2026-11-18）
+
+**问题**：总榜把八个设置平均成一个数，看不出"哪个指标适合哪种用途"。
+导师的建议是：不要求样样都强，找出自研指标的相对优势本身就是贡献。
+
+**方法**：把已有证据按八个方向重排（`scripts/analyze_ours_directions.py`），
+每个方向单独给 69 个自研指标排座次，并同时报出该冠军在**全榜**的位置：
+
+| 方向 | 自研冠军 | 分数 | 全榜名次 |
+|---|---|---|---|
+| 已训练防御模型（RB40） | `feature_adv_excess_centered_unit_l2` | **+0.766** | **1 / 84** |
+| 早期架构·单次前向（NB201 e0） | `feature_measure_relu_active_hybrid_delta` | +0.756 | 3 / 84 |
+| 早期架构·五阶段平均 | `feature_measure_flow_corr_symmetric_rel_delta` | +0.709 | 5 / 84 |
+| DARTS 搜索空间 | `jacobian_spectral_decay` | +0.625 | 7 / 84 |
+| 八设置总榜 | `feature_measure_multiview_max_delta` | +0.524 | 6 / 84 |
+| 400 架构真实预测力（控 clean+参数量） | `feature_measure_robust_delta` | **+0.400** | **1 / 69** |
+| 跨初始化稳定性 | `feature_measure_flow_rel_allpairs_delta` | +0.973 | 2 / 69 |
+| 决策价值（挑前 10%） | `feature_measure_robust_hybrid_delta` | +0.028 | 3 / 5 |
+
+**最值得注意的一条**：`feature_adv_excess_centered_unit_l2` 在 RB40 上的
+rho = **+0.766**，95% 区间 **[+0.594, +0.880]**（按 40 个模型重采样 2000 次，
+seed 20261112），区间整体在 0 以上；85 个指标里排第 2，第 1 是已排除的
+`racl_fixed_network_log_upper_proxy`（+0.781），所以**在 84 个入榜指标里它是第 1**。
+而它在总榜只排第 20 —— 因为总榜 62.5% 的权重给了 NB201（第 12 条测得
+`tau(all, nb201) = +0.926`）。这正是"方向专长被平均掩盖"的直接证据。
+
+**同时必须保留的反例**：同一个指标在 NB201 上只排 20 名左右；`multiview_max_delta`
+在 RB40 上只排 35；`robust_delta` 总榜不进前 10。三个指标各守一个方向，
+说明"没有万能指标"——这比"谁第一"更值得写。
+
+**必须说清的边界**：(1) 这份表只重排已有数字，没有产生新测量；
+(2) RB40 的 40 个模型混了 Linf 与 L2 两种 threat model，target 本身不纯；
+(3) e0 那几列用的是发布表，而第 20 条已证明它与当前代码重算不一致，
+只能当相对参考；(4) D6 用 400 个架构、D7 用 100 个、D8 只有 5 个候选，
+横向比较要留余量。
+
+**顺带修掉一个静默 bug**：`tools/bootstrap_rb40.py` 原来只读 47,600 行主表，
+adv-excess 那 560 行单独存放，于是 RB40 上最强的自研指标在 bootstrap 里
+**根本没有被算过**（`board_metrics_missing_rows` 里静静列着它的名字）。
+加 `--extra` 后 `metrics=85 missing_rows=[]`，`suite` 的 bootstrap 步骤也透传。
+
+**产出**：`docs/experiments/Ours指标分方向优势_20261118.md`、
+`results/audits/ours-directions-20261118.{json,md}`、
+`scripts/analyze_ours_directions.py` + 13 个测试、
+`tests/test_bootstrap_rb40.py` 新增 1 个测试。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**
@@ -788,6 +834,14 @@ RQ2 目前的正确表述是「存在早期信号，量级 0.3–0.5，但**排�
 - RB40 上自研指标与鲁棒性的相关性，在控制家族与参数量后大幅下降（max 0.576→0.186）。
 - **训练后 clean 与训练后 AutoAttack 几乎共线**：RobBench 官方数据里两者秩相关 **+0.982**。
   这条来自官方数据本身，不依赖本仓库任何代码，是 RQ2 必须先控 clean 的理由。
+- **没有一个自研指标在所有方向都最强，但每个关键方向都有一个自研冠军**（第 26 条）：
+  已训练防御模型（RB40）上是 `feature_adv_excess_centered_unit_l2`
+  （+0.766，95% 区间 [+0.594, +0.880]，84 个入榜指标里第 1），
+  400 架构真实预测上是 `feature_measure_robust_delta`（+0.400，69 个自研里第 1），
+  跨初始化稳定性上是 `feature_measure_flow_rel_allpairs_delta`（+0.973，第 2）。
+  而这三者在别的方向上分别掉到 20 名以外、前 10 之外、以及完全未覆盖——
+  **换用途就要换指标**，这本身是可写的结论。
+
 
 **合理推断**
 

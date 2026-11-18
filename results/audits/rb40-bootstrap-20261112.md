@@ -7,18 +7,19 @@
 
 ## 最要紧的一句
 
-RB40 单独排名与已发布八设置榜的一致度 τ = **-0.143**，95% 区间 [-0.243, +0.018]。区间跨过 0，说明**不能断言两套排序反向**，只能说它们不一致。
+RB40 单独排名与已发布八设置榜的一致度 τ = **-0.127**，95% 区间 [-0.226, +0.030]。区间跨过 0，说明**不能断言两套排序反向**，只能说它们不一致。
 
 ## 重点指标
 
 | 指标 | RB40 点估计 | 95% 区间 | 结论 | RB40 名次（区间） | 已发布名次 |
 | --- | ---: | --- | --- | --- | ---: |
-| `trnas_consistency_phi` | +0.576 | [+0.310, +0.761] | positive (whole interval above zero) | 12 (2–34) | 1 |
-| `trnas_r_score` | -0.184 | [-0.459, +0.136] | inconclusive (interval covers zero) | 73 (37–81) | 2 |
-| `trnas_activation_psi` | -0.194 | [-0.471, +0.128] | inconclusive (interval covers zero) | 76 (38–82) | 4 |
-| `adversarial_loss` | +0.743 | [+0.487, +0.903] | positive (whole interval above zero) | 2 (1–14) | 3 |
-| `feature_measure_multiview_max_delta` | +0.302 | [-0.030, +0.589] | inconclusive (interval covers zero) | 35 (17–43) | 6 |
-| `feature_measure_multiview_rms_delta` | +0.226 | [-0.119, +0.521] | inconclusive (interval covers zero) | 38 (24–46) | 7 |
+| `trnas_consistency_phi` | +0.576 | [+0.310, +0.761] | positive (whole interval above zero) | 13 (3–35) | 1 |
+| `trnas_r_score` | -0.184 | [-0.459, +0.136] | inconclusive (interval covers zero) | 74 (38–82) | 2 |
+| `trnas_activation_psi` | -0.194 | [-0.471, +0.128] | inconclusive (interval covers zero) | 77 (39–83) | 4 |
+| `adversarial_loss` | +0.743 | [+0.487, +0.903] | positive (whole interval above zero) | 3 (1–15) | 3 |
+| `feature_adv_excess_centered_unit_l2` | +0.766 | [+0.594, +0.880] | positive (whole interval above zero) | 2 (1–15) | 20 |
+| `feature_measure_multiview_max_delta` | +0.302 | [-0.030, +0.589] | inconclusive (interval covers zero) | 36 (18–44) | 6 |
+| `feature_measure_multiview_rms_delta` | +0.226 | [-0.119, +0.521] | inconclusive (interval covers zero) | 39 (25–47) | 7 |
 
 ## 怎么读
 
@@ -38,12 +39,6 @@ RB40 单独排名与已发布八设置榜的一致度 τ = **-0.143**，95% 区�
 
 把算出的每个指标 RB40 相关系数与发布表 `rb40_mature` 列逐项相减：最大绝对误差 **4.991e-04**，不一致指标 0 个。
 误差为 0 说明这份审计与冻结表算的是同一批数，不是另找了一份数据。
-
-## 榜上有、但本审计算不了的指标
-
-这些指标的原始行不在本机（只在服务器），所以没有区间，也不补数：
-
-- `feature_adv_excess_centered_unit_l2`
 
 ## 这条检查能证明什么，不能证明什么
 

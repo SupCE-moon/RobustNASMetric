@@ -337,3 +337,32 @@ suite 在 `outputs/e28_capacity_family/nb201_e0_v3.csv` 存在时会自动传这
 | `feature_measure_robust_delta`（偏相关最强） | +0.007 | 0.211 |
 
 结论：相关最强的指标在尾部没有区分度；能筛的指标也不如直接数参数量。
+
+## 自研指标的分方向优势（2026-11-18）
+
+`ours-directions-20261118.{json,md}`，由 `scripts/analyze_ours_directions.py` 生成（纯 CPU）。
+它只重排已有数字，不产生新测量，所以能随时重跑：
+
+```powershell
+python scripts\analyze_ours_directions.py `
+  --table    outputs\strict_adv_excess_release_20261024T110422Z\RobustMetric_严格全部指标总表_86项_三位小数.csv `
+  --confounders results\audits\rq2-confounders-20261112.json `
+  --seed        results\audits\e0-weight-seed-20261112.json `
+  --selection   results\audits\rq2-selection-value-20261112.json `
+  --json results\audits\ours-directions-20261118.json `
+  --report results\audits\ours-directions-20261118.md
+```
+
+八个方向各出一个自研冠军，同时给出它在全榜的位置：
+
+| 方向 | 自研冠军 | 分数 | 全榜名次 |
+| --- | --- | --- | --- |
+| 已训练防御模型（RB40） | `feature_adv_excess_centered_unit_l2` | +0.766 | 1 / 84 |
+| 400 架构真实预测力 | `feature_measure_robust_delta` | +0.400 | 1 / 69 |
+| 跨初始化稳定性 | `feature_measure_flow_rel_allpairs_delta` | +0.973 | 2 / 69 |
+| 八设置总榜 | `feature_measure_multiview_max_delta` | +0.524 | 6 / 84 |
+
+**注意两件事**：(1) `feature_adv_excess_centered_unit_l2` 的 560 行原始数据单独存放，
+`tools/bootstrap_rb40.py` 必须传 `--extra`，否则它会被静默列进 `board_metrics_missing_rows`；
+(2) 这份表的 e0 列用的是发布表，而第 20 条已证明它与当前代码重算不一致，
+只能当相对参考。详见 `docs/experiments/Ours指标分方向优势_20261118.md`。

@@ -1,0 +1,994 @@
+{
+  "schema_version": 1,
+  "n_ours": 69,
+  "n_metrics": 86,
+  "top_k": 10,
+  "directions": {
+    "rb40_mature": {
+      "n_all": 84,
+      "n_ours": 69,
+      "top": [
+        {
+          "metric": "feature_adv_excess_centered_unit_l2",
+          "value": 0.766,
+          "rank_ours": 1,
+          "rank_all": 1
+        },
+        {
+          "metric": "perturbation_capacity_topk_delta",
+          "value": 0.727,
+          "rank_ours": 2,
+          "rank_all": 3
+        },
+        {
+          "metric": "perturbation_capacity_channelwise_delta",
+          "value": 0.665,
+          "rank_ours": 3,
+          "rank_all": 4
+        },
+        {
+          "metric": "perturbation_capacity_iqr_delta",
+          "value": 0.662,
+          "rank_ours": 4,
+          "rank_all": 5
+        },
+        {
+          "metric": "perturbation_capacity_delta",
+          "value": 0.616,
+          "rank_ours": 5,
+          "rank_all": 6
+        },
+        {
+          "metric": "perturbation_capacity_flow_rel_delta",
+          "value": 0.604,
+          "rank_ours": 6,
+          "rank_all": 8
+        },
+        {
+          "metric": "perturbation_capacity_multiscale_delta",
+          "value": 0.587,
+          "rank_ours": 7,
+          "rank_all": 9
+        },
+        {
+          "metric": "perturbation_capacity_profile_delta",
+          "value": 0.584,
+          "rank_ours": 8,
+          "rank_all": 10
+        },
+        {
+          "metric": "feature_measure_channel_gram_centered_rel_delta",
+          "value": 0.579,
+          "rank_ours": 9,
+          "rank_all": 11
+        },
+        {
+          "metric": "feature_measure_spectrum_fisher_rao_delta",
+          "value": 0.561,
+          "rank_ours": 10,
+          "rank_all": 13
+        }
+      ],
+      "champion": {
+        "metric": "feature_adv_excess_centered_unit_l2",
+        "value": 0.766,
+        "rank_ours": 1,
+        "rank_all": 1
+      },
+      "best_all_rank": 1,
+      "label": "已训练防御模型（RB40，40 个 RobustBench 模型）",
+      "why": "对已经训练好的防御模型排序"
+    },
+    "nb201_e0": {
+      "n_all": 84,
+      "n_ours": 69,
+      "top": [
+        {
+          "metric": "feature_measure_relu_active_hybrid_delta",
+          "value": 0.756,
+          "rank_ours": 1,
+          "rank_all": 3
+        },
+        {
+          "metric": "feature_measure_fsp_rel_multiscale_delta",
+          "value": 0.743,
+          "rank_ours": 2,
+          "rank_all": 5
+        },
+        {
+          "metric": "feature_measure_channel_gram_cosine_delta",
+          "value": 0.741,
+          "rank_ours": 3,
+          "rank_all": 6
+        },
+        {
+          "metric": "feature_measure_struct01_delta",
+          "value": 0.729,
+          "rank_ours": 4,
+          "rank_all": 8
+        },
+        {
+          "metric": "feature_measure_flow_rel_allpairs_delta",
+          "value": 0.727,
+          "rank_ours": 5,
+          "rank_all": 10
+        },
+        {
+          "metric": "jacobian_spectral_norm",
+          "value": 0.727,
+          "rank_ours": 6,
+          "rank_all": 11
+        },
+        {
+          "metric": "feature_measure_flow_corr_angular_delta",
+          "value": 0.721,
+          "rank_ours": 7,
+          "rank_all": 12
+        },
+        {
+          "metric": "feature_measure_moment_delta",
+          "value": 0.721,
+          "rank_ours": 8,
+          "rank_all": 13
+        },
+        {
+          "metric": "feature_measure_flow_delta",
+          "value": 0.719,
+          "rank_ours": 9,
+          "rank_all": 14
+        },
+        {
+          "metric": "feature_measure_robust_hybrid_delta",
+          "value": 0.719,
+          "rank_ours": 10,
+          "rank_all": 15
+        }
+      ],
+      "champion": {
+        "metric": "feature_measure_relu_active_hybrid_delta",
+        "value": 0.756,
+        "rank_ours": 1,
+        "rank_all": 3
+      },
+      "best_all_rank": 3,
+      "label": "早期架构·单次前向（NB201 e0）",
+      "why": "只跑一次随机初始化的前向"
+    },
+    "nb201_mean": {
+      "n_all": 84,
+      "n_ours": 69,
+      "top": [
+        {
+          "metric": "feature_measure_flow_corr_symmetric_rel_delta",
+          "value": 0.709,
+          "rank_ours": 1,
+          "rank_all": 5
+        },
+        {
+          "metric": "feature_measure_flow_corr_rel_delta",
+          "value": 0.709,
+          "rank_ours": 2,
+          "rank_all": 6
+        },
+        {
+          "metric": "feature_measure_multiview_max_delta",
+          "value": 0.701,
+          "rank_ours": 3,
+          "rank_all": 7
+        },
+        {
+          "metric": "feature_measure_flow_corr_rms_delta",
+          "value": 0.697,
+          "rank_ours": 4,
+          "rank_all": 8
+        },
+        {
+          "metric": "feature_measure_flow_corr_angular_delta",
+          "value": 0.697,
+          "rank_ours": 5,
+          "rank_all": 9
+        },
+        {
+          "metric": "feature_measure_flow_corr_tophalf_delta",
+          "value": 0.693,
+          "rank_ours": 6,
+          "rank_all": 10
+        },
+        {
+          "metric": "feature_measure_moment_delta",
+          "value": 0.693,
+          "rank_ours": 7,
+          "rank_all": 11
+        },
+        {
+          "metric": "feature_measure_multiview_rms_delta",
+          "value": 0.685,
+          "rank_ours": 8,
+          "rank_all": 12
+        },
+        {
+          "metric": "feature_measure_fsp_rel_multiscale_delta",
+          "value": 0.684,
+          "rank_ours": 9,
+          "rank_all": 13
+        },
+        {
+          "metric": "feature_measure_struct01_delta",
+          "value": 0.662,
+          "rank_ours": 10,
+          "rank_all": 15
+        }
+      ],
+      "champion": {
+        "metric": "feature_measure_flow_corr_symmetric_rel_delta",
+        "value": 0.709,
+        "rank_ours": 1,
+        "rank_all": 5
+      },
+      "best_all_rank": 5,
+      "label": "早期架构·五阶段平均（NB201）",
+      "why": "跨训练阶段的平均表现"
+    },
+    "darts_e100": {
+      "n_all": 84,
+      "n_ours": 69,
+      "top": [
+        {
+          "metric": "jacobian_spectral_decay",
+          "value": 0.625,
+          "rank_ours": 1,
+          "rank_all": 7
+        },
+        {
+          "metric": "jacobian_effective_rank",
+          "value": 0.448,
+          "rank_ours": 2,
+          "rank_all": 8
+        },
+        {
+          "metric": "perturbation_capacity_signed_delta",
+          "value": 0.404,
+          "rank_ours": 3,
+          "rank_all": 9
+        },
+        {
+          "metric": "feature_measure_flow_corr_worst_delta",
+          "value": 0.115,
+          "rank_ours": 4,
+          "rank_all": 12
+        },
+        {
+          "metric": "feature_measure_flow_corr_angular_delta",
+          "value": 0.103,
+          "rank_ours": 5,
+          "rank_all": 13
+        },
+        {
+          "metric": "feature_measure_flow_corr_rms_delta",
+          "value": 0.09,
+          "rank_ours": 6,
+          "rank_all": 14
+        },
+        {
+          "metric": "feature_measure_mmd",
+          "value": 0.08,
+          "rank_ours": 7,
+          "rank_all": 15
+        },
+        {
+          "metric": "feature_measure_flow_delta",
+          "value": 0.078,
+          "rank_ours": 8,
+          "rank_all": 16
+        },
+        {
+          "metric": "feature_measure_flow_corr_tophalf_delta",
+          "value": 0.067,
+          "rank_ours": 9,
+          "rank_all": 17
+        },
+        {
+          "metric": "perturbation_capacity_layerprofile_delta",
+          "value": 0.066,
+          "rank_ours": 10,
+          "rank_all": 18
+        }
+      ],
+      "champion": {
+        "metric": "jacobian_spectral_decay",
+        "value": 0.625,
+        "rank_ours": 1,
+        "rank_all": 7
+      },
+      "best_all_rank": 7,
+      "label": "DARTS 搜索空间（e100）",
+      "why": "换一个搜索空间是否还成立"
+    },
+    "all_setting_mean": {
+      "n_all": 84,
+      "n_ours": 69,
+      "top": [
+        {
+          "metric": "feature_measure_multiview_max_delta",
+          "value": 0.524,
+          "rank_ours": 1,
+          "rank_all": 6
+        },
+        {
+          "metric": "feature_measure_multiview_rms_delta",
+          "value": 0.495,
+          "rank_ours": 2,
+          "rank_all": 7
+        },
+        {
+          "metric": "feature_measure_flow_corr_rms_delta",
+          "value": 0.479,
+          "rank_ours": 3,
+          "rank_all": 9
+        },
+        {
+          "metric": "feature_measure_flow_corr_symmetric_rel_delta",
+          "value": 0.478,
+          "rank_ours": 4,
+          "rank_all": 10
+        },
+        {
+          "metric": "feature_measure_flow_corr_angular_delta",
+          "value": 0.478,
+          "rank_ours": 5,
+          "rank_all": 11
+        },
+        {
+          "metric": "feature_measure_flow_corr_rel_delta",
+          "value": 0.477,
+          "rank_ours": 6,
+          "rank_all": 12
+        },
+        {
+          "metric": "feature_measure_flow_corr_tophalf_delta",
+          "value": 0.477,
+          "rank_ours": 7,
+          "rank_all": 13
+        },
+        {
+          "metric": "feature_measure_moment_delta",
+          "value": 0.472,
+          "rank_ours": 8,
+          "rank_all": 14
+        },
+        {
+          "metric": "feature_measure_channel_gram_cosine_delta",
+          "value": 0.47,
+          "rank_ours": 9,
+          "rank_all": 15
+        },
+        {
+          "metric": "feature_measure_struct01_delta",
+          "value": 0.469,
+          "rank_ours": 10,
+          "rank_all": 16
+        }
+      ],
+      "champion": {
+        "metric": "feature_measure_multiview_max_delta",
+        "value": 0.524,
+        "rank_ours": 1,
+        "rank_all": 6
+      },
+      "best_all_rank": 6,
+      "label": "八设置总榜",
+      "why": "官方总榜口径"
+    },
+    "rq2_partial": {
+      "n_all": 69,
+      "n_ours": 58,
+      "top": [
+        {
+          "metric": "feature_measure_robust_delta",
+          "value": 0.4,
+          "rank_ours": 1,
+          "rank_all": 1
+        },
+        {
+          "metric": "feature_measure_weighted_delta",
+          "value": 0.3974,
+          "rank_ours": 2,
+          "rank_all": 2
+        },
+        {
+          "metric": "feature_measure_local_delta",
+          "value": 0.3968,
+          "rank_ours": 3,
+          "rank_all": 3
+        },
+        {
+          "metric": "feature_measure_struct_delta",
+          "value": 0.3742,
+          "rank_ours": 4,
+          "rank_all": 4
+        },
+        {
+          "metric": "feature_measure_robust_hybrid_delta",
+          "value": 0.3679,
+          "rank_ours": 5,
+          "rank_all": 5
+        },
+        {
+          "metric": "feature_measure_robust_rel_delta",
+          "value": 0.3623,
+          "rank_ours": 6,
+          "rank_all": 7
+        },
+        {
+          "metric": "jacobian_spectral_norm",
+          "value": 0.3614,
+          "rank_ours": 7,
+          "rank_all": 8
+        },
+        {
+          "metric": "feature_measure_robust_hybrid_rel_delta",
+          "value": 0.3521,
+          "rank_ours": 8,
+          "rank_all": 9
+        },
+        {
+          "metric": "feature_measure_robust_spatial_delta",
+          "value": 0.3385,
+          "rank_ours": 9,
+          "rank_all": 10
+        },
+        {
+          "metric": "feature_measure_robust_spatial_rel_delta",
+          "value": 0.3339,
+          "rank_ours": 10,
+          "rank_all": 11
+        }
+      ],
+      "champion": {
+        "metric": "feature_measure_robust_delta",
+        "value": 0.4,
+        "rank_ours": 1,
+        "rank_all": 1
+      },
+      "best_all_rank": 1,
+      "label": "400 架构真实预测力（控 clean + 参数量）",
+      "why": "最接近“能不能预测”的那个数"
+    },
+    "seed_stability": {
+      "n_all": 69,
+      "n_ours": 58,
+      "top": [
+        {
+          "metric": "feature_measure_flow_rel_allpairs_delta",
+          "value": 0.9727,
+          "rank_ours": 1,
+          "rank_all": 2
+        },
+        {
+          "metric": "jacobian_spectral_norm",
+          "value": 0.9726,
+          "rank_ours": 2,
+          "rank_all": 3
+        },
+        {
+          "metric": "feature_delta",
+          "value": 0.9674,
+          "rank_ours": 3,
+          "rank_all": 4
+        },
+        {
+          "metric": "feature_measure_flow_rel_multiscale_delta",
+          "value": 0.9669,
+          "rank_ours": 4,
+          "rank_all": 5
+        },
+        {
+          "metric": "feature_measure_flow_rel_delta",
+          "value": 0.9668,
+          "rank_ours": 5,
+          "rank_all": 6
+        },
+        {
+          "metric": "feature_quantile_hausdorff_delta",
+          "value": 0.9635,
+          "rank_ours": 6,
+          "rank_all": 7
+        },
+        {
+          "metric": "feature_measure_relu_active_hybrid_rel_delta",
+          "value": 0.9629,
+          "rank_ours": 7,
+          "rank_all": 8
+        },
+        {
+          "metric": "feature_hausdorff_delta",
+          "value": 0.9628,
+          "rank_ours": 8,
+          "rank_all": 9
+        },
+        {
+          "metric": "feature_measure_spectrum_hellinger_delta",
+          "value": 0.9603,
+          "rank_ours": 9,
+          "rank_all": 10
+        },
+        {
+          "metric": "feature_measure_relu_active_hybrid_delta",
+          "value": 0.9602,
+          "rank_ours": 10,
+          "rank_all": 11
+        }
+      ],
+      "champion": {
+        "metric": "feature_measure_flow_rel_allpairs_delta",
+        "value": 0.9727,
+        "rank_ours": 1,
+        "rank_all": 2
+      },
+      "best_all_rank": 2,
+      "label": "跨初始化稳定性（值稳定 rho）",
+      "why": "换个随机种子序还一样吗"
+    },
+    "selection_delta": {
+      "n_all": 5,
+      "n_ours": 3,
+      "top": [
+        {
+          "metric": "feature_measure_robust_hybrid_delta",
+          "value": 0.0279,
+          "rank_ours": 1,
+          "rank_all": 3
+        },
+        {
+          "metric": "feature_measure_weighted_delta",
+          "value": 0.0098,
+          "rank_ours": 2,
+          "rank_all": 4
+        },
+        {
+          "metric": "feature_measure_robust_delta",
+          "value": 0.0071,
+          "rank_ours": 3,
+          "rank_all": 5
+        }
+      ],
+      "champion": {
+        "metric": "feature_measure_robust_hybrid_delta",
+        "value": 0.0279,
+        "rank_ours": 1,
+        "rank_all": 3
+      },
+      "best_all_rank": 3,
+      "label": "决策价值（挑前 10% 的提升）",
+      "why": "真拿它当筛选器能赚多少"
+    }
+  },
+  "multi_direction": [
+    {
+      "metric": "feature_measure_flow_corr_angular_delta",
+      "n_directions": 4,
+      "directions": [
+        "nb201_e0",
+        "nb201_mean",
+        "darts_e100",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_flow_corr_rms_delta",
+      "n_directions": 3,
+      "directions": [
+        "nb201_mean",
+        "darts_e100",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_flow_corr_tophalf_delta",
+      "n_directions": 3,
+      "directions": [
+        "nb201_mean",
+        "darts_e100",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_moment_delta",
+      "n_directions": 3,
+      "directions": [
+        "nb201_e0",
+        "nb201_mean",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_robust_hybrid_delta",
+      "n_directions": 3,
+      "directions": [
+        "nb201_e0",
+        "rq2_partial",
+        "selection_delta"
+      ]
+    },
+    {
+      "metric": "feature_measure_struct01_delta",
+      "n_directions": 3,
+      "directions": [
+        "nb201_e0",
+        "nb201_mean",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "jacobian_spectral_norm",
+      "n_directions": 3,
+      "directions": [
+        "nb201_e0",
+        "rq2_partial",
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "feature_measure_channel_gram_cosine_delta",
+      "n_directions": 2,
+      "directions": [
+        "nb201_e0",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_flow_corr_rel_delta",
+      "n_directions": 2,
+      "directions": [
+        "nb201_mean",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_flow_corr_symmetric_rel_delta",
+      "n_directions": 2,
+      "directions": [
+        "nb201_mean",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_flow_delta",
+      "n_directions": 2,
+      "directions": [
+        "nb201_e0",
+        "darts_e100"
+      ]
+    },
+    {
+      "metric": "feature_measure_flow_rel_allpairs_delta",
+      "n_directions": 2,
+      "directions": [
+        "nb201_e0",
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "feature_measure_fsp_rel_multiscale_delta",
+      "n_directions": 2,
+      "directions": [
+        "nb201_e0",
+        "nb201_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_multiview_max_delta",
+      "n_directions": 2,
+      "directions": [
+        "nb201_mean",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_multiview_rms_delta",
+      "n_directions": 2,
+      "directions": [
+        "nb201_mean",
+        "all_setting_mean"
+      ]
+    },
+    {
+      "metric": "feature_measure_relu_active_hybrid_delta",
+      "n_directions": 2,
+      "directions": [
+        "nb201_e0",
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "feature_measure_robust_delta",
+      "n_directions": 2,
+      "directions": [
+        "rq2_partial",
+        "selection_delta"
+      ]
+    },
+    {
+      "metric": "feature_measure_weighted_delta",
+      "n_directions": 2,
+      "directions": [
+        "rq2_partial",
+        "selection_delta"
+      ]
+    },
+    {
+      "metric": "feature_adv_excess_centered_unit_l2",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    },
+    {
+      "metric": "feature_delta",
+      "n_directions": 1,
+      "directions": [
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "feature_hausdorff_delta",
+      "n_directions": 1,
+      "directions": [
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "feature_measure_channel_gram_centered_rel_delta",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    },
+    {
+      "metric": "feature_measure_flow_corr_worst_delta",
+      "n_directions": 1,
+      "directions": [
+        "darts_e100"
+      ]
+    },
+    {
+      "metric": "feature_measure_flow_rel_delta",
+      "n_directions": 1,
+      "directions": [
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "feature_measure_flow_rel_multiscale_delta",
+      "n_directions": 1,
+      "directions": [
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "feature_measure_local_delta",
+      "n_directions": 1,
+      "directions": [
+        "rq2_partial"
+      ]
+    },
+    {
+      "metric": "feature_measure_mmd",
+      "n_directions": 1,
+      "directions": [
+        "darts_e100"
+      ]
+    },
+    {
+      "metric": "feature_measure_relu_active_hybrid_rel_delta",
+      "n_directions": 1,
+      "directions": [
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "feature_measure_robust_hybrid_rel_delta",
+      "n_directions": 1,
+      "directions": [
+        "rq2_partial"
+      ]
+    },
+    {
+      "metric": "feature_measure_robust_rel_delta",
+      "n_directions": 1,
+      "directions": [
+        "rq2_partial"
+      ]
+    },
+    {
+      "metric": "feature_measure_robust_spatial_delta",
+      "n_directions": 1,
+      "directions": [
+        "rq2_partial"
+      ]
+    },
+    {
+      "metric": "feature_measure_robust_spatial_rel_delta",
+      "n_directions": 1,
+      "directions": [
+        "rq2_partial"
+      ]
+    },
+    {
+      "metric": "feature_measure_spectrum_fisher_rao_delta",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    },
+    {
+      "metric": "feature_measure_spectrum_hellinger_delta",
+      "n_directions": 1,
+      "directions": [
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "feature_measure_struct_delta",
+      "n_directions": 1,
+      "directions": [
+        "rq2_partial"
+      ]
+    },
+    {
+      "metric": "feature_quantile_hausdorff_delta",
+      "n_directions": 1,
+      "directions": [
+        "seed_stability"
+      ]
+    },
+    {
+      "metric": "jacobian_effective_rank",
+      "n_directions": 1,
+      "directions": [
+        "darts_e100"
+      ]
+    },
+    {
+      "metric": "jacobian_spectral_decay",
+      "n_directions": 1,
+      "directions": [
+        "darts_e100"
+      ]
+    },
+    {
+      "metric": "perturbation_capacity_channelwise_delta",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    },
+    {
+      "metric": "perturbation_capacity_delta",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    },
+    {
+      "metric": "perturbation_capacity_flow_rel_delta",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    },
+    {
+      "metric": "perturbation_capacity_iqr_delta",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    },
+    {
+      "metric": "perturbation_capacity_layerprofile_delta",
+      "n_directions": 1,
+      "directions": [
+        "darts_e100"
+      ]
+    },
+    {
+      "metric": "perturbation_capacity_multiscale_delta",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    },
+    {
+      "metric": "perturbation_capacity_profile_delta",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    },
+    {
+      "metric": "perturbation_capacity_signed_delta",
+      "n_directions": 1,
+      "directions": [
+        "darts_e100"
+      ]
+    },
+    {
+      "metric": "perturbation_capacity_topk_delta",
+      "n_directions": 1,
+      "directions": [
+        "rb40_mature"
+      ]
+    }
+  ],
+  "gaps": [
+    {
+      "direction": "rb40_mature",
+      "label": "已训练防御模型（RB40，40 个 RobustBench 模型）",
+      "best_ours": "feature_adv_excess_centered_unit_l2",
+      "best_ours_value": 0.766,
+      "best_ours_rank_all": 1,
+      "n_all": 84
+    },
+    {
+      "direction": "nb201_e0",
+      "label": "早期架构·单次前向（NB201 e0）",
+      "best_ours": "feature_measure_relu_active_hybrid_delta",
+      "best_ours_value": 0.756,
+      "best_ours_rank_all": 3,
+      "n_all": 84
+    },
+    {
+      "direction": "nb201_mean",
+      "label": "早期架构·五阶段平均（NB201）",
+      "best_ours": "feature_measure_flow_corr_symmetric_rel_delta",
+      "best_ours_value": 0.709,
+      "best_ours_rank_all": 5,
+      "n_all": 84
+    },
+    {
+      "direction": "darts_e100",
+      "label": "DARTS 搜索空间（e100）",
+      "best_ours": "jacobian_spectral_decay",
+      "best_ours_value": 0.625,
+      "best_ours_rank_all": 7,
+      "n_all": 84
+    },
+    {
+      "direction": "all_setting_mean",
+      "label": "八设置总榜",
+      "best_ours": "feature_measure_multiview_max_delta",
+      "best_ours_value": 0.524,
+      "best_ours_rank_all": 6,
+      "n_all": 84
+    },
+    {
+      "direction": "rq2_partial",
+      "label": "400 架构真实预测力（控 clean + 参数量）",
+      "best_ours": "feature_measure_robust_delta",
+      "best_ours_value": 0.4,
+      "best_ours_rank_all": 1,
+      "n_all": 69
+    },
+    {
+      "direction": "seed_stability",
+      "label": "跨初始化稳定性（值稳定 rho）",
+      "best_ours": "feature_measure_flow_rel_allpairs_delta",
+      "best_ours_value": 0.9727,
+      "best_ours_rank_all": 2,
+      "n_all": 69
+    },
+    {
+      "direction": "selection_delta",
+      "label": "决策价值（挑前 10% 的提升）",
+      "best_ours": "feature_measure_robust_hybrid_delta",
+      "best_ours_value": 0.0279,
+      "best_ours_rank_all": 3,
+      "n_all": 5
+    }
+  ],
+  "sources": {
+    "table": "outputs\\strict_adv_excess_release_20261024T110422Z\\RobustMetric_严格全部指标总表_86项_三位小数.csv",
+    "confounders_n": 400,
+    "seed_n": 100
+  }
+}
