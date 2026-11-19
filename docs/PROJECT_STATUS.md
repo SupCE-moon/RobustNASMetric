@@ -852,6 +852,34 @@ adv-excess 那 560 行单独存放，于是 RB40 上最强的自研指标在 boo
 
 **复现与日常用法**：`docs/SERVER_SETUP.md`。
 
+### 28. 主工作树切到主线（2026-11-19）
+
+用户要求"`D:\Project\RobustNAS\DynamicBN` 下的代码始终保持最新版本"。主工作树
+`robust_metric` 原先停在 `main` 784fc74（2026-08-30），比主线落后 83 个提交，
+谁在那里跑 `pytest` 都会看到 E36 的两项失败（`_e36_cross_layer_stats` 缺失）。
+
+**做了什么**
+
+1. 确认主工作树那 6 个未提交文件的 diff 与 11-12 存档的补丁
+   **SHA-256 完全相同**（`d3329f9c…`，83,983 字节），即两个月没有变化、内容已全部
+   并入主线（23 个函数 22 个在 `metrics.py`、`fixed_linf` 在 `attacks.py:65`）；
+2. 丢弃这 6 个改动（补丁仍在 `results/manifests/reconciliation-20261112/patches/`）；
+3. 让 `mainline-consolidation` worktree detach，腾出分支；
+4. 主工作树 `git checkout codex/server-mainline-merge-20261112`。checkout 被 162 个
+   "未跟踪但与分支同名"的文件挡住（`outputs/` 里的历史小表），逐个删除后由分支
+   重新写出：**其中 4 个可逐一核验的文件回来后字节完全相同**，其余 158 个是同一批
+   11 月导入的产物。
+
+**结果**
+
+- 主工作树：`codex/server-mainline-merge-20261112` @ `4699874`，0 个已跟踪改动；
+- `pytest tests -q` = **746 passed, 2 skipped**（此前在这个目录跑会红）；
+- 清理了 30 个临时脚本、测试残留目录与 1 个比对临时文件；
+- 剩下 27 个未跟踪文件全是实验产物（宽表、xlsx、preview），按策略不入库。
+
+**注意**：`DynamicBN20251203` 下面还有另一套代码（`main.py`、`newmetric.py`、
+`torchattacks/` 等），**不是** git 仓库、也没有纳入本仓库管理，本次没有改动它们。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**

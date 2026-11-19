@@ -648,3 +648,14 @@ python tools/run_audit_suite.py --rows-root outputs
 限流），重试即可。`--host` 参数走宿主机而不是容器。
 
 完整说明见 `docs/SERVER_SETUP.md`。
+
+## 32. 主工作树现在是主线（2026-11-19 起）
+
+`D:\Project\RobustNAS\DynamicBN\DynamicBN20251203\robust_metric` 现在检出
+`codex/server-mainline-merge-20261112`，与 GitHub 同一提交。**在 PyCharm 里直接
+打开它、直接跑测试、直接改代码即可**，不需要 `PYTHONPATH` 技巧（`.venv` 的
+editable 安装本来就指向这个目录）。
+
+同步三步：本地改 → push → 服务器 `git pull`（见 §31）。
+
+其余 worktree 是历史备份，见 `docs/WORKTREES.md`。不要再在里面写代码。

@@ -1003,3 +1003,28 @@ p=0.21）；`feature_measure_robust_hybrid_delta` 高 **+0.028**（显著）但�
 `docs/HANDOFF.md` §31、`README.md` 的入口表、`.gitignore` 的 `outputs/sources_strict/`。
 
 ---
+## D-039 主工作树切到主线，放弃 2026-08-30 的旧版本
+
+**背景**：用户要求"`DynamicBN` 目录下的代码保持最新"，并明确表达"代码就是代码，
+为什么会有好几份"。主工作树停在 `main` 784fc74，比主线落后 83 个提交，导致
+同一份代码在两个目录里表现不同（`pytest` 一红一绿），已经造成过误解。
+
+**决定**：把主工作树切到 `codex/server-mainline-merge-20261112`，丢弃它那 6 个
+未提交改动；`mainline-consolidation` worktree 转为 detached 备份。
+
+**为什么可以丢弃那 6 个改动**：它们的 diff 与 11-12 存档的补丁 SHA-256 完全一致
+（`d3329f9c…`），且补丁里 23 个新增函数 **23/23 全部已在主线**（22 个在
+`metrics.py`、`fixed_linf` 在 `attacks.py:65`）。所以丢弃的是"已经被合并过的
+副本"，不是未合并的工作。
+
+**为什么不直接在旧分支上继续**：`main` 是"已发布的旧版本"，按 D-006 不直接改
+main。主工作树切到工作分支后，PyCharm 打开它就是最新代码，不需要用户理解
+worktree 是什么。
+
+**代价**：主工作树与 `mainline-consolidation` worktree 不再各占一个分支，
+后者变成 detached。如果以后需要两个分支同时可见，再 `git worktree add` 一个。
+
+**后果**：`docs/PROJECT_STATUS.md` §3 第 28 条、`docs/HANDOFF.md` §32、
+`docs/WORKTREES.md`（新建，给用户看的"哪个文件夹是什么"）。
+
+---
