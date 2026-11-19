@@ -973,4 +973,33 @@ p=0.21）；`feature_measure_robust_hybrid_delta` 高 **+0.028**（显著）但�
 `scripts/analyze_ours_directions.py` + `tests/test_analyze_ours_directions.py`、
 `results/audits/ours-directions-20261118.{json,md}`、`tools/bootstrap_rb40.py` 的 `--extra`、
 `docs/PROJECT_STATUS.md` §3 第 26 条与 §4、`docs/HANDOFF.md` §30。
+## D-038 服务器上另建一个 git 克隆，而不是把旧目录改造成仓库
 
+**背景**：用户要求"以后做实验优先在服务器上做，且代码最好与 GitHub 同步"。
+服务器上的 `/workspace/robust_metric_lab_nas` 有 48 GB（`outputs/` 9.7 GB、
+`data/` 361 MB、多个 1.1–1.66 GB 权重），且不是 git 工作区——`CODE_PROVENANCE.txt`
+只记了归档时点 `dc6fb9c`。
+
+**决定**：另建 `/workspace/robust_metric_git`，从 GitHub 克隆
+`codex/server-mainline-merge-20261112`，数据用软链接指回旧目录；旧目录一个字都不动。
+
+**为什么不是把旧目录 `git init`**：
+1. 48 GB 的目录里 `git add .` 的代价与风险都不必要——即使 `.gitignore` 挡得住，
+   也没人想在一个装着 9.7 GB 实验产物的目录里跑 `git status`；
+2. 旧目录的 `metric_registry.py` 是"补丁打失败"的状态（`.rej` 还在），
+   把它当基线提交等于把一次失败固化；
+3. 克隆能从零重建，出问题 `rm -rf` 再 clone，一分钟的事，不伤数据。
+
+**服务器直连 GitHub 不通**：`git ls-remote https://github.com/...` 60 秒超时
+（`exit=124`），但 TCP 443 是通的——握手之后被阻断。用 `ghproxy.net` 镜像
+`exit=0`，因此配了 `url.insteadOf` 全局改写。**镜像只支持 fetch，不支持 push**，
+所以服务器是只读远端；这一点已写进 `docs/SERVER_SETUP.md` 第 3 节。
+
+**验证**：克隆后 `pytest tests -q` = 748 passed；84 项复算 `max_abs_error=0`。
+两项都必须在服务器上重跑一遍才算"环境可用"，因为服务器与本机的差别
+（Linux 符号链接、torch 2.5.0 而非 2.6.0）恰好会暴露环境问题。
+
+**后果**：`docs/SERVER_SETUP.md`（新建）、`docs/PROJECT_STATUS.md` §3 第 27 条、
+`docs/HANDOFF.md` §31、`README.md` 的入口表、`.gitignore` 的 `outputs/sources_strict/`。
+
+---

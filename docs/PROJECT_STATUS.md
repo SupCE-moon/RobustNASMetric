@@ -820,6 +820,38 @@ adv-excess 那 560 行单独存放，于是 RB40 上最强的自研指标在 boo
 `scripts/analyze_ours_directions.py` + 13 个测试、
 `tests/test_bootstrap_rb40.py` 新增 1 个测试。
 
+### 27. 服务器实验环境（2026-11-19）
+
+按"以后实验优先在服务器上做、代码与 GitHub 同步"的要求，在服务器上建了一个
+**可 git 管理的实验克隆**，而不是把 48 GB 的旧目录 `git init`：
+
+| 项 | 值 |
+|---|---|
+| 位置 | `/workspace/robust_metric_git`（52 MB，`.git` 7.6 MB） |
+| 分支 | `codex/server-mainline-merge-20261112` |
+| HEAD | `f3229da` |
+| 旧目录 | `/workspace/robust_metric_lab_nas`（48 GB，未改动） |
+
+**已验证事实**
+
+- 服务器直连 GitHub **不通**（`git ls-remote` 超时 `exit=124`），
+  走 `ghproxy.net` 镜像可 clone/fetch（`exit=0`）；已配 `url.insteadOf` 改写。
+- 克隆后 `python -m pytest tests -q` = **748 passed**（本机 746 + 2 skip，
+  多出的两个是符号链接测试在 Linux 上不再跳过）。
+- 84 项复算在服务器上跑通：`recomputed=84 compared=84 max_abs_error=0.000e+00
+  exact=True order_identical=True`。为此上传了三张原始表（14,620,237 / 1,047 /
+  172,751 字节），走 SFTP 到宿主机 `/tmp` 再 `docker cp` 进容器。
+- 数据用软链接，不复制：`data/cifar10`、`data/official_nasrobbench201_source`
+  都指向旧目录。
+
+**必须记住的两条限制**
+
+1. **镜像只支持 fetch，不支持 push**：服务器是"只读远端"，代码改动要在本地推。
+2. `outputs/sources_strict/` 已在 `.git/info/exclude` 与仓库 `.gitignore` 里排除，
+   否则 `git status` 永远脏。
+
+**复现与日常用法**：`docs/SERVER_SETUP.md`。
+
 ## 4. 可信结论（分三级）
 
 **已验证事实**

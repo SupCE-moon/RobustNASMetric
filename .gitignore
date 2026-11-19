@@ -142,3 +142,6 @@ results/manifests/reconciliation-20261112/worktrees.json
 
 # scratch files from the agent session
 .tmp_*
+
+# Server-side symlinked inputs (uploaded to the experiment clone, never committed)
+outputs/sources_strict/

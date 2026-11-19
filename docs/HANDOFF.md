@@ -614,3 +614,37 @@ python scripts\analyze_ours_directions.py `
 
 详见 `docs/experiments/Ours指标分方向优势_20261118.md`。
 
+## 31. 服务器实验环境（2026-11-19 建立）
+
+**位置**：`/workspace/robust_metric_git`（52 MB），分支
+`codex/server-mainline-merge-20261112`，HEAD `f3229da`。旧目录
+`/workspace/robust_metric_lab_nas`（48 GB）保持原样，只当数据源。
+
+**日常三步**
+
+```bash
+# 本地：改完推上去
+git push new-origin HEAD
+
+# 服务器：拉下来（自动走 ghproxy 镜像）
+cd /workspace/robust_metric_git && git pull --ff-only
+
+# 服务器：跑（PYTHONPATH 指向本克隆，别用旧安装）
+export PYTHONPATH=/workspace/robust_metric_git/src
+python -m pytest tests -q          # 应 748 passed
+python tools/run_audit_suite.py --rows-root outputs
+```
+
+**三条限制**
+
+1. 服务器**不能 push**（镜像只支持 fetch）——代码改动一律在本地推。
+2. `docker cp` 只能在宿主机跑，容器内没有 `docker` 命令；上传流程是
+   SFTP 到宿主机 `/tmp` → `docker cp` 进容器。
+3. `--data-root` 要指 `data/cifar10`，不是 `data`。
+
+**连接服务器**：`.tmp_ssh2.py`（paramiko，`RM_PW` 环境变量读密码，
+`RejectPolicy` + `load_system_host_keys()`，4 次退避重试）。
+连续连接会报 `SSHException: Error reading SSH protocol banner`（`MaxStartups`
+限流），重试即可。`--host` 参数走宿主机而不是容器。
+
+完整说明见 `docs/SERVER_SETUP.md`。
